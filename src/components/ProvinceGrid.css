@@ -1,0 +1,42 @@
+/* src/components/ProvinceGrid.css */
+
+.province-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.province-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 13px 15px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  text-align: left;
+  font-family: var(--font-sans);
+}
+
+.province-card:hover {
+  border-color: var(--terracotta);
+}
+
+.province-card__name {
+  font-weight: 600;
+  font-size: 13.5px;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.province-card__value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--green-soft);
+  font-weight: 500;
+}
+
+.province-card__count {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}

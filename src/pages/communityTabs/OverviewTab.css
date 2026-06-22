@@ -1,0 +1,157 @@
+/* src/pages/communityTabs/OverviewTab.css */
+
+.section {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-head h2 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--green);
+}
+
+.section-head .note {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.completeness-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 20px;
+}
+
+.completeness-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.completeness-row:last-child {
+  border-bottom: none;
+}
+
+.completeness-year {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.completeness-bar-track {
+  flex: 1;
+  height: 8px;
+  background: #efe9d8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.completeness-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--green-soft);
+}
+
+.completeness-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.completeness-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.completeness-tag.complete {
+  background: #e4ece3;
+  color: var(--green-soft);
+}
+
+.completeness-tag.partial {
+  background: #fbeedd;
+  color: var(--terracotta);
+}
+
+.completeness-footnote {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* Trend chart — เหมือนหน้าแรกแต่กำหนดในไฟล์นี้เพื่อความเป็นอิสระของ component */
+.trend-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px;
+}
+
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  height: 140px;
+  padding: 0 6px;
+}
+
+.trend-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.trend-bar {
+  width: 44px;
+  border-radius: 5px 5px 2px 2px;
+  background: linear-gradient(180deg, var(--green-soft), var(--green));
+}
+
+.trend-bar--dim {
+  background: linear-gradient(180deg, #c9cfc4, #aab3a0);
+}
+
+.trend-bar-val {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.trend-bar-label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}

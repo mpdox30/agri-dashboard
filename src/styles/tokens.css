@@ -1,0 +1,47 @@
+/* src/styles/tokens.css
+   ระบบสีและตัวอักษรเดียวกับ mockup ที่ใช้คุยกับ Ton มาตลอด (homepage_mockup.html,
+   internal_community_mockup_v3.html, ฯลฯ) — ตั้งใจคงเอกลักษณ์เดิมไว้ ไม่ออกแบบใหม่
+   เพราะทิศทางสีและฟอนต์ผ่านการตกลงกันหลายรอบแล้วในขั้น mockup */
+
+:root {
+  --bg: #F7F3E8;
+  --bg-card: #FFFEFA;
+  --ink: #1A1A1A;
+  --green: #2D4A3E;
+  --green-soft: #41614F;
+  --terracotta: #C17F3E;
+  --sage: #8B9D83;
+  --gold: #B8884A;
+  --line: #E3DCC9;
+  --red-soft: #A85C4A;
+  --muted: #6b6552;
+
+  --font-serif: 'Noto Serif Thai', serif;
+  --font-sans: 'Noto Sans Thai', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* focus visibility ตามมาตรฐานการเข้าถึง — ไม่ลบ outline ของ browser ทิ้งเฉย ๆ */
+:focus-visible {
+  outline: 2px solid var(--green-soft);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

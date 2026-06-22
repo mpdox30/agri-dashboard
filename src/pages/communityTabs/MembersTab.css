@@ -1,0 +1,167 @@
+/* src/pages/communityTabs/MembersTab.css */
+
+.section {
+  padding: 32px 0;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-head h2 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--green);
+}
+
+.section-head .note {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.empty-note {
+  background: var(--bg-card);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.filters input {
+  flex: 1;
+  min-width: 220px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #f1ecdb;
+}
+
+thead th.num {
+  text-align: right;
+}
+
+tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+tbody td.num {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #fbf8ef;
+}
+
+.member-name {
+  font-weight: 600;
+}
+
+.member-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-left: 28px;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: #efe9d8;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.rank-badge.top1 {
+  background: var(--gold);
+  color: #fff;
+}
+
+.rank-badge.top2 {
+  background: #d4bb8c;
+  color: #fff;
+}
+
+.rank-badge.top3 {
+  background: #e3cfa3;
+  color: var(--ink);
+}
+
+.mini-bar-track {
+  width: 90px;
+  height: 6px;
+  background: #efe9d8;
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.mini-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--sage);
+}
+
+@media (max-width: 600px) {
+  table {
+    font-size: 12px;
+  }
+}

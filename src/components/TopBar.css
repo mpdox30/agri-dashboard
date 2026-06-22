@@ -1,0 +1,80 @@
+/* src/components/TopBar.css */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-card);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar__mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-soft) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7f3e8;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.topbar__text {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 16.5px;
+  line-height: 1.25;
+}
+
+.topbar__text span {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.topbar__mode-toggle {
+  display: flex;
+  background: #efe9d8;
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.topbar__mode-toggle button {
+  border: none;
+  background: transparent;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.topbar__mode-toggle button.active {
+  background: var(--green);
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}

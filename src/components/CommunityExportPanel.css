@@ -1,0 +1,132 @@
+/* src/components/CommunityExportPanel.css */
+
+.cep-trigger-btn {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--green-soft);
+  background: var(--bg-card);
+  color: var(--green-soft);
+  cursor: pointer;
+  margin-top: 14px;
+}
+
+.cep-trigger-btn:hover {
+  background: var(--green-soft);
+  color: #fff;
+}
+
+.cep-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-top: 14px;
+  max-width: 480px;
+}
+
+.cep-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+.cep-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cep-note {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.cep-field {
+  margin-bottom: 14px;
+}
+
+.cep-field label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.cep-field select {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.cep-field__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.cep-year-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cep-year-actions button {
+  background: none;
+  border: none;
+  color: var(--green-soft);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.cep-year-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.cep-year-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cep-confirm-btn {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--green-soft);
+  color: #fff;
+  cursor: pointer;
+}
+
+.cep-confirm-btn:disabled {
+  background: #c9cfc4;
+  cursor: not-allowed;
+}
