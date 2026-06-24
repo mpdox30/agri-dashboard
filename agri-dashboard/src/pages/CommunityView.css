@@ -1,0 +1,28 @@
+/* src/pages/CommunityView.css */
+
+.community-view {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 28px 80px;
+}
+
+.community-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  font-size: 15px;
+  color: var(--muted);
+  text-align: center;
+  padding: 0 24px;
+}
+
+.community-status--error {
+  color: var(--red-soft);
+}
+
+@media (max-width: 600px) {
+  .community-view {
+    padding: 0 16px 60px;
+  }
+}

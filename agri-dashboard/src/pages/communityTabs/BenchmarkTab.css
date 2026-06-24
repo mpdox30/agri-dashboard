@@ -1,0 +1,217 @@
+/* src/pages/communityTabs/BenchmarkTab.css */
+
+.section {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-head h2 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--green);
+}
+
+.section-head .note {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.empty-note {
+  background: var(--bg-card);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.incomplete-warning {
+  background: #fbf3e4;
+  border: 1px solid #ead8ae;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  color: var(--terracotta);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rank-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.rank-hero {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.rank-context {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.rank-context b {
+  color: var(--gold);
+  font-size: 17px;
+  font-family: var(--font-serif);
+}
+
+.rank-list-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 12.5px;
+}
+
+.rank-list-row.highlight {
+  background: #fbf3e4;
+  margin: 0 -10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.rank-list-pos {
+  width: 22px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.rank-list-name {
+  flex: 1;
+}
+
+.rank-list-bar-track {
+  flex: 2;
+  height: 6px;
+  background: #efe9d8;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rank-list-bar-fill {
+  height: 100%;
+  background: var(--sage);
+}
+
+.rank-list-bar-fill.self {
+  background: var(--gold);
+}
+
+.rank-list-val {
+  font-family: var(--font-mono);
+  width: 78px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rank-ellipsis {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.rank-footnote {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  line-height: 1.6;
+}
+
+.profile-compare-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.profile-row:last-child {
+  margin-bottom: 0;
+}
+
+.profile-row .plabel {
+  width: 150px;
+  font-size: 12px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.profile-row .pbars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-bar-track {
+  height: 9px;
+  background: #efe9d8;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.profile-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.profile-bar-fill.self {
+  background: var(--green-soft);
+}
+
+.profile-bar-fill.regional {
+  background: var(--sage);
+  opacity: 0.55;
+}
+
+.profile-bar-label {
+  font-size: 10.5px;
+  color: var(--muted);
+}

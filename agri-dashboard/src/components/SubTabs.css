@@ -1,0 +1,41 @@
+/* src/components/SubTabs.css */
+
+.subtabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--line);
+  margin-top: 24px;
+}
+
+.subtab-btn {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 11px 18px;
+  cursor: pointer;
+  position: relative;
+  top: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.subtab-btn.active {
+  color: var(--green);
+  border-bottom: 2px solid var(--terracotta);
+}
+
+.subtab-btn .count {
+  font-size: 10.5px;
+  background: #efe9d8;
+  color: var(--muted);
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
+.subtab-btn.active .count {
+  background: var(--terracotta);
+  color: #fff;
+}

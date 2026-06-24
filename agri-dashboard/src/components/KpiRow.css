@@ -1,0 +1,79 @@
+/* src/components/KpiRow.css */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+
+.kpi-label {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-value {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 23px;
+  color: var(--ink);
+}
+
+.kpi-value .unit {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.kpi-delta {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.kpi-delta.down {
+  color: var(--red-soft);
+}
+
+.kpi-delta.up {
+  color: var(--green-soft);
+}
+
+.kpi-delta.flat {
+  color: var(--muted);
+}
+
+.data-flag {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--terracotta);
+  background: #fbeedd;
+  padding: 2px 7px;
+  border-radius: 999px;
+  cursor: help;
+}
+
+@media (max-width: 900px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-row {
+    grid-template-columns: 1fr;
+  }
+}

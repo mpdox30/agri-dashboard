@@ -1,0 +1,91 @@
+/* src/components/SeasonalLineChart.css */
+
+.seasonal-line-chart-wrap {
+  margin-top: 10px;
+}
+
+.seasonal-line-chart {
+  width: 100%;
+  height: 130px;
+  display: block;
+}
+
+.seasonal-line-chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 2px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.legend-swatch.rainy-swatch {
+  background: var(--sage);
+}
+
+.legend-swatch.dry-swatch {
+  background: var(--gold);
+}
+
+.season-band {
+  opacity: 0.35;
+}
+
+.season-band.rainy-band {
+  fill: var(--sage);
+}
+
+.season-band.dry-band {
+  fill: var(--gold);
+}
+
+.zero-baseline {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.5;
+}
+
+.season-line-path {
+  stroke: var(--green);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.season-dot {
+  stroke: var(--bg-card);
+  stroke-width: 1.5;
+}
+
+.season-dot.rainy-dot {
+  fill: var(--sage);
+}
+
+.season-dot.dry-dot {
+  fill: var(--gold);
+}
+
+.season-value-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: var(--ink);
+}
+
+.season-month-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: var(--muted);
+}
