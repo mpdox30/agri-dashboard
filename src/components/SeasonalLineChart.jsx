@@ -7,11 +7,12 @@ import './SeasonalLineChart.css';
 const WIDTH = 700;
 const HEIGHT_NORMAL = 130;
 const HEIGHT_TALL = 220;
-const PADDING_LEFT = 36;
-const PADDING_RIGHT = 12;
+const PADDING_LEFT_NORMAL = 36;
+const PADDING_RIGHT_NORMAL = 12;
+const PADDING_LEFT_FULL = 14;
+const PADDING_RIGHT_FULL = 14;
 const PADDING_TOP = 14;
 const PADDING_BOTTOM = 22;
-const CHART_WIDTH = WIDTH - PADDING_LEFT - PADDING_RIGHT;
 
 function formatCompact(n) {
   return String(Math.round(n / 1000));
@@ -39,9 +40,13 @@ function buildSeasonBands(monthly) {
  * props:
  *   monthly: { label: string, netIncome: number, isRainy: boolean }[] (12 เดือน เรียงตามลำดับที่ใช้แสดง)
  *   tall: boolean — ถ้าจริง ใช้ความสูงมากขึ้น (สำหรับตอนเป็นกราฟเด่นของหน้า เต็มความกว้าง)
+ *   full: boolean — ถ้าจริง ลดขอบซ้าย/ขวาให้น้อยที่สุด ให้กราฟยืดเต็มพื้นที่การ์ดมากขึ้น
  */
-export default function SeasonalLineChart({ monthly, tall = false }) {
+export default function SeasonalLineChart({ monthly, tall = false, full = false }) {
   const HEIGHT = tall ? HEIGHT_TALL : HEIGHT_NORMAL;
+  const PADDING_LEFT = full ? PADDING_LEFT_FULL : PADDING_LEFT_NORMAL;
+  const PADDING_RIGHT = full ? PADDING_RIGHT_FULL : PADDING_RIGHT_NORMAL;
+  const CHART_WIDTH = WIDTH - PADDING_LEFT - PADDING_RIGHT;
   const CHART_HEIGHT = HEIGHT - PADDING_TOP - PADDING_BOTTOM;
 
   const values = monthly.map((m) => m.netIncome);

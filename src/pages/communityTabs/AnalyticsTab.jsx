@@ -71,11 +71,11 @@ export default function AnalyticsTab({
             </div>
           </div>
         </div>
-        <SeasonalLineChart monthly={seasonal.monthly} tall />
+        <SeasonalLineChart monthly={seasonal.monthly} tall full />
       </div>
 
       <div className="analytics-grid">
-        <div className="composition-card composition-card--full">
+        <div className="composition-card">
           <div className="card-title">องค์ประกอบรายได้สุทธิ — {periodLabel}</div>
           <div className="comp-stack">
             <div style={{ width: `${composition.salePct}%`, background: 'var(--green-soft)' }} />
@@ -97,9 +97,7 @@ export default function AnalyticsTab({
             — เป็นตัวชี้วัดแยก ดูได้ที่การ์ด KPI ด้านบน
           </div>
         </div>
-      </div>
 
-      <div className="analytics-grid analytics-grid--bottom">
         <div className="stat-row-card">
           <div className="card-title">ความเหลื่อมล้ำรายได้ระหว่างสมาชิก</div>
           <div className="stat-line">
@@ -127,7 +125,9 @@ export default function AnalyticsTab({
             <b>{memberStats.top10PctShare.toFixed(1)}%</b> ของทั้งชุมชน
           </div>
         </div>
+      </div>
 
+      <div className="analytics-grid analytics-grid--bottom">
         <div className="retention-card">
           {retention ? (
             <>
@@ -143,6 +143,20 @@ export default function AnalyticsTab({
             </>
           ) : (
             <div className="retention-detail">ไม่มีช่วงก่อนหน้าให้เทียบอัตราคงอยู่ของสมาชิก</div>
+          )}
+        </div>
+
+        <div className="top-members-card">
+          <div className="card-title">สมาชิกรายได้สุทธิสูงสุด — {periodLabel}</div>
+          {memberStats.members.slice(0, 3).map((m, i) => (
+            <div className="top-member-row" key={m.fullName}>
+              <span className="top-member-rank">{i + 1}</span>
+              <span className="top-member-name">{m.fullName}</span>
+              <span className="top-member-value">{formatBaht(m.netIncome)} ฿</span>
+            </div>
+          ))}
+          {memberStats.members.length === 0 && (
+            <div className="retention-detail">ไม่มีข้อมูลสมาชิกในช่วงนี้</div>
           )}
         </div>
       </div>
