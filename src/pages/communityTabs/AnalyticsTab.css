@@ -79,6 +79,21 @@
   padding: 20px;
 }
 
+.season-card--featured {
+  border: 1px solid var(--green-soft);
+  border-top: 3px solid var(--green-soft);
+  padding: 26px 28px;
+  margin-bottom: 16px;
+}
+
+.card-title--featured {
+  font-size: 16px;
+}
+
+.composition-card--full {
+  max-width: 640px;
+}
+
 .season-compare {
   display: flex;
   gap: 16px;
@@ -114,6 +129,10 @@
   font-family: var(--font-serif);
   font-size: 19px;
   font-weight: 600;
+}
+
+.season-block .s-value--featured {
+  font-size: 26px;
 }
 
 .season-block .s-months {

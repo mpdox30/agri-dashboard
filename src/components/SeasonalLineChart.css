@@ -10,10 +10,28 @@
   display: block;
 }
 
+.seasonal-line-chart--tall {
+  height: 220px;
+}
+
+.seasonal-line-chart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
 .seasonal-line-chart-legend {
   display: flex;
   gap: 16px;
-  margin-top: 2px;
+}
+
+.seasonal-line-chart-unit {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-family: var(--font-mono);
 }
 
 .legend-item {

@@ -51,31 +51,31 @@ export default function AnalyticsTab({
         </div>
       )}
 
-      <div className="analytics-grid">
-        <div className="season-card">
-          <div className="card-title">รายได้สุทธิ: ฤดูฝน เทียบ ฤดูแล้ง</div>
-          <div className="season-compare">
-            <div className="season-block rainy">
-              <div className="s-label">🌧 ฤดูฝน (พ.ค.–ต.ค.)</div>
-              <div className="s-value">{formatBaht(seasonal.rainyTotal)} ฿</div>
-              <div className="s-months">{seasonal.rainyPct.toFixed(1)}% ของรายได้ในช่วงนี้</div>
-              <div className="season-bar-track">
-                <div className="season-bar-fill rainy" style={{ width: `${seasonal.rainyPct}%` }} />
-              </div>
-            </div>
-            <div className="season-block dry">
-              <div className="s-label">☀️ ฤดูแล้ง (พ.ย.–เม.ย.)</div>
-              <div className="s-value">{formatBaht(seasonal.dryTotal)} ฿</div>
-              <div className="s-months">{seasonal.dryPct.toFixed(1)}% ของรายได้ในช่วงนี้</div>
-              <div className="season-bar-track">
-                <div className="season-bar-fill dry" style={{ width: `${seasonal.dryPct}%` }} />
-              </div>
+      <div className="season-card season-card--featured">
+        <div className="card-title card-title--featured">รายได้สุทธิ: ฤดูฝน เทียบ ฤดูแล้ง</div>
+        <div className="season-compare">
+          <div className="season-block rainy">
+            <div className="s-label">🌧 ฤดูฝน (พ.ค.–ต.ค.)</div>
+            <div className="s-value s-value--featured">{formatBaht(seasonal.rainyTotal)} ฿</div>
+            <div className="s-months">{seasonal.rainyPct.toFixed(1)}% ของรายได้ในช่วงนี้</div>
+            <div className="season-bar-track">
+              <div className="season-bar-fill rainy" style={{ width: `${seasonal.rainyPct}%` }} />
             </div>
           </div>
-          <SeasonalLineChart monthly={seasonal.monthly} />
+          <div className="season-block dry">
+            <div className="s-label">☀️ ฤดูแล้ง (พ.ย.–เม.ย.)</div>
+            <div className="s-value s-value--featured">{formatBaht(seasonal.dryTotal)} ฿</div>
+            <div className="s-months">{seasonal.dryPct.toFixed(1)}% ของรายได้ในช่วงนี้</div>
+            <div className="season-bar-track">
+              <div className="season-bar-fill dry" style={{ width: `${seasonal.dryPct}%` }} />
+            </div>
+          </div>
         </div>
+        <SeasonalLineChart monthly={seasonal.monthly} tall />
+      </div>
 
-        <div className="composition-card">
+      <div className="analytics-grid">
+        <div className="composition-card composition-card--full">
           <div className="card-title">องค์ประกอบรายได้สุทธิ — {periodLabel}</div>
           <div className="comp-stack">
             <div style={{ width: `${composition.salePct}%`, background: 'var(--green-soft)' }} />

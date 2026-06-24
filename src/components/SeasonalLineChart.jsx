@@ -5,18 +5,16 @@
 import './SeasonalLineChart.css';
 
 const WIDTH = 700;
-const HEIGHT = 130;
+const HEIGHT_NORMAL = 130;
+const HEIGHT_TALL = 220;
 const PADDING_LEFT = 36;
 const PADDING_RIGHT = 12;
 const PADDING_TOP = 14;
 const PADDING_BOTTOM = 22;
 const CHART_WIDTH = WIDTH - PADDING_LEFT - PADDING_RIGHT;
-const CHART_HEIGHT = HEIGHT - PADDING_TOP - PADDING_BOTTOM;
 
 function formatCompact(n) {
-  if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}ล.`;
-  if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(0)}พ.`;
-  return String(Math.round(n));
+  return String(Math.round(n / 1000));
 }
 
 /**
@@ -40,8 +38,12 @@ function buildSeasonBands(monthly) {
 /**
  * props:
  *   monthly: { label: string, netIncome: number, isRainy: boolean }[] (12 เดือน เรียงตามลำดับที่ใช้แสดง)
+ *   tall: boolean — ถ้าจริง ใช้ความสูงมากขึ้น (สำหรับตอนเป็นกราฟเด่นของหน้า เต็มความกว้าง)
  */
-export default function SeasonalLineChart({ monthly }) {
+export default function SeasonalLineChart({ monthly, tall = false }) {
+  const HEIGHT = tall ? HEIGHT_TALL : HEIGHT_NORMAL;
+  const CHART_HEIGHT = HEIGHT - PADDING_TOP - PADDING_BOTTOM;
+
   const values = monthly.map((m) => m.netIncome);
   const maxVal = Math.max(0, ...values);
   const minVal = Math.min(0, ...values); // รวม 0 ไว้เสมอ เผื่อมีเดือนติดลบจริง จะได้มีเส้นฐาน 0 ให้เทียบ
@@ -65,7 +67,7 @@ export default function SeasonalLineChart({ monthly }) {
     <div className="seasonal-line-chart-wrap">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="seasonal-line-chart"
+        className={tall ? 'seasonal-line-chart seasonal-line-chart--tall' : 'seasonal-line-chart'}
         role="img"
         aria-label="กราฟเส้นรายได้สุทธิรายเดือน แยกฤดูฝนและฤดูแล้ง"
       >
@@ -106,13 +108,16 @@ export default function SeasonalLineChart({ monthly }) {
           </g>
         ))}
       </svg>
-      <div className="seasonal-line-chart-legend">
-        <span className="legend-item">
-          <span className="legend-swatch rainy-swatch" /> ฤดูฝน
-        </span>
-        <span className="legend-item">
-          <span className="legend-swatch dry-swatch" /> ฤดูแล้ง
-        </span>
+      <div className="seasonal-line-chart-footer">
+        <div className="seasonal-line-chart-legend">
+          <span className="legend-item">
+            <span className="legend-swatch rainy-swatch" /> ฤดูฝน
+          </span>
+          <span className="legend-item">
+            <span className="legend-swatch dry-swatch" /> ฤดูแล้ง
+          </span>
+        </div>
+        <span className="seasonal-line-chart-unit">หน่วยตัวเลขบนกราฟ: x1,000 (บาท)</span>
       </div>
     </div>
   );
