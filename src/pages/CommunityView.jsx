@@ -10,9 +10,11 @@ import BenchmarkTab from './communityTabs/BenchmarkTab';
 import MembersTab from './communityTabs/MembersTab';
 import {
   getPeriodRange,
-  getPeriodDisplayLabel,
   getPreviousPeriod,
   countMonthsWithData,
+  narrowRangeByMonths,
+  buildMonthOfYearOptions,
+  formatPeriodOrRangeLabel,
 } from './fiscalYears';
 import {
   sumRangeTotals,
@@ -40,6 +42,11 @@ const TABS = [
   { key: 'members', label: 'รายสมาชิก' },
 ];
 
+function defaultMonthRangeFor(yearType) {
+  const options = buildMonthOfYearOptions(yearType);
+  return { from: options[0].value, to: options[options.length - 1].value };
+}
+
 export default function CommunityView() {
   const [communities, setCommunities] = useState([]);
   const [allSummaryRows, setAllSummaryRows] = useState([]);
@@ -49,7 +56,8 @@ export default function CommunityView() {
   const [communityKey, setCommunityKey] = useState(null);
   const [yearType, setYearType] = useState('fiscal'); // 'fiscal' | 'calendar'
   const [year, setYear] = useState('68-69'); // fiscal year key หรือ calendar year string ตาม yearType
-  const [month, setMonth] = useState('all');
+  const [monthFrom, setMonthFrom] = useState(() => defaultMonthRangeFor('fiscal').from);
+  const [monthTo, setMonthTo] = useState(() => defaultMonthRangeFor('fiscal').to);
   const [activeTab, setActiveTab] = useState('overview');
 
   const [recordsForCommunity, setRecordsForCommunity] = useState([]);
@@ -143,23 +151,40 @@ export default function CommunityView() {
     return names.size;
   }, [cleanedRecordsForCommunity]);
 
-  // ช่วงเดือนจริงของตัวเลือกปัจจุบัน (ไม่ว่าจะเป็นปีงบหรือปีปฏิทิน) — ทุกอย่างด้านล่าง
-  // คำนวณจาก range นี้ตรง ๆ จึงเปลี่ยนตามตัวกรองที่เลือกไว้เสมอ
-  const selectedRange = useMemo(() => getPeriodRange(yearType, year), [yearType, year]);
+  // ช่วงปีเต็ม ๆ ของตัวเลือกปัจจุบัน (ไม่ว่าจะเป็นปีงบหรือปีปฏิทิน)
+  const fullYearRange = useMemo(() => getPeriodRange(yearType, year), [yearType, year]);
   const previousYearValue = useMemo(() => getPreviousPeriod(yearType, year), [yearType, year]);
-  const previousRange = useMemo(
+  const previousFullYearRange = useMemo(
     () => (previousYearValue ? getPeriodRange(yearType, previousYearValue) : null),
     [yearType, previousYearValue]
   );
-  const periodLabel = getPeriodDisplayLabel(yearType, year);
-  const previousPeriodLabel = previousYearValue ? getPeriodDisplayLabel(yearType, previousYearValue) : null;
+
+  // ย่อช่วงปีเต็มให้เหลือแค่ "จากเดือน-ถึงเดือน" ที่เลือกไว้ (ดู narrowRangeByMonths ใน
+  // fiscalYears.js) — ถ้าเลือกไม่ถูกต้อง (เดือนเริ่มมาหลังเดือนสิ้นสุดในลำดับของปีนั้น)
+  // จะได้ null กลับมา แล้ว fallback ไปใช้ทั้งปีแทน พร้อมตั้ง flag ไว้เตือนผู้ใช้
+  const narrowedRangeRaw = useMemo(
+    () => narrowRangeByMonths(fullYearRange, monthFrom, monthTo),
+    [fullYearRange, monthFrom, monthTo]
+  );
+  const isInvalidMonthRange = fullYearRange && narrowedRangeRaw === null;
+  const selectedRange = narrowedRangeRaw || fullYearRange;
+
+  const previousRange = useMemo(() => {
+    if (!previousFullYearRange) return null;
+    return narrowRangeByMonths(previousFullYearRange, monthFrom, monthTo) || previousFullYearRange;
+  }, [previousFullYearRange, monthFrom, monthTo]);
+
+  const periodLabel = formatPeriodOrRangeLabel(yearType, year, selectedRange, fullYearRange);
+  const previousPeriodLabel = previousFullYearRange
+    ? formatPeriodOrRangeLabel(yearType, previousYearValue, previousRange, previousFullYearRange)
+    : null;
 
   const completeness = useMemo(
     () => countMonthsWithData(summaryRowsForCommunity, selectedRange),
     [summaryRowsForCommunity, selectedRange]
   );
 
-  // KPI ของ header — ตามช่วงที่เลือกในตัวกรองหลักเสมอ
+  // KPI ของ header — ตามช่วงที่เลือกในตัวกรองหลักเสมอ (รวมช่วงเดือนย่อยที่กรองไว้ด้วย)
   const kpis = useMemo(() => {
     const totals = sumRangeTotals(summaryRowsForCommunity, selectedRange);
     if (!totals) return null;
@@ -184,8 +209,8 @@ export default function CommunityView() {
     [summaryRowsForCommunity]
   );
 
-  // แท็บวิเคราะห์เชิงลึก/เปรียบเทียบ — คำนวณจาก selectedRange ตรง ๆ เสมอ ไม่ว่าจะครบ
-  // หรือไม่ครบก็ตาม (ต่างจากเดิมที่ใช้ "ปีล่าสุดที่ครบ" แทนปีที่เลือกไว้ — สร้างความสับสน)
+  // แท็บวิเคราะห์เชิงลึก/เปรียบเทียบ/รายสมาชิก — คำนวณจาก selectedRange ตรง ๆ เสมอ ซึ่ง
+  // ตอนนี้ครอบคลุมทั้งปีเต็ม ๆ หรือช่วงเดือนย่อยที่กรองไว้ก็ได้ ไม่ว่าจะครบหรือไม่ครบก็ตาม
   const seasonal = useMemo(
     () => buildSeasonalBreakdown(summaryRowsForCommunity, selectedRange),
     [summaryRowsForCommunity, selectedRange]
@@ -226,15 +251,16 @@ export default function CommunityView() {
   );
 
   const memberTable = useMemo(
-    () => buildMemberTable(cleanedRecordsForCommunity, selectedRange, month),
-    [cleanedRecordsForCommunity, selectedRange, month]
+    () => buildMemberTable(cleanedRecordsForCommunity, selectedRange),
+    [cleanedRecordsForCommunity, selectedRange]
   );
 
-  function handlePickerChange({ communityKey: nextKey, yearType: nextYearType, year: nextYear, month: nextMonth }) {
+  function handlePickerChange({ communityKey: nextKey, yearType: nextYearType, year: nextYear, monthFrom: nextMonthFrom, monthTo: nextMonthTo }) {
     setCommunityKey(nextKey);
     setYearType(nextYearType);
     setYear(nextYear);
-    setMonth(nextMonth);
+    setMonthFrom(nextMonthFrom);
+    setMonthTo(nextMonthTo);
   }
 
   async function handleCommunityExport(exportCommunityKey, yearKeys) {
@@ -276,8 +302,6 @@ export default function CommunityView() {
     );
   }
 
-  const memberTablePeriodLabel = `${periodLabel} · ${month === 'all' ? 'ทั้งช่วง' : 'เฉพาะเดือนที่เลือก'}`;
-
   return (
     <div className="community-view">
       <CommunityHeader
@@ -286,11 +310,20 @@ export default function CommunityView() {
         communityKey={communityKey || ''}
         yearType={yearType}
         year={year}
-        month={month}
+        monthFrom={monthFrom}
+        monthTo={monthTo}
         onChange={handlePickerChange}
         memberCount={memberCount}
         kpis={kpis}
+        periodLabel={periodLabel}
       />
+
+      {isInvalidMonthRange && (
+        <div className="month-range-warning">
+          ⚑ ช่วงเดือนที่เลือกไม่ถูกต้อง (เดือนเริ่มต้องมาก่อนเดือนสิ้นสุดในลำดับของปีนี้) —
+          แสดงข้อมูลทั้งปีไว้ก่อน กรุณาเลือกช่วงเดือนใหม่
+        </div>
+      )}
 
       <CommunityExportPanel
         communities={communities}
@@ -337,7 +370,7 @@ export default function CommunityView() {
             />
           )}
           {activeTab === 'members' && (
-            <MembersTab members={memberTable} periodLabel={memberTablePeriodLabel} />
+            <MembersTab members={memberTable} periodLabel={periodLabel} />
           )}
         </>
       )}

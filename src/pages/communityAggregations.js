@@ -414,15 +414,17 @@ export function buildRegionalEconomicProfile(communities, allSummaryRows, target
  * สร้างตารางสมาชิกของช่วงเดือน/เดือนเดียวที่ระบุ (month === 'all' หมายถึงทั้งช่วง)
  * คืน array เรียงตามรายได้สุทธิมาก->น้อย พร้อม rank
  */
-export function buildMemberTable(monthlyRecordsForCommunity, range, month) {
+/**
+ * สร้างตารางสมาชิกของช่วงที่ระบุ คืน array เรียงตามรายได้สุทธิมาก->น้อย
+ * (เดิมรับ month แยกสำหรับกรองเฉพาะเดือนเดียวภายในปี — ตอนนี้ใช้ range ตรง ๆ แทน เพราะ
+ * "ช่วงเดือนย่อยที่เลือก" ถูกคำนวณรวมไว้ใน range ให้แล้วที่ CommunityView ก่อนส่งเข้ามา)
+ */
+export function buildMemberTable(monthlyRecordsForCommunity, range) {
   if (!range) return [];
 
-  let rows = monthlyRecordsForCommunity.filter(
+  const rows = monthlyRecordsForCommunity.filter(
     (r) => r.month >= range.start && r.month <= range.end
   );
-  if (month !== 'all') {
-    rows = rows.filter((r) => r.month.split('-')[1] === month);
-  }
 
   const byMember = new Map();
   rows.forEach((r) => {
