@@ -15,7 +15,7 @@ const PADDING_TOP = 14;
 const PADDING_BOTTOM = 22;
 
 function formatCompact(n) {
-  return String(Math.round(n / 1000));
+  return (n / 1000).toFixed(2);
 }
 
 /**
