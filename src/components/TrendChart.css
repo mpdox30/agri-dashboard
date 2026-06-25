@@ -35,6 +35,10 @@
   background: linear-gradient(180deg, #c9cfc4, #aab3a0);
 }
 
+.trend-bar--negative {
+  background: linear-gradient(180deg, #e8a999, #c9614a);
+}
+
 .trend-bar-val {
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -75,4 +79,8 @@
 
 .trend-legend__dot--unknown {
   background: #aab3a0;
+}
+
+.trend-legend__dot--negative {
+  background: #c9614a;
 }
