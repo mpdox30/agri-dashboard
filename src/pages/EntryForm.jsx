@@ -4,7 +4,6 @@ import { getCommunities, getMonthlyRecords, checkLock, submitEntry } from '../ap
 import {
   VALUE_FIELDS,
   formatMonthWithBuddhistYear,
-  generateRecentMonthOptions,
   buildMemberRoster,
   isRowTouched,
   computeRowTotal,
@@ -12,6 +11,7 @@ import {
   getPreviousMonth,
   findSimilarExistingName,
 } from './entryFormHelpers';
+import { CALENDAR_YEAR_LIST, buildCalendarYearDropdownOptions, enumerateMonths } from './fiscalYears';
 import './EntryForm.css';
 
 function formatBaht(n) {
@@ -31,8 +31,23 @@ export default function EntryForm() {
   const [baseLoadError, setBaseLoadError] = useState(null);
 
   const [communityKey, setCommunityKey] = useState(null);
-  const monthOptions = useMemo(() => generateRecentMonthOptions(currentMonthString(), 6), []);
-  const [month, setMonth] = useState(monthOptions[0]);
+
+  const currentYear = String(new Date().getFullYear());
+  const defaultYear = CALENDAR_YEAR_LIST.includes(currentYear) ? currentYear : CALENDAR_YEAR_LIST[0];
+  const [year, setYear] = useState(defaultYear);
+  const yearOptions = useMemo(() => buildCalendarYearDropdownOptions(), []);
+
+  // ตัวเลือกเดือนของปีที่เลือก เรียง ม.ค. -> ธ.ค. ตามปีปฏิทินจริง แต่แสดงจากเดือนล่าสุด
+  // ไปเดือนแรกในปีนั้น (ใหม่ -> เก่า) ให้สอดคล้องกับพฤติกรรมเดิมที่ผู้ใช้คุ้นเคย
+  const monthOptions = useMemo(() => {
+    const months = enumerateMonths(`${year}-01`, `${year}-12`);
+    return [...months].reverse();
+  }, [year]);
+
+  const [month, setMonth] = useState(() => {
+    const nowMonthStr = currentMonthString();
+    return monthOptions.includes(nowMonthStr) ? nowMonthStr : monthOptions[0];
+  });
 
   const [recordsForCommunity, setRecordsForCommunity] = useState([]);
   const [recordsLoadState, setRecordsLoadState] = useState('loading');
@@ -116,6 +131,18 @@ export default function EntryForm() {
 
   function handleCommunityChange(nextKey) {
     setCommunityKey(nextKey);
+    setRowValues({});
+    setNewMembers([]);
+    setSubmitState('idle');
+    setSubmitError(null);
+  }
+
+  function handleYearChange(nextYear) {
+    const months = enumerateMonths(`${nextYear}-01`, `${nextYear}-12`).reverse();
+    const nowMonthStr = currentMonthString();
+    const nextMonth = months.includes(nowMonthStr) ? nowMonthStr : months[0];
+    setYear(nextYear);
+    setMonth(nextMonth);
     setRowValues({});
     setNewMembers([]);
     setSubmitState('idle');
@@ -240,6 +267,16 @@ export default function EntryForm() {
 
   const currentAveragePerTouched = touchedRows.length > 0 ? netIncomeTotal / touchedRows.length : null;
 
+  // เดือนที่เลือกย้อนหลังจากเดือนปัจจุบันจริงเกิน 2 เดือน ถือว่าเป็นการ "กรอกย้อนหลัง"
+  // เพื่อเติมข้อมูลเก่าที่ขาดไว้ — ไม่ใช่การกรอกตามรอบปกติ จึงเตือนไว้กันเลือกเดือนผิด
+  const isBackdated = useMemo(() => {
+    const nowStr = currentMonthString();
+    const [nowY, nowM] = nowStr.split('-').map(Number);
+    const [selY, selM] = month.split('-').map(Number);
+    const monthsDiff = (nowY - selY) * 12 + (nowM - selM);
+    return monthsDiff > 2;
+  }, [month]);
+
   const isLocked = lockInfo && lockInfo.locked;
   const canSubmit =
     !isLocked &&
@@ -320,6 +357,16 @@ export default function EntryForm() {
             </select>
           </div>
           <div className="control-group">
+            <label>ปี</label>
+            <select value={year} onChange={(e) => handleYearChange(e.target.value)}>
+              {yearOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="control-group">
             <label>เดือนที่กรอก</label>
             <select value={month} onChange={(e) => handleMonthChange(e.target.value)}>
               {monthOptions.map((m) => (
@@ -344,6 +391,13 @@ export default function EntryForm() {
           <div className="locked-banner">
             🔒 <b>เดือน {formatMonthWithBuddhistYear(month)} มีข้อมูลที่ส่งไปแล้วและกำลังรอตรวจสอบ</b> —
             ไม่สามารถกรอกซ้ำได้จนกว่าทีมกลางจะตรวจสอบเสร็จ ส่งเมื่อ {lockInfo.submission.submitted_at}
+          </div>
+        )}
+
+        {isBackdated && (
+          <div className="warning-banner">
+            🕓 <b>กำลังกรอกข้อมูลย้อนหลังเดือน {formatMonthWithBuddhistYear(month)}</b> —
+            ตรวจสอบให้แน่ใจว่าเลือกปี/เดือนถูกต้องแล้ว ก่อนกรอกข้อมูลเพื่อเติมส่วนที่ขาดหายไปของเดือนนี้
           </div>
         )}
 
