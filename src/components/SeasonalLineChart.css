@@ -1,7 +1,11 @@
 /* src/components/SeasonalLineChart.css */
 
 .seasonal-line-chart-wrap {
-  margin-top: 10px;
+  margin: 10px -28px 0;
+}
+
+.seasonal-line-chart-footer {
+  padding: 0 28px;
 }
 
 .seasonal-line-chart {
