@@ -15,18 +15,10 @@
   gap: 12px;
 }
 
-.topbar__mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--green) 0%, var(--green-soft) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #f7f3e8;
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 18px;
+.topbar__logo {
+  height: 40px;
+  width: auto;
+  display: block;
 }
 
 .topbar__text {
