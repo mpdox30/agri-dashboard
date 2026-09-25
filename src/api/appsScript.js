@@ -6,7 +6,7 @@
 //
 // *** ต้องแก้ค่านี้ก่อนใช้งานจริง ***
 // แก้เป็น URL ที่ได้จาก Deploy > New deployment > Web app (ลงท้ายด้วย /exec)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRknYQEUa5f3LXUfiA1hob_bZZevXgx6dkdFLibpodI7s64PkcXEQZUH9gTSnxaB0M/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID_HERE/exec';
 
 /**
  * ป้องกันไว้อีกชั้น เผื่อ Google Sheets แปลงคอลัมน์ "month" เป็นชนิดวันที่อัตโนมัติ

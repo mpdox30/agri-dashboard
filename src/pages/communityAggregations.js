@@ -414,17 +414,15 @@ export function buildRegionalEconomicProfile(communities, allSummaryRows, target
  * สร้างตารางสมาชิกของช่วงเดือน/เดือนเดียวที่ระบุ (month === 'all' หมายถึงทั้งช่วง)
  * คืน array เรียงตามรายได้สุทธิมาก->น้อย พร้อม rank
  */
-/**
- * สร้างตารางสมาชิกของช่วงที่ระบุ คืน array เรียงตามรายได้สุทธิมาก->น้อย
- * (เดิมรับ month แยกสำหรับกรองเฉพาะเดือนเดียวภายในปี — ตอนนี้ใช้ range ตรง ๆ แทน เพราะ
- * "ช่วงเดือนย่อยที่เลือก" ถูกคำนวณรวมไว้ใน range ให้แล้วที่ CommunityView ก่อนส่งเข้ามา)
- */
-export function buildMemberTable(monthlyRecordsForCommunity, range) {
+export function buildMemberTable(monthlyRecordsForCommunity, range, month) {
   if (!range) return [];
 
-  const rows = monthlyRecordsForCommunity.filter(
+  let rows = monthlyRecordsForCommunity.filter(
     (r) => r.month >= range.start && r.month <= range.end
   );
+  if (month !== 'all') {
+    rows = rows.filter((r) => r.month.split('-')[1] === month);
+  }
 
   const byMember = new Map();
   rows.forEach((r) => {
@@ -450,4 +448,330 @@ export function buildMemberTable(monthlyRecordsForCommunity, range) {
   }));
   members.sort((a, b) => b.netIncome - a.netIncome);
   return members;
+}
+
+/**
+ * รายได้สุทธิรายเดือนของสมาชิกคนเดียว ตลอด "ช่วงที่เลือกอยู่" (selectedRange เต็ม ไม่ผูก
+ * กับตัวกรอง "เดือนเดียว" ของตารางรายสมาชิก) ใช้กับกราฟรายเดือนที่กดดูรายคนได้ในแท็บ
+ * "รายสมาชิก" — เดือนที่สมาชิกคนนี้ไม่มีแถวข้อมูลถือเป็น 0 แต่ทำเครื่องหมาย hasData ไว้
+ * แยก เหมือนฟังก์ชันกราฟรายเดือนอื่น ๆ ในไฟล์นี้ (buildSeasonalBreakdown ฯลฯ)
+ */
+export function buildMemberMonthlySeries(monthlyRecordsForCommunity, range, fullName) {
+  if (!range || !fullName) return null;
+  const rows = monthlyRecordsForCommunity.filter(
+    (r) => r.month >= range.start && r.month <= range.end && r.full_name === fullName
+  );
+  return enumerateMonths(range.start, range.end).map((m) => {
+    const row = rows.find((r) => r.month === m);
+    const netIncome = row
+      ? (Number(row['ขาย']) || 0) - (Number(row['ซื้อ']) || 0) + (Number(row['แบ่งปัน']) || 0)
+      : 0;
+    return { label: formatMonthLabel(m), netIncome, hasData: Boolean(row) };
+  });
+}
+
+// --- ส่วนขยายแท็บ "วิเคราะห์เชิงลึก" (ไอเดียข้อ 1-7) ---
+
+/**
+ * เทียบรายได้สุทธิรายเดือนของ "หลายปีย้อนหลัง" ซ้อนกันบนกราฟเดียว เดือนต่อเดือนแบบ
+ * index ต่อ index (ใช้ได้เพราะทุกช่วง — ปีงบหรือปีปฏิทิน — ยาว 12 เดือนเท่ากันเสมอ ดู
+ * fiscalYears.js) periods คือ chain จาก buildPeriodChain() (index 0 = ปีที่เลือกอยู่
+ * ปัจจุบัน ไล่ย้อนไปเก่ากว่าเรื่อย ๆ) เดือนไหนไม่มีแถวข้อมูลจริง ใช้ 0 ในการคำนวณกราฟ/
+ * ยอดรวม แต่ทำเครื่องหมาย hasData ไว้ให้ UI เลือกแสดงต่าง (เช่น จุดจาง ๆ) เพื่อไม่ให้
+ * ตีความว่า "รายได้เป็น 0 จริง" ผิดจากที่ควรเป็น "ไม่มีข้อมูล"
+ */
+export function buildMultiYearComparison(summaryRowsForCommunity, periods) {
+  if (!periods || periods.length === 0) return null;
+
+  const monthsPerPeriod = periods.map((p) => enumerateMonths(p.range.start, p.range.end));
+  const monthCount = monthsPerPeriod[0].length;
+  if (monthsPerPeriod.some((m) => m.length !== monthCount)) return null; // กันไว้เผื่อกรณีผิดปกติ ปกติยาวเท่ากันเสมอทุกช่วง
+
+  function findRow(monthStr) {
+    return summaryRowsForCommunity.find((r) => r.month === monthStr) || null;
+  }
+  function netOf(row) {
+    return row ? (Number(row.sale) || 0) - (Number(row.purchase) || 0) + (Number(row.sharing) || 0) : 0;
+  }
+
+  // label เดือนอ้างอิงจากช่วงแรก (ปีที่เลือกอยู่) ใช้เป็นแกน x ร่วมกันทุกเส้น เพราะเดือน
+  // ที่ i ของทุกช่วงตรงกันเสมอ (ทุกช่วงเริ่มต้นเดือนเดียวกันของปีงบ/ปีปฏิทิน)
+  const monthLabels = monthsPerPeriod[0].map((m) => formatMonthLabel(m));
+
+  const series = periods.map((p, pIdx) => {
+    const monthsList = monthsPerPeriod[pIdx];
+    const points = monthsList.map((m) => {
+      const row = findRow(m);
+      return { value: netOf(row), hasData: Boolean(row) };
+    });
+    const total = points.reduce((a, pt) => a + pt.value, 0);
+    // colorIndex = ตำแหน่งเดิมใน periods (0 = ปีปัจจุบันเสมอ) เก็บแยกจากตำแหน่งใน array
+    // เพราะ UI จะให้ผู้ใช้เลือกซ่อน/แสดงบางปีได้ ถ้า UI กรอง series ออกแล้ว colorIndex
+    // ยังต้องอ้างอิงตำแหน่งเดิมเพื่อให้สีของแต่ละปีไม่เปลี่ยนตามที่ซ่อน/แสดง
+    return { key: p.value, label: p.label, points, total, colorIndex: pIdx, isCurrent: pIdx === 0 };
+  });
+
+  return { monthLabels, series };
+}
+
+/**
+ * Lorenz curve เต็มรูปแบบ + ค่าสัมประสิทธิ์ Gini จากรายได้สุทธิรายบุคคล (ต่อยอดจาก
+ * buildMemberIncomeStats ที่มีแค่ "ส่วนแบ่งของ 10% แรก" อย่างเดียว)
+ *
+ * หมายเหตุ: Lorenz curve/Gini นิยามไว้สำหรับค่าไม่ติดลบเท่านั้น รายได้สุทธิที่ติดลบ
+ * (ซื้อมากกว่าขาย+แบ่งปันในเดือนนั้น) จะถูกปัดเป็น 0 เฉพาะในการคำนวณนี้จุดเดียว
+ * ไม่กระทบตัวเลขรายได้จริงที่แสดงในการ์ดอื่น
+ */
+export function buildLorenzCurve(members) {
+  if (!members || members.length === 0) return null;
+  const incomes = members.map((m) => Math.max(0, m.netIncome)).sort((a, b) => a - b);
+  const n = incomes.length;
+  const total = incomes.reduce((a, b) => a + b, 0);
+
+  if (total === 0) {
+    return {
+      points: [
+        { x: 0, y: 0 },
+        { x: 100, y: 100 },
+      ],
+      gini: 0,
+      n,
+      total: 0,
+    };
+  }
+
+  let cumIncome = 0;
+  const points = [{ x: 0, y: 0 }];
+  incomes.forEach((v, i) => {
+    cumIncome += v;
+    points.push({ x: ((i + 1) / n) * 100, y: (cumIncome / total) * 100 });
+  });
+
+  // สูตร Gini แบบไม่ต่อเนื่อง: G = (2·Σ(i·xᵢ))/(n·Σx) − (n+1)/n โดย xᵢ เรียงน้อย->มาก, i เริ่มที่ 1
+  let weightedSum = 0;
+  incomes.forEach((v, i) => {
+    weightedSum += (i + 1) * v;
+  });
+  const gini = (2 * weightedSum) / (n * total) - (n + 1) / n;
+
+  return { points, gini, n, total };
+}
+
+/**
+ * ความผันผวนของรายได้ต่อสมาชิกแต่ละคนภายในช่วงที่เลือก วัดด้วย coefficient of variation
+ * (CV = ส่วนเบี่ยงเบนมาตรฐาน / ค่าเฉลี่ย × 100) — ยิ่งสูงยิ่งแกว่งมาก เทียบกันได้ข้ามคน
+ * แม้ฐานรายได้ต่างกัน (ต่างจาก SD เฉย ๆ ที่เทียบข้ามคนไม่ได้ตรง ๆ)
+ * ต้องมีข้อมูลอย่างน้อย 2 เดือนและค่าเฉลี่ยเป็นบวกถึงจะวัดมีความหมาย (คนที่มีเดือนเดียว
+ * หรือรายได้เฉลี่ย ≤ 0 จะไม่ถูกนำมาคำนวณ CV เพราะตีความไม่ได้/หารด้วยเลขไม่เป็นบวก)
+ */
+export function buildMemberVolatility(monthlyRecordsForCommunity, range) {
+  if (!range) return null;
+  const rows = monthlyRecordsForCommunity.filter(
+    (r) => r.month >= range.start && r.month <= range.end
+  );
+
+  const byMember = new Map(); // full_name -> netIncome[] รายเดือน
+  rows.forEach((r) => {
+    const net = (Number(r['ขาย']) || 0) - (Number(r['ซื้อ']) || 0) + (Number(r['แบ่งปัน']) || 0);
+    if (!byMember.has(r.full_name)) byMember.set(r.full_name, []);
+    byMember.get(r.full_name).push(net);
+  });
+
+  const members = [];
+  byMember.forEach((values, fullName) => {
+    if (values.length < 2) return;
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    if (mean <= 0) return;
+    const variance = values.reduce((a, v) => a + (v - mean) ** 2, 0) / values.length;
+    const sd = Math.sqrt(variance);
+    const cv = (sd / mean) * 100;
+    members.push({ fullName, mean, sd, cv, monthsCounted: values.length });
+  });
+
+  members.sort((a, b) => b.cv - a.cv);
+  const avgCv = members.length > 0 ? members.reduce((a, m) => a + m.cv, 0) / members.length : 0;
+
+  return {
+    members,
+    avgCv,
+    mostVolatile: members.slice(0, 5),
+    mostStable: [...members].sort((a, b) => a.cv - b.cv).slice(0, 5),
+  };
+}
+
+/**
+ * แนวโน้มสัดส่วนแหล่งที่มาของรายได้ (ขาย / แบ่งปัน / ผลิตเอง / รับฟรี-อื่นๆ) รายเดือน
+ * ตลอดช่วงที่เลือก — ใช้ดูว่าชุมชนพึ่งพาแหล่งไหนมากขึ้น/น้อยลงเมื่อเวลาผ่านไป ต่างจาก
+ * buildIncomeComposition ที่สรุปเป็นก้อนเดียวของทั้งช่วง ที่นี่แยกเป็นรายเดือนเพื่อเห็น
+ * แนวโน้ม ฐาน % คำนวณจาก (ขาย+แบ่งปัน+ผลิตเอง+รับฟรี) ของเดือนนั้น ๆ เอง (ไม่รวมซื้อ
+ * เพราะเป็นรายจ่าย ไม่ใช่แหล่งที่มาของรายได้)
+ */
+export function buildDependencyTrend(summaryRowsForCommunity, range) {
+  if (!range) return null;
+  const months = enumerateMonths(range.start, range.end);
+
+  const monthly = months.map((m) => {
+    const row = summaryRowsForCommunity.find((r) => r.month === m);
+    if (!row) {
+      return {
+        label: formatMonthLabel(m),
+        hasData: false,
+        salePct: 0,
+        sharingPct: 0,
+        selfProducedPct: 0,
+        freeOtherPct: 0,
+      };
+    }
+    const sale = Number(row.sale) || 0;
+    const sharing = Number(row.sharing) || 0;
+    const selfProduced = Number(row.self_produced) || 0;
+    const freeOther = Number(row.free_other) || 0;
+    const base = sale + sharing + selfProduced + freeOther;
+    const pct = (v) => (base !== 0 ? (v / base) * 100 : 0);
+    return {
+      label: formatMonthLabel(m),
+      hasData: true,
+      salePct: pct(sale),
+      sharingPct: pct(sharing),
+      selfProducedPct: pct(selfProduced),
+      freeOtherPct: pct(freeOther),
+    };
+  });
+
+  const withData = monthly.filter((m) => m.hasData);
+  const avg = (key) => (withData.length > 0 ? withData.reduce((a, m) => a + m[key], 0) / withData.length : 0);
+
+  return {
+    monthly,
+    avgSalePct: avg('salePct'),
+    avgSharingPct: avg('sharingPct'),
+    avgSelfProducedPct: avg('selfProducedPct'),
+    avgFreeOtherPct: avg('freeOtherPct'),
+  };
+}
+
+/**
+ * จัดอันดับรายได้สุทธิเทียบกับชุมชนอื่นใน "จังหวัดเดียวกัน" (แคบกว่าและเจาะจงกว่า
+ * buildRegionalIncomeRanking ในแท็บเปรียบเทียบที่จัดอันดับระดับภาค) — คืน null ถ้าไม่มี
+ * ข้อมูลจังหวัดของชุมชนนี้ หรือไม่มีชุมชนอื่นในจังหวัดเดียวกันให้เทียบ
+ */
+export function buildProvincePeerRanking(communities, allSummaryRows, targetCommunityKey, range) {
+  const target = communities.find((c) => c.community_key === targetCommunityKey);
+  if (!target || !target.province) return null;
+  const provinceCommunities = communities.filter((c) => c.province === target.province);
+  if (provinceCommunities.length <= 1) return null;
+
+  const list = provinceCommunities.map((c) => {
+    const rows = allSummaryRows.filter((r) => r.community_key === c.community_key);
+    const totals = sumRangeTotals(rows, range);
+    return { communityKey: c.community_key, netIncome: totals ? totals.netIncome : 0 };
+  });
+
+  list.sort((a, b) => b.netIncome - a.netIncome);
+  const rank = list.findIndex((entry) => entry.communityKey === targetCommunityKey) + 1;
+
+  return { rank, total: list.length, list, provinceName: target.province };
+}
+
+/**
+ * พยากรณ์แนวโน้มรายได้สุทธิเดือนถัดไปแบบง่าย จากประวัติจริงทั้งหมดของชุมชนนี้ (ไม่ผูก
+ * กับช่วงที่เลือกดูอยู่ด้านบน เพราะยิ่งมีประวัติยาวยิ่งพยากรณ์ได้แม่นกว่า) ใช้ข้อมูล
+ * windowSize เดือนล่าสุดที่มีจริง คำนวณทั้งค่าเฉลี่ยเคลื่อนที่ (moving average) และเส้น
+ * แนวโน้มเชิงเส้นอย่างง่าย (simple linear regression) — เป็นการประมาณคร่าว ๆ เพื่อดู
+ * ทิศทาง ไม่ใช่โมเดลพยากรณ์ที่แม่นยำสูง จึงไม่ควรใช้ตัดสินใจเชิงนโยบายโดยลำพัง
+ */
+export function buildSimpleForecast(summaryRowsForCommunity, windowSize = 6) {
+  const sorted = [...summaryRowsForCommunity].sort((a, b) => a.month.localeCompare(b.month));
+  if (sorted.length < 3) return null;
+
+  const recent = sorted.slice(-windowSize);
+  const netIncomes = recent.map(
+    (r) => (Number(r.sale) || 0) - (Number(r.purchase) || 0) + (Number(r.sharing) || 0)
+  );
+  const n = netIncomes.length;
+
+  const movingAverage = netIncomes.reduce((a, b) => a + b, 0) / n;
+
+  const xs = netIncomes.map((_, i) => i);
+  const meanX = xs.reduce((a, b) => a + b, 0) / n;
+  const meanY = movingAverage;
+  let num = 0;
+  let den = 0;
+  xs.forEach((x, i) => {
+    num += (x - meanX) * (netIncomes[i] - meanY);
+    den += (x - meanX) ** 2;
+  });
+  const slope = den !== 0 ? num / den : 0;
+  const intercept = meanY - slope * meanX;
+  const linearForecast = intercept + slope * n;
+
+  const lastMonth = recent[recent.length - 1].month;
+  let [y, m] = lastMonth.split('-').map(Number);
+  m += 1;
+  if (m > 12) {
+    m = 1;
+    y += 1;
+  }
+  const nextMonthLabel = formatMonthLabel(`${y}-${String(m).padStart(2, '0')}`);
+
+  return {
+    windowMonths: n,
+    movingAverage,
+    linearForecast,
+    // slope วัดหน่วยบาท/เดือน — ใช้ threshold ±1 บาทกันตัวเลข noise เล็กน้อยไม่ให้ขึ้นว่า
+    // "มีแนวโน้ม" ทั้งที่จริงแทบราบ
+    trendDirection: slope > 1 ? 'up' : slope < -1 ? 'down' : 'flat',
+    nextMonthLabel,
+    recentMonthly: recent.map((r, i) => ({ label: formatMonthLabel(r.month), netIncome: netIncomes[i] })),
+  };
+}
+
+/**
+ * แยกสาเหตุการเติบโต (หรือหดตัว) ของรายได้สุทธิรวม ระหว่างช่วงปัจจุบันกับช่วงก่อนหน้า
+ * ออกเป็น 2 ปัจจัย: (1) จำนวนสมาชิกเปลี่ยน (member count effect) และ (2) รายได้เฉลี่ย
+ * ต่อคนเปลี่ยน (per-member income effect) — ผลรวม 2 ส่วนนี้เท่ากับผลต่างรายได้รวมพอดี
+ * เสมอ (สูตรพีชคณิตตรง ไม่มีเศษเหลือ ไม่ใช่ค่าประมาณ):
+ *   Δรวม = (สมาชิกปัจจุบัน − สมาชิกก่อนหน้า) × รายได้/คนปัจจุบัน   [ผลจากจำนวนคน]
+ *        + สมาชิกก่อนหน้า × (รายได้/คนปัจจุบัน − รายได้/คนก่อนหน้า) [ผลจากรายได้ต่อคน]
+ * คืน null ถ้าไม่มีช่วงก่อนหน้า หรือช่วงใดช่วงหนึ่งไม่มีข้อมูลเลย (คำนวณไม่ได้อย่างมี
+ * ความหมาย เหตุผลเดียวกับ buildRegionalGrowthRanking)
+ */
+export function buildGrowthDrivers(summaryRowsForCommunity, monthlyRecordsForCommunity, currentRange, previousRange) {
+  if (!currentRange || !previousRange) return null;
+
+  const currentTotals = sumRangeTotals(summaryRowsForCommunity, currentRange);
+  const previousTotals = sumRangeTotals(summaryRowsForCommunity, previousRange);
+  if (!currentTotals || !previousTotals || previousTotals.monthsWithData === 0 || currentTotals.monthsWithData === 0) {
+    return null;
+  }
+
+  const currentMembers = new Set(
+    monthlyRecordsForCommunity
+      .filter((r) => r.month >= currentRange.start && r.month <= currentRange.end)
+      .map((r) => r.full_name)
+  ).size;
+  const previousMembers = new Set(
+    monthlyRecordsForCommunity
+      .filter((r) => r.month >= previousRange.start && r.month <= previousRange.end)
+      .map((r) => r.full_name)
+  ).size;
+
+  if (previousMembers === 0) return null;
+
+  const currentPerMember = currentMembers > 0 ? currentTotals.netIncome / currentMembers : 0;
+  const previousPerMember = previousTotals.netIncome / previousMembers;
+
+  const totalDelta = currentTotals.netIncome - previousTotals.netIncome;
+  const memberCountEffect = (currentMembers - previousMembers) * currentPerMember;
+  const perMemberIncomeEffect = previousMembers * (currentPerMember - previousPerMember);
+
+  return {
+    currentMembers,
+    previousMembers,
+    currentPerMember,
+    previousPerMember,
+    totalDelta,
+    memberCountEffect,
+    perMemberIncomeEffect,
+  };
 }

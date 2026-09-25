@@ -1,15 +1,27 @@
 // src/components/CommunityHeader.jsx
 import { useState } from 'react';
-import {
-  buildFiscalYearDropdownOptions,
-  buildCalendarYearDropdownOptions,
-  buildMonthOfYearOptions,
-} from '../pages/fiscalYears';
+import { buildFiscalYearDropdownOptions, buildCalendarYearDropdownOptions, getPeriodDisplayLabel } from '../pages/fiscalYears';
 import './CommunityHeader.css';
 
 // สร้างจาก fiscalYears.js จุดเดียว — ไม่ต้องแก้ที่นี่เวลาขึ้นปีงบใหม่
 const FISCAL_YEAR_OPTIONS = buildFiscalYearDropdownOptions();
 const CALENDAR_YEAR_OPTIONS = buildCalendarYearDropdownOptions();
+
+const MONTH_OPTIONS = [
+  { value: 'all', label: 'ทั้งปี' },
+  { value: '01', label: 'ม.ค.' },
+  { value: '02', label: 'ก.พ.' },
+  { value: '03', label: 'มี.ค.' },
+  { value: '04', label: 'เม.ย.' },
+  { value: '05', label: 'พ.ค.' },
+  { value: '06', label: 'มิ.ย.' },
+  { value: '07', label: 'ก.ค.' },
+  { value: '08', label: 'ส.ค.' },
+  { value: '09', label: 'ก.ย.' },
+  { value: '10', label: 'ต.ค.' },
+  { value: '11', label: 'พ.ย.' },
+  { value: '12', label: 'ธ.ค.' },
+];
 
 function formatBaht(n) {
   return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(n);
@@ -22,9 +34,8 @@ function formatBaht(n) {
  *   communityKey: string
  *   yearType: 'fiscal' | 'calendar'
  *   year: string (fiscal year key เช่น '68-69' หรือปีปฏิทินเช่น '2026' ตาม yearType)
- *   monthFrom, monthTo: string ('01'..'12') — เดือนเริ่ม/สิ้นสุดของช่วงที่ดู ภายในปีที่เลือก
- *     (ค่าเริ่มต้น = เดือนแรก/เดือนสุดท้ายของปีนั้น ซึ่งเท่ากับ "ทั้งปี")
- *   onChange: ({ communityKey, yearType, year, monthFrom, monthTo }) => void
+ *   month: string
+ *   onChange: ({ communityKey, yearType, year, month }) => void
  *   memberCount: number of distinct members found in monthly_records for this community
  *   kpis: { netIncome, householdReduction, sharing, perMember, deltas: {...} } or null while loading
  */
@@ -34,16 +45,13 @@ export default function CommunityHeader({
   communityKey,
   yearType,
   year,
-  monthFrom,
-  monthTo,
+  month,
   onChange,
   memberCount,
   kpis,
-  periodLabel,
 }) {
   const yearOptions = yearType === 'fiscal' ? FISCAL_YEAR_OPTIONS : CALENDAR_YEAR_OPTIONS;
-  const monthOptions = buildMonthOfYearOptions(yearType);
-  const isFullYear = monthFrom === monthOptions[0].value && monthTo === monthOptions[monthOptions.length - 1].value;
+  const periodLabel = getPeriodDisplayLabel(yearType, year);
 
   // ตัวกรอง "ภาค" เป็นแค่ตัวช่วยย่อรายชื่อใน dropdown ชุมชนให้สั้นลง ไม่ใช่ส่วนของข้อมูล
   // ที่หน้าอื่นต้องรู้ จึงเก็บเป็น state ภายในคอมโพเนนต์นี้เอง ไม่ต้องส่งขึ้นไปให้ CommunityView
@@ -59,26 +67,14 @@ export default function CommunityHeader({
     if (!stillValid) {
       const inRegion = communities.filter((c) => c.region === nextRegion);
       if (inRegion.length > 0) {
-        onChange({ communityKey: inRegion[0].community_key, yearType, year, monthFrom, monthTo });
+        onChange({ communityKey: inRegion[0].community_key, yearType, year, month });
       }
     }
   }
 
   function handleYearTypeChange(nextType) {
     const defaultYear = nextType === 'fiscal' ? FISCAL_YEAR_OPTIONS[0].value : CALENDAR_YEAR_OPTIONS[0].value;
-    const newMonthOptions = buildMonthOfYearOptions(nextType);
-    // สลับประเภทปีแล้วช่วงเดือนเดิมอาจไม่ตรงลำดับเดือนของปีแบบใหม่ รีเซ็ตเป็น "ทั้งปี" เสมอ
-    onChange({
-      communityKey,
-      yearType: nextType,
-      year: defaultYear,
-      monthFrom: newMonthOptions[0].value,
-      monthTo: newMonthOptions[newMonthOptions.length - 1].value,
-    });
-  }
-
-  function handleResetToFullYear() {
-    onChange({ communityKey, yearType, year, monthFrom: monthOptions[0].value, monthTo: monthOptions[monthOptions.length - 1].value });
+    onChange({ communityKey, yearType: nextType, year: defaultYear, month });
   }
 
   return (
@@ -111,7 +107,7 @@ export default function CommunityHeader({
           <label>ชุมชน</label>
           <select
             value={communityKey}
-            onChange={(e) => onChange({ communityKey: e.target.value, yearType, year, monthFrom, monthTo })}
+            onChange={(e) => onChange({ communityKey: e.target.value, yearType, year, month })}
           >
             {communitiesInRegion.map((c) => (
               <option key={c.community_key} value={c.community_key}>
@@ -145,7 +141,7 @@ export default function CommunityHeader({
           <label>{yearType === 'fiscal' ? 'ปีงบประมาณ' : 'ปี'}</label>
           <select
             value={year}
-            onChange={(e) => onChange({ communityKey, yearType, year: e.target.value, monthFrom, monthTo })}
+            onChange={(e) => onChange({ communityKey, yearType, year: e.target.value, month })}
           >
             {yearOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -154,38 +150,19 @@ export default function CommunityHeader({
             ))}
           </select>
         </div>
-
         <div className="control-group">
-          <label>จากเดือน</label>
+          <label>เดือน</label>
           <select
-            value={monthFrom}
-            onChange={(e) => onChange({ communityKey, yearType, year, monthFrom: e.target.value, monthTo })}
+            value={month}
+            onChange={(e) => onChange({ communityKey, yearType, year, month: e.target.value })}
           >
-            {monthOptions.map((opt) => (
+            {MONTH_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
             ))}
           </select>
         </div>
-        <div className="control-group">
-          <label>ถึงเดือน</label>
-          <select
-            value={monthTo}
-            onChange={(e) => onChange({ communityKey, yearType, year, monthFrom, monthTo: e.target.value })}
-          >
-            {monthOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        {!isFullYear && (
-          <button type="button" className="reset-link" onClick={handleResetToFullYear}>
-            ดูทั้งปี
-          </button>
-        )}
       </div>
 
       {selectedCommunity && (

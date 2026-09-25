@@ -48,18 +48,29 @@
   line-height: 1.6;
 }
 
+/* ไฮไลต์หลัก: กล่อง "รายได้สุทธิ ฤดูฝน เทียบ ฤดูแล้ง" เต็มความกว้าง เด่นกว่าการ์ดอื่นทั้งหมด */
+.analytics-highlight {
+  margin-bottom: 20px;
+}
+
 .analytics-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
   gap: 16px;
 }
 
-.analytics-grid--bottom {
-  margin-top: 16px;
+.analytics-grid--secondary {
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 0;
 }
 
-@media (max-width: 900px) {
-  .analytics-grid {
+@media (max-width: 1100px) {
+  .analytics-grid--secondary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .analytics-grid--secondary {
     grid-template-columns: 1fr;
   }
 }
@@ -68,6 +79,11 @@
   font-size: 13px;
   font-weight: 700;
   margin-bottom: 12px;
+}
+
+.card-title--highlight {
+  font-size: 17px;
+  margin-bottom: 18px;
 }
 
 .season-card,
@@ -79,15 +95,11 @@
   padding: 20px;
 }
 
-.season-card--featured {
-  border: 1px solid var(--green-soft);
-  border-top: 3px solid var(--green-soft);
-  padding: 26px 28px;
-  margin-bottom: 16px;
-}
-
-.card-title--featured {
-  font-size: 16px;
+/* กล่องไฮไลต์: ใหญ่กว่าปกติชัดเจน — padding มากขึ้น เส้นขอบเน้น เงาเบา ๆ ให้ลอยเด่น */
+.season-card--highlight {
+  padding: 32px 36px;
+  border: 1.5px solid var(--sage);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
 .season-compare {
@@ -96,10 +108,20 @@
   margin-bottom: 16px;
 }
 
+.season-card--highlight .season-compare {
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
 .season-block {
   flex: 1;
   border-radius: 9px;
   padding: 14px 16px;
+}
+
+.season-card--highlight .season-block {
+  padding: 22px 26px;
+  border-radius: 12px;
 }
 
 .season-block.rainy {
@@ -121,14 +143,19 @@
   gap: 6px;
 }
 
+.season-card--highlight .season-block .s-label {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
 .season-block .s-value {
   font-family: var(--font-serif);
   font-size: 19px;
   font-weight: 600;
 }
 
-.season-block .s-value--featured {
-  font-size: 26px;
+.season-card--highlight .season-block .s-value {
+  font-size: 34px;
 }
 
 .season-block .s-months {
@@ -137,12 +164,22 @@
   margin-top: 3px;
 }
 
+.season-card--highlight .season-block .s-months {
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+
 .season-bar-track {
   height: 8px;
   background: #efe9d8;
   border-radius: 4px;
   overflow: hidden;
   margin-top: 4px;
+}
+
+.season-card--highlight .season-bar-track {
+  height: 10px;
+  margin-top: 10px;
 }
 
 .season-bar-fill {
@@ -280,54 +317,6 @@
   gap: 22px;
 }
 
-.top-members-card {
-  background: var(--bg-card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 20px;
-}
-
-.top-member-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 12.5px;
-}
-
-.top-member-row:last-child {
-  border-bottom: none;
-}
-
-.top-member-rank {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #efe9d8;
-  color: var(--muted);
-  font-size: 10.5px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.top-member-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.top-member-value {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--green-soft);
-  white-space: nowrap;
-}
-
 .retention-ring {
   width: 76px;
   height: 76px;
@@ -360,4 +349,222 @@
 
 .retention-detail b {
   color: var(--ink);
+}
+
+/* --- ส่วนขยาย (ไอเดียข้อ 1-7) --- */
+
+.trend-up {
+  color: var(--green-soft);
+}
+
+.trend-down {
+  color: var(--red-soft);
+}
+
+.chart-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.dep-avg-footer {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  line-height: 1.7;
+}
+
+.yoy-year-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.yoy-year-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.yoy-year-toggle:hover {
+  border-color: var(--sage);
+}
+
+.yoy-year-toggle.active {
+  color: var(--ink);
+  border-color: currentColor;
+  background: var(--bg-card);
+  font-weight: 600;
+}
+
+.yoy-year-toggle:not(.active):not(.yoy-year-toggle--current) {
+  opacity: 0.5;
+}
+
+.yoy-year-toggle--current {
+  cursor: default;
+  color: var(--ink);
+  font-weight: 700;
+  border-style: solid;
+  border-color: var(--green-soft);
+  background: var(--bg-card);
+}
+
+.yoy-year-toggle-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.analytics-grid--drivers {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 800px) {
+  .analytics-grid--drivers {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lorenz-svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin: 8px auto 0;
+}
+
+.lorenz-equality-line {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+}
+
+.lorenz-area {
+  fill: var(--terracotta);
+  opacity: 0.18;
+}
+
+.lorenz-curve-path {
+  stroke: var(--terracotta);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+.lorenz-caption {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.volatility-subhead {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 12px 0 4px;
+}
+
+.peer-rank-card .rank-list-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 12.5px;
+}
+
+.rank-list-row.highlight {
+  background: #fbf3e4;
+  margin: 0 -10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.rank-list-pos {
+  width: 22px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.rank-list-name {
+  flex: 1;
+}
+
+.rank-list-bar-track {
+  flex: 2;
+  height: 6px;
+  background: #efe9d8;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rank-list-bar-fill {
+  height: 100%;
+  background: var(--sage);
+}
+
+.rank-list-bar-fill.self {
+  background: var(--gold);
+}
+
+.rank-list-val {
+  font-family: var(--font-mono);
+  width: 90px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rank-ellipsis {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.driver-bar-row {
+  margin-top: 12px;
+}
+
+.driver-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.driver-bar-track {
+  height: 9px;
+  background: #efe9d8;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.driver-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
 }

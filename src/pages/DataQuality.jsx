@@ -1,6 +1,6 @@
 // src/pages/DataQuality.jsx
 import { useEffect, useMemo, useState } from 'react';
-import { getMonthlySummary, getMonthlyRecords } from '../api/appsScript';
+import { getMonthlySummary, getMonthlyRecords } from '../api/supabase';
 import {
   findNearDuplicateNames,
   findCarryoverDuplicates,

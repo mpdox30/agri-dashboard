@@ -1,10 +1,11 @@
 // src/pages/Homepage.jsx
 import { useEffect, useMemo, useState } from 'react';
-import { getCommunities, getMonthlySummary } from '../api/appsScript';
+import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
+import ProvinceMap from '../components/ProvinceMap';
 import {
   filterSummaryRows,
   aggregateTotals,
@@ -236,6 +237,7 @@ export default function Homepage() {
             คลิกจังหวัดเพื่อกรองข้อมูลด้านบนตามจังหวัดนั้น · แสดง {provinceTotals.length} จังหวัด
           </span>
         </div>
+        <ProvinceMap provinceTotals={provinceTotals} onSelectProvince={handleSelectProvince} />
         <ProvinceGrid provinceTotals={provinceTotals} onSelectProvince={handleSelectProvince} />
       </div>
 

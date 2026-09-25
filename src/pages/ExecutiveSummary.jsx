@@ -1,6 +1,6 @@
 // src/pages/ExecutiveSummary.jsx
 import { useEffect, useMemo, useState } from 'react';
-import { getCommunities, getMonthlySummary } from '../api/appsScript';
+import { getCommunities, getMonthlySummary } from '../api/supabase';
 import { buildFiscalYearDropdownOptions, buildCalendarYearDropdownOptions } from './fiscalYears';
 import { buildExecutiveSummaryData, buildRegionalComparisonRows } from './executiveSummaryData';
 import { downloadWorkbook } from '../utils/excelExport';

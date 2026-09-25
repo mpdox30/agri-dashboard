@@ -13,29 +13,23 @@ import './TrendChart.css';
  */
 export default function TrendChart({ months }) {
   const knownValues = months.filter((m) => m.netIncome !== null).map((m) => m.netIncome);
-  // ใช้ค่าสมบูรณ์สูงสุดเป็นตัวหารสเกล เพื่อให้ค่าติดลบเล็กๆ ไม่ถูกดันให้แถบสูงผิดปกติ
-  const maxAbsValue =
-    knownValues.length > 0 ? Math.max(...knownValues.map((v) => Math.abs(v)), 1) : 1;
-  // ขั้นต่ำความสูงแท่งแค่พอให้มองเห็นเป็นเส้นบางๆ — ไม่บังคับสูงจนค่าใกล้ 0 ดูเหมือนมีรายได้มาก
-  // การแยก "มีข้อมูล" vs "ยังไม่มีข้อมูล" ใช้สี (เขียว/เทา) เป็นตัวบอกอยู่แล้ว ไม่ต้องพึ่งความสูง
-  const MIN_VISIBLE_PCT = 1.5;
+  const maxValue = knownValues.length > 0 ? Math.max(...knownValues, 1) : 1;
 
   return (
     <div className="trend-card">
       <div className="trend-chart">
         {months.map((m) => {
           const hasData = m.netIncome !== null;
-          const isNegative = hasData && m.netIncome < 0;
-          const rawPct = hasData ? (Math.abs(m.netIncome) / maxAbsValue) * 100 : 0;
-          const heightPct = hasData ? Math.max(rawPct, MIN_VISIBLE_PCT) : 1.2;
-          let barClass = 'trend-bar trend-bar--dim';
-          if (hasData) barClass = isNegative ? 'trend-bar trend-bar--negative' : 'trend-bar';
+          const heightPct = hasData ? Math.max((m.netIncome / maxValue) * 100, 4) : 3;
           return (
             <div className="trend-bar-col" key={m.label}>
               <div className="trend-bar-val">
                 {hasData ? (m.netIncome / 1_000_000).toFixed(2) : '—'}
               </div>
-              <div className={barClass} style={{ height: `${heightPct}%` }} />
+              <div
+                className={hasData ? 'trend-bar' : 'trend-bar trend-bar--dim'}
+                style={{ height: `${heightPct}%` }}
+              />
               <div className="trend-bar-label">{m.label}</div>
             </div>
           );
@@ -45,10 +39,6 @@ export default function TrendChart({ months }) {
         <span>
           <span className="trend-legend__dot trend-legend__dot--known" />
           มีข้อมูลกรอกแล้ว
-        </span>
-        <span>
-          <span className="trend-legend__dot trend-legend__dot--negative" />
-          รายได้สุทธิติดลบ
         </span>
         <span>
           <span className="trend-legend__dot trend-legend__dot--unknown" />

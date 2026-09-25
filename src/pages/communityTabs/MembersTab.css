@@ -160,6 +160,56 @@ tbody tr:hover {
   background: var(--sage);
 }
 
+.member-row {
+  cursor: pointer;
+}
+
+.expand-cell {
+  width: 22px;
+  padding-right: 0;
+}
+
+.expand-caret {
+  display: inline-block;
+  color: var(--muted);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+
+.expand-caret.expanded {
+  transform: rotate(90deg);
+  color: var(--green);
+}
+
+.member-detail-row td {
+  padding: 0 14px 16px;
+  background: #fbf8ef;
+}
+
+.member-detail-row:hover {
+  background: transparent;
+}
+
+.member-chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px 10px;
+}
+
+.member-chart-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 6px;
+}
+
+.member-chart-empty {
+  font-size: 12.5px;
+  color: var(--muted);
+  padding: 12px 0;
+}
+
 @media (max-width: 600px) {
   table {
     font-size: 12px;

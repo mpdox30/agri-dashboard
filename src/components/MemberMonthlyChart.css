@@ -1,0 +1,50 @@
+/* src/components/MemberMonthlyChart.css */
+
+.member-chart-wrap {
+  margin-top: 4px;
+}
+
+.member-chart {
+  width: 100%;
+  height: 130px;
+  display: block;
+}
+
+.member-chart-hint {
+  font-size: 10.5px;
+  color: var(--muted);
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.member-chart-zero-baseline {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.5;
+}
+
+.member-chart-line {
+  stroke: var(--green-soft);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.member-chart-dot {
+  fill: var(--gold);
+  stroke: var(--bg-card);
+  stroke-width: 1.5;
+}
+
+.member-chart-value-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: var(--ink);
+}
+
+.member-chart-month-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: var(--muted);
+}

@@ -1,5 +1,6 @@
 // src/pages/communityTabs/MembersTab.jsx
-import { useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import MemberMonthlyChart from '../../components/MemberMonthlyChart';
 import './MembersTab.css';
 
 function formatBaht(n) {
@@ -16,10 +17,27 @@ const SORT_OPTIONS = [
  * props:
  *   members: ผลลัพธ์จาก buildMemberTable() — เรียงตามรายได้สุทธิมาก->น้อยมาแล้ว
  *   periodLabel: ข้อความอธิบายช่วงเวลาที่กำลังดู (เช่น "ปีงบ 68–69 · ทั้งปี")
+ *   monthlySeriesByName: map ชื่อสมาชิก -> ผลลัพธ์จาก buildMemberMonthlySeries() ใช้วาดกราฟ
+ *     เมื่อกดขยายแถว — คำนวณจาก selectedRange เต็มเสมอ (ดู CommunityView.jsx) ไม่ผูกกับ
+ *     ตัวกรอง "เดือนเดียว" ของตารางนี้
+ *   fullPeriodLabel: ป้ายกำกับช่วงเวลาเต็ม (ไม่รวมตัวกรองเดือน) ใช้เป็นคำบรรยายกราฟ
  */
-export default function MembersTab({ members, periodLabel }) {
+export default function MembersTab({ members, periodLabel, monthlySeriesByName, fullPeriodLabel }) {
   const [searchText, setSearchText] = useState('');
   const [sortBy, setSortBy] = useState('netIncome');
+  const [expandedName, setExpandedName] = useState(null);
+
+  // ถ้าสมาชิกที่กำลังขยายอยู่หายไปจากลิสต์ปัจจุบัน (เช่น เปลี่ยนชุมชน/ช่วงเวลา) ให้ยุบกราฟ
+  // ทิ้งไปด้วย — แต่ไม่ยุบทุกครั้งที่แค่ค้นหา/เรียงลำดับใหม่ ตราบใดที่สมาชิกคนนั้นยังอยู่ในลิสต์
+  useEffect(() => {
+    if (expandedName && !members.some((m) => m.fullName === expandedName)) {
+      setExpandedName(null);
+    }
+  }, [members, expandedName]);
+
+  function toggleExpand(name) {
+    setExpandedName((prev) => (prev === name ? null : name));
+  }
 
   const filteredSorted = useMemo(() => {
     let result = members;
@@ -69,6 +87,7 @@ export default function MembersTab({ members, periodLabel }) {
         <table>
           <thead>
             <tr>
+              <th></th>
               <th>สมาชิก</th>
               <th className="num">ขาย</th>
               <th className="num">ซื้อ</th>
@@ -83,23 +102,50 @@ export default function MembersTab({ members, periodLabel }) {
               const rankClass =
                 rankInFull === 1 ? 'top1' : rankInFull === 2 ? 'top2' : rankInFull === 3 ? 'top3' : '';
               const barWidthPct = (Math.abs(m.netIncome) / maxNetIncome) * 100;
+              const isExpanded = expandedName === m.fullName;
+              const monthly = monthlySeriesByName ? monthlySeriesByName[m.fullName] : null;
               return (
-                <tr key={m.fullName}>
-                  <td>
-                    <span className={`rank-badge ${rankClass}`}>{rankInFull}</span>
-                    <span className="member-name">{m.fullName}</span>
-                    <div className="member-sub">เข้าร่วมปี {m.joinYear || 'ไม่ระบุ'}</div>
-                  </td>
-                  <td className="num">{formatBaht(m.sale)}</td>
-                  <td className="num">{formatBaht(m.purchase)}</td>
-                  <td className="num">{formatBaht(m.sharing)}</td>
-                  <td className="num">
-                    <span className="mini-bar-track">
-                      <span className="mini-bar-fill" style={{ width: `${barWidthPct}%` }} />
-                    </span>
-                    {formatBaht(m.netIncome)}
-                  </td>
-                </tr>
+                <Fragment key={m.fullName}>
+                  <tr
+                    className="member-row"
+                    onClick={() => toggleExpand(m.fullName)}
+                    aria-expanded={isExpanded}
+                  >
+                    <td className="expand-cell">
+                      <span className={isExpanded ? 'expand-caret expanded' : 'expand-caret'}>▸</span>
+                    </td>
+                    <td>
+                      <span className={`rank-badge ${rankClass}`}>{rankInFull}</span>
+                      <span className="member-name">{m.fullName}</span>
+                      <div className="member-sub">เข้าร่วมปี {m.joinYear || 'ไม่ระบุ'}</div>
+                    </td>
+                    <td className="num">{formatBaht(m.sale)}</td>
+                    <td className="num">{formatBaht(m.purchase)}</td>
+                    <td className="num">{formatBaht(m.sharing)}</td>
+                    <td className="num">
+                      <span className="mini-bar-track">
+                        <span className="mini-bar-fill" style={{ width: `${barWidthPct}%` }} />
+                      </span>
+                      {formatBaht(m.netIncome)}
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr className="member-detail-row">
+                      <td colSpan={6}>
+                        <div className="member-chart-card">
+                          <div className="member-chart-title">
+                            แนวโน้มรายเดือน — {m.fullName} ({fullPeriodLabel})
+                          </div>
+                          {monthly ? (
+                            <MemberMonthlyChart monthly={monthly} />
+                          ) : (
+                            <div className="member-chart-empty">ไม่มีข้อมูลรายเดือนสำหรับสมาชิกคนนี้</div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               );
             })}
           </tbody>

@@ -1,9 +1,10 @@
 // src/pages/EntryForm.jsx
-import { useEffect, useMemo, useState } from 'react';
-import { getCommunities, getMonthlyRecords, checkLock, submitEntry } from '../api/appsScript';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { getCommunities, getMonthlyRecords, checkLock, submitEntry } from '../api/supabase';
 import {
   VALUE_FIELDS,
   formatMonthWithBuddhistYear,
+  generateRecentMonthOptions,
   buildMemberRoster,
   isRowTouched,
   computeRowTotal,
@@ -11,7 +12,6 @@ import {
   getPreviousMonth,
   findSimilarExistingName,
 } from './entryFormHelpers';
-import { CALENDAR_YEAR_LIST, buildCalendarYearDropdownOptions, enumerateMonths } from './fiscalYears';
 import './EntryForm.css';
 
 function formatBaht(n) {
@@ -23,6 +23,43 @@ function currentMonthString() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// --- Autosave draft ลง localStorage ระหว่างกรอก ---
+// กันข้อมูลหายถ้าเบราว์เซอร์ปิดกะทันหัน/รีเฟรชพลาด/แท็บถูกปิดโดยไม่ตั้งใจก่อนกดส่ง
+// เก็บแยก key ตาม (ชุมชน, เดือน) เพื่อไม่ให้ร่างของชุมชน/เดือนอื่นมาปนกัน
+const DRAFT_STORAGE_PREFIX = 'agri_entry_draft__';
+
+function draftStorageKey(communityKey, month) {
+  return `${DRAFT_STORAGE_PREFIX}${communityKey}__${month}`;
+}
+
+function loadDraft(communityKey, month) {
+  try {
+    const raw = window.localStorage.getItem(draftStorageKey(communityKey, month));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return parsed;
+  } catch {
+    return null; // localStorage ปิดอยู่ (private mode) หรือข้อมูลเสีย — ไม่ critical ข้ามไป
+  }
+}
+
+function saveDraft(communityKey, month, draft) {
+  try {
+    window.localStorage.setItem(draftStorageKey(communityKey, month), JSON.stringify(draft));
+  } catch {
+    // localStorage เต็มหรือถูกปิด — ไม่ critical ปล่อยผ่าน ไม่ต้องรบกวนผู้ใช้
+  }
+}
+
+function clearDraft(communityKey, month) {
+  try {
+    window.localStorage.removeItem(draftStorageKey(communityKey, month));
+  } catch {
+    // ignore
+  }
+}
+
 let newMemberCounter = 0;
 
 export default function EntryForm() {
@@ -31,23 +68,8 @@ export default function EntryForm() {
   const [baseLoadError, setBaseLoadError] = useState(null);
 
   const [communityKey, setCommunityKey] = useState(null);
-
-  const currentYear = String(new Date().getFullYear());
-  const defaultYear = CALENDAR_YEAR_LIST.includes(currentYear) ? currentYear : CALENDAR_YEAR_LIST[0];
-  const [year, setYear] = useState(defaultYear);
-  const yearOptions = useMemo(() => buildCalendarYearDropdownOptions(), []);
-
-  // ตัวเลือกเดือนของปีที่เลือก เรียง ม.ค. -> ธ.ค. ตามปีปฏิทินจริง แต่แสดงจากเดือนล่าสุด
-  // ไปเดือนแรกในปีนั้น (ใหม่ -> เก่า) ให้สอดคล้องกับพฤติกรรมเดิมที่ผู้ใช้คุ้นเคย
-  const monthOptions = useMemo(() => {
-    const months = enumerateMonths(`${year}-01`, `${year}-12`);
-    return [...months].reverse();
-  }, [year]);
-
-  const [month, setMonth] = useState(() => {
-    const nowMonthStr = currentMonthString();
-    return monthOptions.includes(nowMonthStr) ? nowMonthStr : monthOptions[0];
-  });
+  const monthOptions = useMemo(() => generateRecentMonthOptions(currentMonthString(), 6), []);
+  const [month, setMonth] = useState(monthOptions[0]);
 
   const [recordsForCommunity, setRecordsForCommunity] = useState([]);
   const [recordsLoadState, setRecordsLoadState] = useState('loading');
@@ -62,6 +84,9 @@ export default function EntryForm() {
   const [password, setPassword] = useState('');
   const [submitState, setSubmitState] = useState('idle'); // idle | submitting | success | error
   const [submitError, setSubmitError] = useState(null);
+
+  const [draftRestoredNotice, setDraftRestoredNotice] = useState(false);
+  const justRestoredDraftRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,20 +154,48 @@ export default function EntryForm() {
     };
   }, [communityKey, month]);
 
+  // กู้คืนร่างที่บันทึกไว้ (ถ้ามี) ทุกครั้งที่เปลี่ยนชุมชนหรือเดือน — ทำงานหลัง state
+  // ถูกรีเซ็ตเป็นค่าว่างจาก handleCommunityChange/handleMonthChange แล้วเสมอ
+  useEffect(() => {
+    if (!communityKey || !month) return;
+    const draft = loadDraft(communityKey, month);
+    justRestoredDraftRef.current = true;
+    if (draft) {
+      setRowValues(draft.rowValues || {});
+      const restoredMembers = Array.isArray(draft.newMembers) ? draft.newMembers : [];
+      setNewMembers(restoredMembers);
+      restoredMembers.forEach((m) => {
+        const match = /^__new_(\d+)$/.exec(m.id);
+        if (match) {
+          const n = Number(match[1]);
+          if (n > newMemberCounter) newMemberCounter = n;
+        }
+      });
+      setDraftRestoredNotice(true);
+    } else {
+      setDraftRestoredNotice(false);
+    }
+  }, [communityKey, month]);
+
+  // Autosave: บันทึกร่างลง localStorage ทุกครั้งที่ข้อมูลในตารางเปลี่ยน
+  // ข้าม 1 รอบทันทีหลังกู้คืนร่าง (justRestoredDraftRef) กันเซฟทับด้วยค่าว่างก่อนที่
+  // state ที่กู้คืนมาจะ render จริง (ดูรายละเอียดจังหวะ effect ใน commit message)
+  useEffect(() => {
+    if (!communityKey || !month) return;
+    if (justRestoredDraftRef.current) {
+      justRestoredDraftRef.current = false;
+      return;
+    }
+    const hasAnyData = Object.keys(rowValues).length > 0 || newMembers.length > 0;
+    if (!hasAnyData) {
+      clearDraft(communityKey, month);
+      return;
+    }
+    saveDraft(communityKey, month, { rowValues, newMembers, savedAt: new Date().toISOString() });
+  }, [communityKey, month, rowValues, newMembers]);
+
   function handleCommunityChange(nextKey) {
     setCommunityKey(nextKey);
-    setRowValues({});
-    setNewMembers([]);
-    setSubmitState('idle');
-    setSubmitError(null);
-  }
-
-  function handleYearChange(nextYear) {
-    const months = enumerateMonths(`${nextYear}-01`, `${nextYear}-12`).reverse();
-    const nowMonthStr = currentMonthString();
-    const nextMonth = months.includes(nowMonthStr) ? nowMonthStr : months[0];
-    setYear(nextYear);
-    setMonth(nextMonth);
     setRowValues({});
     setNewMembers([]);
     setSubmitState('idle');
@@ -267,16 +320,6 @@ export default function EntryForm() {
 
   const currentAveragePerTouched = touchedRows.length > 0 ? netIncomeTotal / touchedRows.length : null;
 
-  // เดือนที่เลือกย้อนหลังจากเดือนปัจจุบันจริงเกิน 2 เดือน ถือว่าเป็นการ "กรอกย้อนหลัง"
-  // เพื่อเติมข้อมูลเก่าที่ขาดไว้ — ไม่ใช่การกรอกตามรอบปกติ จึงเตือนไว้กันเลือกเดือนผิด
-  const isBackdated = useMemo(() => {
-    const nowStr = currentMonthString();
-    const [nowY, nowM] = nowStr.split('-').map(Number);
-    const [selY, selM] = month.split('-').map(Number);
-    const monthsDiff = (nowY - selY) * 12 + (nowM - selM);
-    return monthsDiff > 2;
-  }, [month]);
-
   const isLocked = lockInfo && lockInfo.locked;
   const canSubmit =
     !isLocked &&
@@ -300,6 +343,7 @@ export default function EntryForm() {
 
     try {
       await submitEntry({ password, communityKey, month, submittedBy, members });
+      clearDraft(communityKey, month);
       setSubmitState('success');
     } catch (err) {
       setSubmitState('error');
@@ -357,16 +401,6 @@ export default function EntryForm() {
             </select>
           </div>
           <div className="control-group">
-            <label>ปี</label>
-            <select value={year} onChange={(e) => handleYearChange(e.target.value)}>
-              {yearOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="control-group">
             <label>เดือนที่กรอก</label>
             <select value={month} onChange={(e) => handleMonthChange(e.target.value)}>
               {monthOptions.map((m) => (
@@ -394,17 +428,20 @@ export default function EntryForm() {
           </div>
         )}
 
-        {isBackdated && (
-          <div className="warning-banner">
-            🕓 <b>กำลังกรอกข้อมูลย้อนหลังเดือน {formatMonthWithBuddhistYear(month)}</b> —
-            ตรวจสอบให้แน่ใจว่าเลือกปี/เดือนถูกต้องแล้ว ก่อนกรอกข้อมูลเพื่อเติมส่วนที่ขาดหายไปของเดือนนี้
-          </div>
-        )}
-
         {!isLocked && alreadyApprovedThisMonth && (
           <div className="warning-banner">
             ⚑ <b>เดือนนี้มีข้อมูลที่อนุมัติแล้วอยู่ในระบบแล้ว</b> — ถ้าส่งซ้ำอีกครั้งจะมีข้อมูลซ้ำกัน
             สองชุดสำหรับเดือนนี้ ตรวจสอบให้แน่ใจก่อนว่าตั้งใจจะแก้ไขข้อมูลเดือนนี้จริง ๆ ไม่ใช่เผลอเลือกเดือนผิด
+          </div>
+        )}
+
+        {!isLocked && draftRestoredNotice && (
+          <div className="draft-banner">
+            💾 <b>กู้คืนร่างที่กรอกไว้ก่อนหน้าให้แล้ว</b> — ข้อมูลที่เห็นด้านล่างเป็นร่างที่ระบบบันทึกอัตโนมัติไว้ในเครื่องนี้
+            (ยังไม่ได้ส่ง) ตรวจทานอีกครั้งก่อนกดส่งจริง
+            <button type="button" className="draft-banner-dismiss" onClick={() => setDraftRestoredNotice(false)}>
+              ปิด
+            </button>
           </div>
         )}
 

@@ -134,6 +134,40 @@
   color: var(--terracotta);
 }
 
+.draft-banner {
+  background: #e7f0fb;
+  border: 1.5px solid #bcd6f2;
+  border-radius: 10px;
+  padding: 13px 18px;
+  font-size: 13px;
+  color: #2b4a6b;
+  margin-top: 14px;
+  line-height: 1.7;
+  position: relative;
+  padding-right: 60px;
+}
+
+.draft-banner b {
+  color: #1f5f99;
+}
+
+.draft-banner-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: 1px solid #bcd6f2;
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 11.5px;
+  color: #2b4a6b;
+  cursor: pointer;
+}
+
+.draft-banner-dismiss:hover {
+  background: #d7e6f7;
+}
+
 .error-banner {
   background: #f3d9d2;
   border: 1.5px solid #ddb3a4;

@@ -1,5 +1,4 @@
 // src/components/TopBar.jsx
-import hiiLogo from '../assets/hii-logo.png';
 import './TopBar.css';
 
 const MODES = [
@@ -20,10 +19,10 @@ export default function TopBar({ activeMode, onModeChange }) {
   return (
     <div className="topbar">
       <div className="topbar__brand">
-        <img src={hiiLogo} alt="Hydro-Informatics Institute" className="topbar__logo" />
+        <div className="topbar__mark">ท</div>
         <div className="topbar__text">
           ระบบติดตามรายได้แปลงเกษตรทฤษฎีใหม่
-          <span>ฝ่ายจัดการน้ำชุมชน</span>
+          <span>Hydro-Informatics Institute · ฝ่ายจัดการน้ำชุมชน</span>
         </div>
       </div>
       <div className="topbar__mode-toggle">

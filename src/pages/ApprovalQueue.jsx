@@ -1,6 +1,6 @@
 // src/pages/ApprovalQueue.jsx
 import { useMemo, useState } from 'react';
-import { getPendingReview, approveSubmission, rejectSubmission } from '../api/appsScript';
+import { getPendingReview, approveSubmission, rejectSubmission } from '../api/supabase';
 import { formatMonthWithBuddhistYear } from './entryFormHelpers';
 import { summarizeSubmission, buildDiffRows, filterAndSortSubmissions } from './approvalQueueHelpers';
 import './ApprovalQueue.css';

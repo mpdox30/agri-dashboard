@@ -45,7 +45,7 @@ export const FISCAL_YEAR_DISPLAY_LABEL = {
 };
 
 /** "2025-10" -> "ต.ค.68" (เดือนย่อ + ปี พ.ศ. 2 หลักท้าย) ใช้สร้าง label ช่วงปีงบอัตโนมัติ */
-export function toShortThaiLabel(monthStr) {
+function toShortThaiLabel(monthStr) {
   const [y, m] = monthStr.split('-').map(Number);
   const beShort = String((y + 543) % 100).padStart(2, '0');
   return `${THAI_MONTH_ABBR[m]}${beShort}`;
@@ -157,46 +157,20 @@ export function countMonthsWithData(summaryRowsForCommunity, range) {
 }
 
 /**
- * ย่อช่วงปีงบ/ปีปฏิทินเต็ม ๆ ให้เหลือแค่ช่วงเดือนย่อยที่เลือก (เช่น "ธ.ค. ถึง มี.ค." ภายใน
- * ปีงบ 68–69) — รับเลขเดือน (เช่น "12", "03") ไม่ใช่ YYYY-MM ตรง ๆ เพราะผู้ใช้เลือกจาก
- * dropdown เดือนของปีนั้น ๆ ซึ่งไม่รู้ปี ค.ศ. ล่วงหน้า
- *
- * ต้องคำนวณจากลำดับเดือนจริงของปีนั้น (ดู enumerateMonths) ไม่ใช่เทียบเลขเดือน 01-12
- * ตรง ๆ เพราะปีงบเริ่ม ต.ค. ทำให้ลำดับเดือนไม่ใช่ 01->12 แต่เป็น 10,11,12,01,...,09 —
- * ถ้าเทียบเลขตรง ๆ "ธ.ค.(12) ถึง มี.ค.(03)" จะดูเหมือนเดือนสิ้นสุดมาก่อนเดือนเริ่ม ทั้งที่
- * จริง ๆ แล้ว ธ.ค. มาก่อน มี.ค. ในปีงบเดียวกัน
- *
- * คืน {start, end} แบบ YYYY-MM หรือ null ถ้าเลือกไม่ถูกต้อง (เดือนเริ่มมาหลังเดือนสิ้นสุด
- * ในลำดับของปีนั้น หรือหาเดือนที่เลือกไม่เจอในปีนั้นเลย)
+ * สร้างรายการช่วงเวลาย้อนหลังต่อเนื่องจากปีที่เลือกไว้ (index 0 = ปีที่เลือกอยู่ ไล่ย้อน
+ * ไปปีเก่ากว่าเรื่อย ๆ) ใช้กับกราฟเทียบหลายปีซ้อนกันแบบเดือนต่อเดือน — หยุดเมื่อครบ
+ * maxPeriods หรือย้อนไปสุดประวัติที่มี (แล้วแต่อย่างไหนถึงก่อน) ทำงานได้ทั้งปีงบ (ที่มี
+ * ช่วงขาดหายจริงระหว่างทาง เช่น ไม่มี '66-67' — getPreviousPeriod ข้ามช่องว่างนี้ให้เอง)
+ * และปีปฏิทิน (ต่อเนื่องทุกปีจริงไม่มีช่องว่าง)
  */
-export function narrowRangeByMonths(yearRange, monthFromNum, monthToNum) {
-  if (!yearRange) return null;
-  const allMonths = enumerateMonths(yearRange.start, yearRange.end);
-  const fromIndex = allMonths.findIndex((m) => m.split('-')[1] === monthFromNum);
-  const toIndex = allMonths.findIndex((m) => m.split('-')[1] === monthToNum);
-  if (fromIndex === -1 || toIndex === -1 || fromIndex > toIndex) return null;
-  return { start: allMonths[fromIndex], end: allMonths[toIndex] };
-}
-
-/**
- * สร้างตัวเลือกเดือนสำหรับ dropdown "จากเดือน"/"ถึงเดือน" เรียงตามลำดับจริงของปีประเภท
- * นั้น (ปีงบ: ต.ค.->ก.ย., ปีปฏิทิน: ม.ค.->ธ.ค.) ไม่ใช่เรียงเลข 01->12 เสมอ
- */
-export function buildMonthOfYearOptions(yearType) {
-  const sampleRange = yearType === 'calendar' ? { start: '2000-01', end: '2000-12' } : FISCAL_YEAR_RANGES['68-69'];
-  return enumerateMonths(sampleRange.start, sampleRange.end).map((m) => {
-    const monthNum = m.split('-')[1];
-    return { value: monthNum, label: formatMonthLabel(m) };
-  });
-}
-
-/**
- * ป้ายข้อความสำหรับช่วงที่กำลังดูจริง — ถ้า range ที่ส่งมาคือทั้งปี (เท่ากับ fullYearRange)
- * ใช้ป้ายปีตามปกติ (เช่น "ปีงบ 68–69") แต่ถ้าเป็นช่วงเดือนย่อยที่ผู้ใช้กรองไว้ ใช้ป้าย
- * ช่วงเดือนแทน (เช่น "ธ.ค.68 – มี.ค.69") ให้เห็นชัดว่ากำลังดูแค่บางเดือน ไม่ใช่ทั้งปี
- */
-export function formatPeriodOrRangeLabel(yearType, year, range, fullYearRange) {
-  const isFullYear = fullYearRange && range.start === fullYearRange.start && range.end === fullYearRange.end;
-  if (isFullYear) return getPeriodDisplayLabel(yearType, year);
-  return `${toShortThaiLabel(range.start)} – ${toShortThaiLabel(range.end)}`;
+export function buildPeriodChain(yearType, year, maxPeriods = 6) {
+  const chain = [];
+  let currentValue = year;
+  while (currentValue && chain.length < maxPeriods) {
+    const range = getPeriodRange(yearType, currentValue);
+    if (!range) break;
+    chain.push({ value: currentValue, label: getPeriodDisplayLabel(yearType, currentValue), range });
+    currentValue = getPreviousPeriod(yearType, currentValue);
+  }
+  return chain;
 }
