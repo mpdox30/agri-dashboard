@@ -14,9 +14,7 @@ const CHART_WIDTH = WIDTH - PADDING_LEFT - PADDING_RIGHT;
 const CHART_HEIGHT = HEIGHT - PADDING_TOP - PADDING_BOTTOM;
 
 function formatCompact(n) {
-  if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}ล.`;
-  if (Math.abs(n) >= 1_000) return `${(n / 1_000).toFixed(0)}พ.`;
-  return String(Math.round(n));
+  return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(Math.round(n));
 }
 
 /**
