@@ -1,4 +1,5 @@
 // src/components/TopBar.jsx
+import sasanLogo from '../assets/sasan-logo.png';
 import './TopBar.css';
 
 const MODES = [
@@ -19,7 +20,7 @@ export default function TopBar({ activeMode, onModeChange }) {
   return (
     <div className="topbar">
       <div className="topbar__brand">
-        <div className="topbar__mark">ท</div>
+        <img className="topbar__logo" src={sasanLogo} alt="สถาบันสารสนเทศทรัพยากรน้ำ (สสน.)" />
         <div className="topbar__text">
           ระบบติดตามรายได้แปลงเกษตรทฤษฎีใหม่
           <span>Hydro-Informatics Institute · ฝ่ายจัดการน้ำชุมชน</span>
