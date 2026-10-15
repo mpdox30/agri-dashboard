@@ -24,13 +24,28 @@
   font-size: 13.5px;
 }
 
+.change-split__item {
+  padding: 3px 10px 3px 6px;
+  border-radius: 999px;
+  transition: background 0.2s var(--ease);
+}
+.change-split__item.is-active { background: var(--shell); }
+
+/* วงกลมสีมีสัญลักษณ์ ▲ ● ▼ กำกับ ไม่พึ่งสีอย่างเดียว */
 .change-split__dot {
   align-self: center;
-  width: 9px;
-  height: 9px;
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-size: 8px;
+  line-height: 1;
+  color: #fff;
   border-radius: 50%;
   background: var(--flat);
+  transition: transform 0.25s var(--ease-out);
 }
+.change-split__item.is-active .change-split__dot { transform: scale(1.18); }
 .change-split__item--up .change-split__dot { background: var(--up); }
 .change-split__item--flat .change-split__dot { background: var(--sage); }
 .change-split__item--down .change-split__dot { background: var(--down); }

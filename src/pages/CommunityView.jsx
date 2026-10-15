@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getCommunities, getMonthlySummary, getMonthlyRecords } from '../api/supabase';
 import CommunityHeader from '../components/CommunityHeader';
 import SubTabs from '../components/SubTabs';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import CommunityExportPanel from '../components/CommunityExportPanel';
 import OverviewTab from './communityTabs/OverviewTab';
 import AnalyticsTab from './communityTabs/AnalyticsTab';
@@ -322,9 +323,7 @@ export default function CommunityView() {
 
   if (baseLoadState === 'loading') {
     return (
-      <div className="community-status">
-        <p>กำลังโหลดข้อมูล...</p>
-      </div>
+      <LoadingSkeleton variant="community" />
     );
   }
 
@@ -362,11 +361,9 @@ export default function CommunityView() {
       <SubTabs tabs={TABS} activeKey={activeTab} onChange={setActiveTab} />
 
       {recordsLoadState === 'loading' ? (
-        <div className="community-status">
-          <p>กำลังโหลดข้อมูลรายสมาชิก...</p>
-        </div>
+        <LoadingSkeleton variant="panel" label="กำลังโหลดข้อมูลรายสมาชิก..." />
       ) : (
-        <>
+        <div key={activeTab} className="tab-panel-enter">
           {activeTab === 'overview' && (
             <OverviewTab
               summaryRowsForCommunity={summaryRowsForCommunity}
@@ -413,7 +410,7 @@ export default function CommunityView() {
               fullPeriodLabel={periodLabel}
             />
           )}
-        </>
+        </div>
       )}
     </div>
   );

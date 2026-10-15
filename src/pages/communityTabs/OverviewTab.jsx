@@ -1,6 +1,7 @@
 // src/pages/communityTabs/OverviewTab.jsx
 import { FISCAL_YEAR_DISPLAY_LABEL, FISCAL_YEAR_RANGES, enumerateMonths, formatMonthLabel } from '../fiscalYears';
 import BarTrendChart from '../../components/BarTrendChart';
+import Reveal from '../../components/ui/Reveal';
 import './OverviewTab.css';
 
 /**
@@ -23,8 +24,8 @@ export default function OverviewTab({ summaryRowsForCommunity, trend, excludedMo
           <h2>ความครบถ้วนของข้อมูล</h2>
           <span className="note">จำนวนเดือนที่มีข้อมูลกรอกแล้ว จาก 12 เดือนที่คาดไว้ ต่อปีงบ</span>
         </div>
-        <div className="completeness-panel">
-          {Object.keys(FISCAL_YEAR_RANGES).map((yearKey) => {
+        <Reveal className="completeness-panel">
+          {Object.keys(FISCAL_YEAR_RANGES).map((yearKey, rowIndex) => {
             const range = FISCAL_YEAR_RANGES[yearKey];
             const expectedMonths = enumerateMonths(range.start, range.end);
             const presentMonths = new Set(
@@ -35,7 +36,7 @@ export default function OverviewTab({ summaryRowsForCommunity, trend, excludedMo
             const completedCount = expectedMonths.filter((m) => presentMonths.has(m)).length;
             const isComplete = completedCount === expectedMonths.length;
             return (
-              <div className="completeness-row" key={yearKey}>
+              <div className="completeness-row" key={yearKey} style={{ '--i': rowIndex }}>
                 <span className="completeness-year">{FISCAL_YEAR_DISPLAY_LABEL[yearKey]}</span>
                 <span className="completeness-bar-track">
                   <span
@@ -52,7 +53,7 @@ export default function OverviewTab({ summaryRowsForCommunity, trend, excludedMo
               </div>
             );
           })}
-        </div>
+        </Reveal>
         {excludedMonthsList.length > 0 && (
           <div className="completeness-footnote">
             ⚑ ตัดออกจาก "มีข้อมูล" ด้านบนแล้ว {excludedMonthsList.length} เดือน เพราะค่าทุกยอด

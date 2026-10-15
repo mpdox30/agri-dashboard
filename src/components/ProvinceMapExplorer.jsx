@@ -108,7 +108,7 @@ export default function ProvinceMapExplorer({ rows, communities, selectedProvinc
     <div className="map-explorer">
       <div className="map-explorer__bar">
         <SegmentedControl ariaLabel="ตัวชี้วัดบนแผนที่" options={METRIC_OPTIONS} value={metric} onChange={setMetric} />
-        <div className="map-explorer__now" aria-live="polite">
+        <div className="map-explorer__now" aria-live="polite" key={activeMonth}>
           {activeMonth === 'all' ? 'ทั้งช่วงที่เลือก' : `เดือน ${monthText(activeMonth)}`}
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function ProvinceMapExplorer({ rows, communities, selectedProvinc
         <div className="map-explorer__scrubber">
           <button
             type="button"
-            className="map-explorer__play"
+            className={playing ? 'map-explorer__play is-playing' : 'map-explorer__play'}
             onClick={handlePlayToggle}
             aria-label={playing ? 'หยุดเล่น' : 'เล่นไล่ดูทีละเดือน'}
           >

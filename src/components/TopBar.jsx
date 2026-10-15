@@ -1,4 +1,5 @@
 // src/components/TopBar.jsx
+import { useEffect, useState } from 'react';
 import sasanLogo from '../assets/sasan-logo.png';
 import './TopBar.css';
 
@@ -17,8 +18,16 @@ const MODES = [
  *   onModeChange: (mode: string) => void
  */
 export default function TopBar({ activeMode, onModeChange }) {
+  // เลื่อนลงแล้วแถบเกาะขอบบนพร้อมเงาบางๆ (เปลี่ยน state เฉพาะตอนข้ามเส้น ไม่ใช่ทุกพิกเซลที่เลื่อน)
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setStuck(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <div className="topbar">
+    <div className={stuck ? 'topbar is-stuck' : 'topbar'}>
       <div className="topbar__brand">
         <img className="topbar__logo" src={sasanLogo} alt="สถาบันสารสนเทศทรัพยากรน้ำ (สสน.)" />
         <div className="topbar__text">

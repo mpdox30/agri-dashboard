@@ -1,6 +1,7 @@
 /* src/components/ProvinceMap.css */
 
 .province-map {
+  isolation: isolate; /* ให้ z-index ภายในของ Leaflet อยู่ในกล่องนี้ ไม่ลอยทับแถบบนที่เกาะขอบ */
   background: var(--bg-card);
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -71,3 +72,15 @@
   pointer-events: none;
 }
 .province-map .leaflet-tooltip.province-map__label::before { display: none; }
+
+/* สีและขอบเปลี่ยนนุ่มๆ ตอนเลื่อนเดือน/สลับตัวชี้วัด และจังหวัดที่ชี้อยู่มีเงารองให้ดูลอยขึ้น */
+.province-map path.leaflet-interactive {
+  transition: fill 0.7s var(--ease), stroke 0.2s;
+}
+.province-map path.leaflet-interactive:hover {
+  filter: drop-shadow(0 3px 5px rgba(45, 74, 62, 0.45));
+}
+@media (prefers-reduced-motion: reduce) {
+  .province-map path.leaflet-interactive { transition: none; }
+}
+html.is-exporting .province-map path.leaflet-interactive { transition: none; }

@@ -2,6 +2,7 @@
 //
 // การ์ดสรุปว่าชุมชนกี่แห่ง รายได้เพิ่มขึ้น / ทรงตัว / ลดลง เมื่อเทียบกับเดือนเดียวกันของปีก่อน
 // ใช้แถบสัดส่วนสีเดียวแบบสุภาพ ไม่ใช้สีเตือนแรง เพราะรายได้เกษตรผันผวนตามฤดูกาลเป็นปกติ
+import { useState } from 'react';
 import Card from './ui/Card';
 import Reveal from './ui/Reveal';
 import SegmentBar from './ui/SegmentBar';
@@ -18,6 +19,7 @@ function formatInteger(n) {
  *   pairedCount: จำนวนคู่ (ชุมชน, เดือน) ที่ใช้เทียบ
  */
 export default function ChangeSplitCard({ split, pairedCount }) {
+  const [hovered, setHovered] = useState(null);
   if (!split || split.total === 0) {
     return (
       <Reveal className="change-split">
@@ -37,11 +39,16 @@ export default function ChangeSplitCard({ split, pairedCount }) {
     <Reveal className="change-split">
       <Card>
         <div className="change-split__title">เทียบกับเดือนเดียวกันของปีก่อน</div>
-        <SegmentBar segments={items} />
+        <SegmentBar segments={items} activeKey={hovered} />
         <ul className="change-split__legend">
           {items.map((it) => (
-            <li key={it.key} className={`change-split__item change-split__item--${it.tone}`}>
-              <span className="change-split__dot" aria-hidden="true" />
+            <li
+              key={it.key}
+              className={`change-split__item change-split__item--${it.tone}${hovered === it.key ? ' is-active' : ''}`}
+              onMouseEnter={() => setHovered(it.key)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <span className="change-split__dot" aria-hidden="true">{{ up: '▲', flat: '●', down: '▼' }[it.tone]}</span>
               <span className="change-split__num">
                 <CountUp value={it.value} format={formatInteger} />
               </span>

@@ -49,7 +49,8 @@ function buildSeasonBands(monthly) {
 
 /**
  * props:
- *   monthly: { label: string, netIncome: number, isRainy: boolean }[] (12 เดือน เรียงตามลำดับที่ใช้แสดง)
+ *   monthly: { label: string, netIncome: number, isRainy: boolean, hasData?: boolean }[] (12 เดือน เรียงตามลำดับที่ใช้แสดง)
+ *     hasData = false คือเดือนที่ยังไม่มีข้อมูล จะไม่ลากเส้นไปหา และแสดงเป็นจุดจาง ไม่ให้เข้าใจว่าได้ 0 บาทจริง
  */
 export default function SeasonalLineChart({ monthly }) {
   const values = monthly.map((m) => m.netIncome);
@@ -72,11 +73,22 @@ export default function SeasonalLineChart({ monthly }) {
 
   // แสดงตัวเลขกำกับเฉพาะจุดสูงสุด จุดล่าสุด และจุดที่ผู้ใช้ชี้อยู่ ที่เหลืออ่านจากกล่องค่าหรือตาราง
   // (12 ป้ายตัวเลขเต็มพร้อมจุลภาคแน่นเกินไปบนจอมือถือ)
-  const peakIndex = values.indexOf(maxVal);
-  const lastIndex = points.length - 1;
+  const dataIndexes = points.map((p, i) => (p.hasData === false ? -1 : i)).filter((i) => i >= 0);
+  const peakIndex = dataIndexes.length ? dataIndexes.reduce((a, b) => (values[b] > values[a] ? b : a)) : -1;
+  const lastIndex = dataIndexes.length ? dataIndexes[dataIndexes.length - 1] : -1;
   const labelIndexes = new Set([peakIndex, lastIndex]);
   if (active !== null) labelIndexes.add(active);
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  // เส้นขาดตรงเดือนที่ไม่มีข้อมูล (แยกเป็นช่วงต่อเนื่อง)
+  const segments = [];
+  points.forEach((p) => {
+    if (p.hasData === false) {
+      if (segments.length && segments[segments.length - 1].open) segments[segments.length - 1].open = false;
+      return;
+    }
+    const last = segments[segments.length - 1];
+    if (last && last.open) last.pts.push(p);
+    else segments.push({ pts: [p], open: true });
+  });
   const zeroY = yAt(0);
   const bands = buildSeasonBands(monthly);
 
@@ -110,10 +122,16 @@ export default function SeasonalLineChart({ monthly }) {
           <line x1={PADDING_LEFT} y1={zeroY} x2={WIDTH - PADDING_RIGHT} y2={zeroY} className="zero-baseline" />
         )}
 
-        <AreaFill points={points} baselineY={PADDING_TOP + CHART_HEIGHT} />
-
-        {/* เส้นกราฟหลัก */}
-        <DrawInPath d={linePath} className="season-line-path" />
+        {/* เส้นกราฟหลัก (วาดทีละช่วงที่มีข้อมูลต่อเนื่อง) */}
+        {segments.map((seg, si) => (
+          <g key={si}>
+            <AreaFill points={seg.pts} baselineY={PADDING_TOP + CHART_HEIGHT} />
+            <DrawInPath
+              d={seg.pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')}
+              className="season-line-path"
+            />
+          </g>
+        ))}
 
         {/* จุดข้อมูลแต่ละเดือน สีตามฤดู + label ค่าเฉพาะจุดสำคัญ + label เดือนด้านล่าง */}
         {points.map((p, i) => (
@@ -123,6 +141,7 @@ export default function SeasonalLineChart({ monthly }) {
               cy={p.y}
               r={active === i ? 5.5 : 4}
               className={p.isRainy ? 'season-dot rainy-dot' : 'season-dot dry-dot'}
+              opacity={p.hasData === false ? 0.3 : 1}
             />
             {labelIndexes.has(i) && active === null && (
               <text x={p.x} y={Math.max(p.y - 8, 10)} textAnchor="middle" className="season-value-label">
@@ -142,7 +161,7 @@ export default function SeasonalLineChart({ monthly }) {
               x={xs[active]}
               y={points[active].y}
               title={`${points[active].label} · ${points[active].isRainy ? 'ฤดูฝน' : 'ฤดูแล้ง'}`}
-              lines={[{ label: 'รายได้สุทธิ', value: `${formatCompact(points[active].netIncome)} บาท`, color: points[active].isRainy ? 'var(--green-soft)' : 'var(--terracotta)' }]}
+              lines={[{ label: 'รายได้สุทธิ', value: points[active].hasData === false ? 'ยังไม่มีข้อมูล' : `${formatCompact(points[active].netIncome)} บาท`, color: points[active].isRainy ? 'var(--green-soft)' : 'var(--terracotta)' }]}
               viewBoxWidth={WIDTH}
             />
           </>
@@ -158,7 +177,7 @@ export default function SeasonalLineChart({ monthly }) {
       </div>
       <DataTableToggle
         columns={TABLE_COLUMNS}
-        rows={monthly.map((m) => ({ key: m.label, month: m.label, season: m.isRainy ? 'ฤดูฝน' : 'ฤดูแล้ง', net: formatCompact(m.netIncome) }))}
+        rows={monthly.map((m) => ({ key: m.label, month: m.label, season: m.isRainy ? 'ฤดูฝน' : 'ฤดูแล้ง', net: m.hasData === false ? 'ยังไม่มีข้อมูล' : formatCompact(m.netIncome) }))}
         caption="รายได้สุทธิรายเดือน หน่วยบาท"
       />
     </div>

@@ -164,7 +164,7 @@ export function buildSeasonalBreakdown(summaryRowsForCommunity, range) {
     const isRainy = RAINY_MONTHS.has(monthNumberOf(m));
     if (isRainy) rainyTotal += netIncome;
     else dryTotal += netIncome;
-    return { label: formatMonthLabel(m), netIncome, isRainy };
+    return { label: formatMonthLabel(m), netIncome, isRainy, hasData: !!row };
   });
 
   const grandTotal = rainyTotal + dryTotal;

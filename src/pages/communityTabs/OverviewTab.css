@@ -19,11 +19,25 @@
 }
 
 .section-head h2 {
+  position: relative;
+  padding-left: 14px;
   font-family: var(--font-serif);
   font-size: 18px;
   font-weight: 600;
   margin: 0;
   color: var(--green);
+}
+
+/* แท่งสีนำหัวข้อ เหมือนหน้าแรก */
+.section-head h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  bottom: 0.18em;
+  width: 4px;
+  background: linear-gradient(180deg, var(--terracotta), var(--green-soft));
+  border-radius: 3px;
 }
 
 .section-head .note {
@@ -34,7 +48,8 @@
 .completeness-panel {
   background: var(--bg-card);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--r-core);
+  box-shadow: var(--inset-hi), var(--shadow-card);
   padding: 6px 20px;
 }
 
@@ -69,8 +84,16 @@
 .completeness-bar-fill {
   display: block;
   height: 100%;
-  background: var(--green-soft);
+  background: linear-gradient(90deg, var(--green-soft), var(--green));
+  border-radius: 4px;
+  transform-origin: 0 50%;
+  animation: completeness-fill 0.9s var(--ease-out) calc(0.25s + var(--i, 0) * 0.12s) both;
 }
+@keyframes completeness-fill {
+  from { transform: scaleX(0); }
+}
+@media (prefers-reduced-motion: reduce) { .completeness-bar-fill { animation: none; } }
+html.is-exporting .completeness-bar-fill { animation: none; }
 
 .completeness-count {
   font-family: var(--font-mono);
@@ -104,54 +127,4 @@
   color: var(--muted);
   margin-top: 10px;
   line-height: 1.6;
-}
-
-/* Trend chart — เหมือนหน้าแรกแต่กำหนดในไฟล์นี้เพื่อความเป็นอิสระของ component */
-.trend-card {
-  background: var(--bg-card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 22px;
-}
-
-.trend-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 24px;
-  height: 140px;
-  padding: 0 6px;
-}
-
-.trend-bar-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  justify-content: flex-end;
-}
-
-.trend-bar {
-  width: 44px;
-  border-radius: 5px 5px 2px 2px;
-  background: linear-gradient(180deg, var(--green-soft), var(--green));
-}
-
-.trend-bar--dim {
-  background: linear-gradient(180deg, #c9cfc4, #aab3a0);
-}
-
-.trend-bar-val {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  margin-bottom: 6px;
-  font-weight: 500;
-}
-
-.trend-bar-label {
-  margin-top: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  font-family: var(--font-mono);
 }

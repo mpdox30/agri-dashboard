@@ -1,6 +1,8 @@
 // src/components/CommunityHeader.jsx
 import { useState } from 'react';
 import { buildFiscalYearDropdownOptions, buildCalendarYearDropdownOptions, getPeriodDisplayLabel } from '../pages/fiscalYears';
+import SegmentedControl from './ui/SegmentedControl';
+import StatCard from './ui/StatCard';
 import './CommunityHeader.css';
 
 // สร้างจาก fiscalYears.js จุดเดียว — ไม่ต้องแก้ที่นี่เวลาขึ้นปีงบใหม่
@@ -21,6 +23,11 @@ const MONTH_OPTIONS = [
   { value: '10', label: 'ต.ค.' },
   { value: '11', label: 'พ.ย.' },
   { value: '12', label: 'ธ.ค.' },
+];
+
+const YEAR_TYPE_OPTIONS = [
+  { value: 'fiscal', label: 'ปีงบประมาณ' },
+  { value: 'calendar', label: 'ปีปฏิทิน' },
 ];
 
 function formatBaht(n) {
@@ -119,22 +126,12 @@ export default function CommunityHeader({
 
         <div className="control-group">
           <label>ประเภทปี</label>
-          <div className="seg-toggle">
-            <button
-              type="button"
-              className={yearType === 'fiscal' ? 'active' : ''}
-              onClick={() => handleYearTypeChange('fiscal')}
-            >
-              ปีงบประมาณ
-            </button>
-            <button
-              type="button"
-              className={yearType === 'calendar' ? 'active' : ''}
-              onClick={() => handleYearTypeChange('calendar')}
-            >
-              ปีปฏิทิน
-            </button>
-          </div>
+          <SegmentedControl
+            ariaLabel="ประเภทปี"
+            value={yearType}
+            onChange={handleYearTypeChange}
+            options={YEAR_TYPE_OPTIONS}
+          />
         </div>
 
         <div className="control-group">
@@ -186,54 +183,47 @@ export default function CommunityHeader({
       )}
 
       {kpis && (
-        <div className="kpi-row">
-          <div className="kpi-card">
-            <div className="kpi-label">รายได้สุทธิ — {periodLabel}</div>
-            <div className="kpi-value">
-              {formatBaht(kpis.netIncome)}
-              <span className="unit">฿</span>
-            </div>
-            <DeltaLabel value={kpis.deltas.netIncome} />
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-label">ลดรายจ่ายครัวเรือน</div>
-            <div className="kpi-value">
-              {formatBaht(kpis.householdReduction)}
-              <span className="unit">฿</span>
-            </div>
-            <DeltaLabel value={kpis.deltas.householdReduction} />
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-label">แบ่งปันในชุมชน</div>
-            <div className="kpi-value">
-              {formatBaht(kpis.sharing)}
-              <span className="unit">฿</span>
-            </div>
-            <DeltaLabel value={kpis.deltas.sharing} />
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-label">เฉลี่ยต่อสมาชิก ({memberCount} คน)</div>
-            <div className="kpi-value">
-              {formatBaht(kpis.perMember)}
-              <span className="unit">฿/ช่วง</span>
-            </div>
-            <div className="kpi-delta flat">รายบุคคลต่างกันมาก ดูแท็บรายสมาชิก</div>
-          </div>
+        <div className="comm-kpis">
+          <StatCard
+            label={`รายได้สุทธิ — ${periodLabel}`}
+            value={kpis.netIncome}
+            format={formatBaht}
+            unit="฿"
+            delta={kpis.deltas.netIncome}
+            deltaSuffix="จากช่วงก่อน"
+            note="ไม่มีข้อมูลช่วงก่อนเทียบ"
+            delay={0}
+          />
+          <StatCard
+            label="ลดรายจ่ายครัวเรือน"
+            value={kpis.householdReduction}
+            format={formatBaht}
+            unit="฿"
+            delta={kpis.deltas.householdReduction}
+            deltaSuffix="จากช่วงก่อน"
+            note="ไม่มีข้อมูลช่วงก่อนเทียบ"
+            delay={70}
+          />
+          <StatCard
+            label="แบ่งปันในชุมชน"
+            value={kpis.sharing}
+            format={formatBaht}
+            unit="฿"
+            delta={kpis.deltas.sharing}
+            deltaSuffix="จากช่วงก่อน"
+            note="ไม่มีข้อมูลช่วงก่อนเทียบ"
+            delay={140}
+          />
+          <StatCard
+            label={`เฉลี่ยต่อสมาชิก (${memberCount} คน)`}
+            value={kpis.perMember}
+            format={formatBaht}
+            unit="฿/ช่วง"
+            note="รายบุคคลต่างกันมาก ดูแท็บรายสมาชิก"
+            delay={210}
+          />
         </div>
       )}
-    </div>
-  );
-}
-
-function DeltaLabel({ value }) {
-  if (value === null) {
-    return <div className="kpi-delta flat">ไม่มีข้อมูลช่วงก่อนเทียบ</div>;
-  }
-  const direction = value > 0 ? 'up' : value < 0 ? 'down' : 'flat';
-  const arrow = value > 0 ? '↑' : value < 0 ? '↓' : '—';
-  return (
-    <div className={`kpi-delta ${direction}`}>
-      {arrow} {Math.abs(value).toFixed(1)}% จากช่วงก่อน
     </div>
   );
 }

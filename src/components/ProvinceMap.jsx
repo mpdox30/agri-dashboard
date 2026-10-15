@@ -1,9 +1,11 @@
 // src/components/ProvinceMap.jsx
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
 import { MapContainer, GeoJSON, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import thailandProvinces from '../data/thailand_provinces.json';
+import useInView from './ui/useInView';
+import { useMotionDisabled } from './ui/motion';
 import './ProvinceMap.css';
 
 function formatBaht(n) {
@@ -47,6 +49,12 @@ export default function ProvinceMap({
   selectedProvince = null,
 }) {
   const geoJsonRef = useRef(null);
+  const motionOff = useMotionDisabled();
+  const [viewRef, inView] = useInView({ disabled: motionOff });
+  const sweptRef = useRef(false);
+  // handler ของ layer ถูกสร้างครั้งเดียว จึงอ่านค่าล่าสุดผ่าน ref (ข้อมูลเปลี่ยนแล้วไม่ต้องสร้าง layer ใหม่
+  // สีจึงไล่เปลี่ยนต่อเนื่องตอนเลื่อนเดือน แทนที่จะกระโดดวาบ)
+  const latestRef = useRef({});
 
   const totalsByProvince = useMemo(() => {
     const map = new Map();
@@ -84,8 +92,6 @@ export default function ProvinceMap({
     [topProvinces]
   );
 
-  // บังคับให้ layer GeoJSON สร้างใหม่ทุกครั้งที่ข้อมูลเปลี่ยน (เปลี่ยนตัวกรอง/ปี) แทนที่จะ
-  // พึ่งกลไก diff ภายในของ react-leaflet เพื่อความชัวร์ว่าสี/tooltip อัปเดตตรงกับข้อมูลจริงเสมอ
   const dataVersion = useMemo(
     () => provinceTotals.map((p) => `${p.province}:${p[valueKey]}:${p.communityCount}`).join('|') + `|${valueKey}|${selectedProvince}`,
     [provinceTotals, valueKey, selectedProvince]
@@ -106,26 +112,77 @@ export default function ProvinceMap({
     };
   }
 
-  function onEachFeature(feature, layer) {
+  function labelForFeature(feature) {
     const provinceName = feature.properties.name_th;
     const stat = totalsByProvince.get(provinceName);
-    const label = stat
+    return stat
       ? `<b>${provinceName}</b><br/>${valueLabel} ${formatBaht(stat[valueKey] || 0)} บาท · ${stat.communityCount} ชุมชน`
       : `<b>${provinceName}</b><br/>ไม่มีข้อมูลในช่วงนี้`;
-    layer.bindTooltip(label, { sticky: true });
+  }
+
+  // เก็บค่าล่าสุดไว้ให้ handler ที่สร้างครั้งเดียวอ่าน (เขียนใน effect ไม่ใช่ตอนเรนเดอร์)
+  useEffect(() => {
+    latestRef.current = { styleForFeature, totalsByProvince, onSelectProvince };
+  });
+
+  function onEachFeature(feature, layer) {
+    const provinceName = feature.properties.name_th;
+    layer.bindTooltip(labelForFeature(feature), { sticky: true });
     layer.on({
-      mouseover: (e) => e.target.setStyle({ weight: 2.5, color: HOVER_STROKE }),
-      mouseout: (e) => {
-        if (geoJsonRef.current) geoJsonRef.current.resetStyle(e.target);
+      mouseover: (e) => {
+        e.target.setStyle({ weight: 2.5, color: HOVER_STROKE });
+        e.target.bringToFront();
       },
+      mouseout: (e) => e.target.setStyle(latestRef.current.styleForFeature(feature)),
       click: () => {
-        if (stat) onSelectProvince(provinceName);
+        if (latestRef.current.totalsByProvince.get(provinceName)) latestRef.current.onSelectProvince(provinceName);
       },
     });
   }
 
+  // ข้อมูลเปลี่ยน: ทาสีและอัปเดตข้อความ tooltip ใน layer เดิม (CSS ทำให้สีไล่เปลี่ยนนุ่มๆ)
+  useEffect(() => {
+    const group = geoJsonRef.current;
+    if (!group) return;
+    group.eachLayer((layer) => {
+      layer.setStyle(styleForFeature(layer.feature));
+      layer.setTooltipContent(labelForFeature(layer.feature));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataVersion]);
+
+  // ครั้งแรกที่แผนที่เลื่อนเข้าจอ: จังหวัดผุดขึ้นไล่จากรายได้สูงไปต่ำ (ข้ามถ้าปิดการเคลื่อนไหว)
+  useEffect(() => {
+    if (motionOff || !inView || sweptRef.current || !geoJsonRef.current) return undefined;
+    sweptRef.current = true;
+    const ranked = [...provinceTotals].sort((a, b) => (b[valueKey] || 0) - (a[valueKey] || 0)).map((p) => p.province);
+    const timers = [];
+    geoJsonRef.current.eachLayer((layer) => {
+      const el = layer.getElement && layer.getElement();
+      if (!el) return;
+      const rank = ranked.indexOf(layer.feature.properties.name_th);
+      const delay = (rank === -1 ? ranked.length : rank) * 28;
+      el.style.transition = 'none';
+      el.style.opacity = '0';
+      timers.push(
+        window.setTimeout(() => {
+          el.style.transition = 'opacity 0.5s ease-out';
+          el.style.opacity = '1';
+          timers.push(
+            window.setTimeout(() => {
+              el.style.transition = '';
+              el.style.opacity = '';
+            }, 600)
+          );
+        }, 60 + delay)
+      );
+    });
+    return () => timers.forEach((t) => window.clearTimeout(t));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, motionOff]);
+
   return (
-    <div className="province-map">
+    <div className="province-map" ref={viewRef}>
       <MapContainer
         center={[13.2, 101.3]}
         zoom={5.4}
@@ -139,7 +196,6 @@ export default function ProvinceMap({
         style={{ height: '460px', width: '100%', background: 'transparent' }}
       >
         <GeoJSON
-          key={dataVersion}
           ref={geoJsonRef}
           data={thailandProvinces}
           style={styleForFeature}

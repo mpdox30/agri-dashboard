@@ -9,8 +9,9 @@ import './ui.css';
 /**
  * props:
  *   segments: { key, value, tone: 'up' | 'down' | 'flat', label }[]
+ *   activeKey: ช่วงที่ผู้ใช้กำลังชี้ดู (ช่วงอื่นจะจางลง) หรือ null
  */
-export default function SegmentBar({ segments, className = '' }) {
+export default function SegmentBar({ segments, activeKey = null, className = '' }) {
   const motionOff = useMotionDisabled();
   const [ref, inView] = useInView({ disabled: motionOff });
   const total = segments.reduce((sum, s) => sum + Math.max(0, s.value), 0);
@@ -25,7 +26,7 @@ export default function SegmentBar({ segments, className = '' }) {
           .map((s) => (
             <span
               key={s.key}
-              className={`segbar__part segbar__part--${s.tone}`}
+              className={`segbar__part segbar__part--${s.tone}${activeKey && activeKey !== s.key ? ' is-dim' : ''}`}
               style={{ width: inView ? `${(s.value / total) * 100}%` : '0%' }}
             />
           ))

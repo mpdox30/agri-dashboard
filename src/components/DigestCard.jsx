@@ -22,8 +22,8 @@ export default function DigestCard({ items, onFocusCommunity }) {
           <p className="digest__empty">ยังไม่พบรายการที่โดดเด่นเป็นพิเศษในขอบเขตที่เลือก</p>
         ) : (
           <ul className="digest__list">
-            {items.map((it) => (
-              <li key={it.key} className={`digest__item digest__item--${it.tone}`}>
+            {items.map((it, i) => (
+              <li key={it.key} className={`digest__item digest__item--${it.tone}`} style={{ '--i': i }}>
                 <span className="digest__mark" aria-hidden="true">{TONE_MARK[it.tone]}</span>
                 <span className="sr-only">{TONE_WORD[it.tone]}: </span>
                 <span className="digest__text">{it.text}</span>

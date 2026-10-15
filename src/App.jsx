@@ -14,12 +14,14 @@ export default function App() {
   return (
     <>
       <TopBar activeMode={mode} onModeChange={setMode} />
-      {mode === 'public' && <Homepage />}
-      {mode === 'internal' && <CommunityView />}
-      {mode === 'entry' && <EntryForm />}
-      {mode === 'approval' && <ApprovalQueue />}
-      {mode === 'dataquality' && <DataQuality />}
-      {mode === 'executive' && <ExecutiveSummary />}
+      <div key={mode} className="mode-enter">
+        {mode === 'public' && <Homepage />}
+        {mode === 'internal' && <CommunityView />}
+        {mode === 'entry' && <EntryForm />}
+        {mode === 'approval' && <ApprovalQueue />}
+        {mode === 'dataquality' && <DataQuality />}
+        {mode === 'executive' && <ExecutiveSummary />}
+      </div>
     </>
   );
 }

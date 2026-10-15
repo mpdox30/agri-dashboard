@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import LiveHeadline from '../components/LiveHeadline';
 import ChangeSplitCard from '../components/ChangeSplitCard';
 import MyCommunityCard from '../components/MyCommunityCard';
@@ -296,9 +297,7 @@ export default function Homepage() {
 
   if (loadState === 'loading') {
     return (
-      <div className="homepage-status">
-        <p>กำลังโหลดข้อมูล...</p>
-      </div>
+      <LoadingSkeleton variant="home" />
     );
   }
 

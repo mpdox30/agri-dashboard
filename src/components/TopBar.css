@@ -90,3 +90,23 @@
     white-space: nowrap;
   }
 }
+
+/* จอกว้าง: แถบบนเกาะขอบบนเมื่อเลื่อน (มือถือไม่เกาะ เพราะแถบสูงกินพื้นที่อ่าน) */
+@media (min-width: 901px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: box-shadow 0.25s var(--ease), padding 0.25s var(--ease);
+  }
+  .topbar.is-stuck {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    box-shadow: 0 6px 18px -10px rgba(45, 74, 62, 0.35);
+  }
+  .topbar__logo { transition: height 0.25s var(--ease); }
+  .topbar.is-stuck .topbar__logo { height: 36px; }
+}
+@media (min-width: 901px) and (prefers-reduced-motion: reduce) {
+  .topbar, .topbar__logo { transition: none; }
+}

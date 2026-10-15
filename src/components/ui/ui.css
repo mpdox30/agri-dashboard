@@ -193,3 +193,71 @@ html.is-exporting .segbar__part { transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .stat-card:hover .ui-card__core { transform: none; }
 }
+
+/* ---------- LoadingSkeleton ---------- */
+.skel {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 28px;
+}
+.skel__bar,
+.skel__block {
+  position: relative;
+  overflow: hidden;
+  background: var(--shell);
+  border-radius: var(--r-sm, 8px);
+}
+.skel__bar--title { width: min(320px, 60%); height: 30px; margin-bottom: 12px; }
+.skel__bar--line { width: min(520px, 90%); height: 14px; margin-bottom: 26px; }
+.skel__block--filter { height: 120px; margin-bottom: 22px; border-radius: var(--r-core); }
+.skel__cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.skel__block--card { height: 132px; border-radius: var(--r-core); }
+.skel__block--chart { height: 240px; margin-bottom: 18px; border-radius: var(--r-core); }
+.skel--panel { padding-top: 24px; }
+
+/* แสงวิ่งผ่านจากซ้ายไปขวา เหลื่อมกันทีละบล็อก */
+.skel__bar::after,
+.skel__block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 254, 250, 0.75) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: skel-sheen 1.5s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.15s);
+}
+@keyframes skel-sheen {
+  to { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel__bar::after, .skel__block::after { animation: none; }
+}
+@media (max-width: 900px) {
+  .skel__cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .skel { padding: 24px 16px; }
+  .skel__cards { grid-template-columns: 1fr; }
+}
+
+/* ---------- การเปลี่ยนโหมด/แท็บ: เฟดเข้าเบาๆ แทนการสลับวับ ---------- */
+.mode-enter { animation: mode-fade 0.35s var(--ease-out); }
+@keyframes mode-fade { from { opacity: 0; } }
+.tab-panel-enter { animation: tab-rise 0.4s var(--ease-out); }
+@keyframes tab-rise {
+  from { opacity: 0; transform: translateY(8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mode-enter, .tab-panel-enter { animation: none; }
+}
+html.is-exporting .mode-enter,
+html.is-exporting .tab-panel-enter { animation: none; }
+
+/* ช่วงของแถบสัดส่วนที่ไม่ได้ถูกชี้จางลง ให้สายตาจับที่ช่วงที่ชี้ */
+.segbar__part { transition: width 0.9s var(--ease-out), opacity 0.25s var(--ease); }
+.segbar__part.is-dim { opacity: 0.35; }

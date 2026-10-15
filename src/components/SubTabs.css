@@ -1,6 +1,7 @@
 /* src/components/SubTabs.css */
 
 .subtabs {
+  position: relative;
   display: flex;
   gap: 4px;
   border-bottom: 2px solid var(--line);
@@ -19,11 +20,32 @@
   position: relative;
   top: 2px;
   border-bottom: 2px solid transparent;
+  transition: color 0.2s;
 }
+.subtab-btn:hover { color: var(--green); }
 
 .subtab-btn.active {
   color: var(--green);
-  border-bottom: 2px solid var(--terracotta);
+}
+
+/* เส้นใต้ที่เลื่อนไปหาแท็บที่เลือก (ทับเส้นฐานของแถบ) */
+.subtabs__ind {
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: var(--w, 0px);
+  background: var(--terracotta);
+  transform: translateX(var(--x, 0px));
+  pointer-events: none;
+}
+.subtabs[data-ready] .subtabs__ind {
+  transition:
+    transform 0.35s var(--ease),
+    width 0.35s var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .subtabs[data-ready] .subtabs__ind { transition: none; }
 }
 
 .subtab-btn .count {

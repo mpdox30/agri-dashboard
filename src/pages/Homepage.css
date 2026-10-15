@@ -250,3 +250,14 @@ html.is-exporting .homepage__hero::before { animation: none; }
   background: var(--green-soft);
   color: #fff;
 }
+
+/* แถบบนเกาะขอบบนบนจอกว้าง: ลิงก์ข้ามไปยังหัวข้อต้องเว้นที่ไม่ให้หัวข้อถูกบัง */
+@media (min-width: 901px) {
+  .homepage__section,
+  .homepage__hero { scroll-margin-top: 84px; }
+}
+
+/* มือถือ: ฉากหลังส่วนหัวไม่ล้นออกนอกจอ (ไม่ให้เกิดแถบเลื่อนแนวนอน) */
+@media (max-width: 900px) {
+  .homepage__hero::before { inset: 0; }
+}
