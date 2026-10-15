@@ -1,0 +1,174 @@
+/* src/components/ui/ui.css
+   สไตล์ของคอมโพเนนต์กลาง (Card, StatCard, SegmentedControl, DeltaBadge, SegmentBar, Sparkline, Reveal)
+   ใช้ตัวแปรจาก styles/tokens.css เท่านั้น ไม่ฮาร์ดโค้ดสี */
+
+/* ---------- Card: เปลือกนอก + เนื้อใน (double-bezel) ---------- */
+.ui-card {
+  padding: 5px;
+  background: var(--shell);
+  border-radius: var(--r-shell);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.ui-card__core {
+  height: 100%;
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border-radius: var(--r-core);
+  box-shadow: var(--inset-hi), var(--shadow-card);
+}
+.ui-card--accent { background: rgba(193, 127, 62, 0.10); }
+.ui-card--good { background: rgba(65, 97, 79, 0.10); }
+.ui-card--calm { background: rgba(139, 157, 131, 0.14); }
+
+/* ---------- Reveal: ผุดขึ้นเมื่อเลื่อนมาเห็น ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+@media print {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+html.is-exporting .reveal,
+html.is-exporting .reveal * {
+  opacity: 1;
+  transform: none;
+  transition: none !important;
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- ตัวเลขหลัก ---------- */
+.count-up { font-variant-numeric: tabular-nums; }
+
+/* ---------- StatCard ---------- */
+.stat-card { min-width: 0; }
+.stat-card__label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.stat-card__value {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3.2vw, 32px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--green);
+  overflow-wrap: anywhere;
+}
+.stat-card__unit {
+  margin-left: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.stat-card__note {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.stat-card .delta-badge { margin-top: 6px; }
+
+/* ---------- DeltaBadge ---------- */
+.delta-badge {
+  display: inline-block;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.delta-badge--up { color: var(--up); }
+.delta-badge--down { color: var(--down); }
+.delta-badge--flat { color: var(--flat); }
+.delta-badge__suffix { color: var(--muted); }
+
+/* ---------- SegmentedControl ---------- */
+.seg {
+  position: relative;
+  display: inline-flex;
+  gap: 0;
+  padding: 4px;
+  background: var(--shell);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--line);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.seg::-webkit-scrollbar { display: none; }
+.seg__ind {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: var(--w, 0px);
+  transform: translateX(var(--x, 0px));
+  background: var(--bg-card);
+  border-radius: 999px;
+  box-shadow: var(--inset-hi), 0 1px 3px rgba(45, 74, 62, 0.18);
+  pointer-events: none;
+}
+.seg[data-ready] .seg__ind {
+  transition:
+    transform 0.35s var(--ease),
+    width 0.35s var(--ease);
+}
+.seg__btn {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.seg__btn[aria-checked='true'] {
+  color: var(--green);
+  font-weight: 600;
+}
+.seg__btn:hover { color: var(--green); }
+
+/* ---------- SegmentBar ---------- */
+.segbar {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line);
+}
+.segbar__part {
+  height: 100%;
+  transition: width 0.9s var(--ease-out);
+}
+.segbar__part--up { background: var(--up); }
+.segbar__part--down { background: var(--down); }
+.segbar__part--flat { background: var(--sage); }
+.segbar__part--empty { background: var(--line); }
+@media (prefers-reduced-motion: reduce) { .segbar__part { transition: none; } }
+html.is-exporting .segbar__part { transition: none; }
+
+/* ---------- Sparkline ---------- */
+.spark { display: block; overflow: visible; }
+.spark__line {
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.spark__area { stroke: none; opacity: 0.14; }
+.spark__dot { stroke: var(--bg-card); stroke-width: 1.2; }
+.spark__empty { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 3; }

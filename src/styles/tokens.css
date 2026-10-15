@@ -45,3 +45,38 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===== โทเคนเพิ่มเติมสำหรับรอบปรับปรุง v2 (การ์ดสองชั้น การเคลื่อนไหว สีแสดงทิศทาง) ===== */
+:root {
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --r-shell: 20px;
+  --r-core: 14px;
+  --r-sm: 10px;
+
+  /* สีแสดงทิศทาง: โทนกลางๆ ไม่ใช้แดงจัด เพราะรายได้เกษตรผันผวนตามฤดูกาลเป็นปกติ */
+  --up: var(--green-soft);
+  --down: var(--red-soft);
+  --flat: var(--muted);
+
+  --shell: rgba(45, 74, 62, 0.05);
+  --shadow-card: 0 1px 2px rgba(45, 74, 62, 0.05), 0 8px 24px -12px rgba(45, 74, 62, 0.18);
+  --inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
