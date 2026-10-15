@@ -13,6 +13,8 @@
   gap: 12px;
   height: 150px;
   padding: 0 4px;
+  /* จอแคบ: 12 แท่งกว้างเกินการ์ด ให้เลื่อนแนวนอนในกรอบแทนการดันทั้งหน้าให้เลื่อน */
+  overflow-x: auto;
 }
 
 .trend-bar-col {
@@ -22,6 +24,7 @@
   align-items: center;
   height: 100%;
   justify-content: flex-end;
+  min-width: 34px;
 }
 
 .trend-bar {
@@ -75,4 +78,14 @@
 
 .trend-legend__dot--unknown {
   background: #aab3a0;
+}
+
+@media (max-width: 600px) {
+  .trend-card {
+    padding: 16px 12px;
+  }
+
+  .trend-chart {
+    gap: 6px;
+  }
 }

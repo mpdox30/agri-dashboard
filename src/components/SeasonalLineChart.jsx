@@ -122,7 +122,7 @@ export default function SeasonalLineChart({ monthly }) {
               className={p.isRainy ? 'season-dot rainy-dot' : 'season-dot dry-dot'}
             />
             {labelIndexes.has(i) && active === null && (
-              <text x={p.x} y={p.y - 8} textAnchor="middle" className="season-value-label">
+              <text x={p.x} y={Math.max(p.y - 8, 10)} textAnchor="middle" className="season-value-label">
                 {formatCompact(p.netIncome)}
               </text>
             )}

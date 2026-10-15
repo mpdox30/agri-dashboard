@@ -1,0 +1,61 @@
+/* src/components/ProvinceMapExplorer.css */
+
+.map-explorer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+}
+
+.map-explorer__now {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* ProvinceMap มีระยะห่างล่างของตัวเองอยู่แล้ว ลดลงเมื่อมีแถบเวลาตามหลัง */
+.map-explorer .province-map { margin-bottom: 12px; }
+
+.map-explorer__scrubber {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.map-explorer__play {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  font-size: 14px;
+  color: #fff;
+  background: var(--green-soft);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.map-explorer__play:hover { background: var(--green); }
+
+.map-explorer__track { flex: 1; min-width: 0; }
+
+.map-explorer__track input[type='range'] {
+  width: 100%;
+  height: 32px;
+  margin: 0;
+  accent-color: var(--green-soft);
+  cursor: pointer;
+}
+
+.map-explorer__ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--muted);
+}

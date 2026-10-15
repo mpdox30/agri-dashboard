@@ -57,3 +57,17 @@
   background: #ede8d8;
   border: 1px dashed #b9ad8a;
 }
+
+/* ชื่อกำกับจังหวัดอันดับต้นบนแผนที่ ไม่มีกรอบ อ่านง่ายบนสีเข้ม */
+.province-map .leaflet-tooltip.province-map__label {
+  padding: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  text-shadow: 0 0 3px #fffefa, 0 0 3px #fffefa, 0 0 3px #fffefa;
+  pointer-events: none;
+}
+.province-map .leaflet-tooltip.province-map__label::before { display: none; }

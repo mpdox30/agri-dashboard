@@ -9,7 +9,7 @@ import MyCommunityCard from '../components/MyCommunityCard';
 import useMyCommunity from '../components/useMyCommunity';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
-import ProvinceMap from '../components/ProvinceMap';
+import ProvinceMapExplorer from '../components/ProvinceMapExplorer';
 import {
   filterSummaryRows,
   aggregateTotals,
@@ -128,20 +128,40 @@ export default function Homepage() {
     [summaryRows, filters, communityToRegion, communityToProvince]
   );
 
-  const provinceTotals = useMemo(() => {
-    // กราฟ/กริดรายจังหวัดอิงตามตัวกรองปี/เดือน/ภาคเดียวกัน แต่ไม่ล็อกตามจังหวัด/ชุมชน
-    // ที่เลือกไว้ (เพื่อให้ยังเห็นภาพรวมหลายจังหวัดแม้กำลัง drill-down อยู่ที่จังหวัดหนึ่ง —
-    // ถ้าเลือกภาคไว้ จะยังกรองเหลือแค่จังหวัดในภาคนั้น เพราะภาคถือเป็นขอบเขตกว้างที่ตั้งใจ
-    // เลือกไว้ ไม่ใช่แค่ "กำลังจะดูจังหวัดเดียว" แบบจังหวัด/ชุมชน)
-    const rowsForProvinceView = filterSummaryRows(summaryRows, {
-      ...filters,
-      province: 'all',
-      community: 'all',
-      communityToRegion,
-      communityToProvince,
-    });
-    return aggregateByProvince(rowsForProvinceView, communities);
-  }, [summaryRows, filters, communities, communityToRegion, communityToProvince]);
+  // แถวข้อมูลสำหรับมุมมองรายจังหวัด: อิงตัวกรองปี/เดือน/ภาคเดียวกัน แต่ไม่ล็อกตามจังหวัด/ชุมชน
+  // ที่เลือกไว้ (เพื่อให้ยังเห็นภาพรวมหลายจังหวัดแม้กำลัง drill-down อยู่ที่จังหวัดหนึ่ง —
+  // ถ้าเลือกภาคไว้ จะยังกรองเหลือแค่จังหวัดในภาคนั้น เพราะภาคถือเป็นขอบเขตกว้างที่ตั้งใจ
+  // เลือกไว้ ไม่ใช่แค่ "กำลังจะดูจังหวัดเดียว" แบบจังหวัด/ชุมชน)
+  const provinceViewRows = useMemo(
+    () =>
+      filterSummaryRows(summaryRows, {
+        ...filters,
+        province: 'all',
+        community: 'all',
+        communityToRegion,
+        communityToProvince,
+      }),
+    [summaryRows, filters, communityToRegion, communityToProvince]
+  );
+
+  const provinceTotals = useMemo(
+    () => aggregateByProvince(provinceViewRows, communities),
+    [provinceViewRows, communities]
+  );
+
+  // แผนที่ใช้แถวของทั้งปี (ไม่ล็อกเดือนตามตัวกรอง) เพื่อให้แถบเวลาเลื่อนดูได้ทุกเดือนของปีที่เลือก
+  const mapRows = useMemo(
+    () =>
+      filterSummaryRows(summaryRows, {
+        ...filters,
+        month: 'all',
+        province: 'all',
+        community: 'all',
+        communityToRegion,
+        communityToProvince,
+      }),
+    [summaryRows, filters, communityToRegion, communityToProvince]
+  );
 
   const latestDataMonth = useMemo(() => findLatestDataMonth(summaryRows), [summaryRows]);
 
@@ -317,7 +337,12 @@ export default function Homepage() {
             คลิกจังหวัดเพื่อกรองข้อมูลด้านบนตามจังหวัดนั้น · แสดง {provinceTotals.length} จังหวัด
           </span>
         </div>
-        <ProvinceMap provinceTotals={provinceTotals} onSelectProvince={handleSelectProvince} />
+        <ProvinceMapExplorer
+          rows={mapRows}
+          communities={communities}
+          selectedProvince={filters.province}
+          onSelectProvince={handleSelectProvince}
+        />
         <ProvinceGrid provinceTotals={provinceTotals} onSelectProvince={handleSelectProvince} />
       </div>
 

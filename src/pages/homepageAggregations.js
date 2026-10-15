@@ -189,8 +189,9 @@ export function aggregateByProvince(filteredRows, communities) {
     const province = communityToProvince.get(row.community_key);
     if (!province) return;
     const net = (Number(row.sale) || 0) - (Number(row.purchase) || 0) + (Number(row.sharing) || 0);
-    const entry = totals.get(province) || { netIncome: 0, communitySet: new Set(), byMonth: new Map() };
+    const entry = totals.get(province) || { netIncome: 0, householdReduction: 0, communitySet: new Set(), byMonth: new Map() };
     entry.netIncome += net;
+    entry.householdReduction += Number(row.household_expense_reduction) || 0;
     entry.communitySet.add(row.community_key);
     entry.byMonth.set(row.month, (entry.byMonth.get(row.month) || 0) + net);
     monthSet.add(row.month);
@@ -203,6 +204,7 @@ export function aggregateByProvince(filteredRows, communities) {
     .map(([province, entry]) => ({
       province,
       netIncome: entry.netIncome,
+      householdReduction: entry.householdReduction,
       communityCount: entry.communitySet.size,
       series: months.map((m) => (entry.byMonth.has(m) ? entry.byMonth.get(m) : null)),
     }))

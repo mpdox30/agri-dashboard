@@ -90,7 +90,7 @@ export default function MemberMonthlyChart({ monthly }) {
               opacity={p.hasData ? 1 : 0.35}
             />
             {labelIndexes.has(i) && active === null && (
-              <text x={p.x} y={p.y - 8} textAnchor="middle" className="member-chart-value-label">
+              <text x={p.x} y={Math.max(p.y - 8, 10)} textAnchor="middle" className="member-chart-value-label">
                 {formatCompact(p.netIncome)}
               </text>
             )}

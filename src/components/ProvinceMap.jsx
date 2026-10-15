@@ -1,13 +1,16 @@
 // src/components/ProvinceMap.jsx
 import { useMemo, useRef } from 'react';
-import { MapContainer, GeoJSON } from 'react-leaflet';
+import L from 'leaflet';
+import { MapContainer, GeoJSON, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import thailandProvinces from '../data/thailand_provinces.json';
 import './ProvinceMap.css';
 
-function formatMillionBaht(n) {
-  return (n / 1_000_000).toLocaleString('th-TH', { maximumFractionDigits: 2 });
+function formatBaht(n) {
+  return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(n);
 }
+
+const LABEL_TOP_N = 5; // ใส่ชื่อกำกับบนแผนที่เฉพาะจังหวัดที่ค่าสูงสุด กันป้ายซ้อนกันบนจอเล็ก
 
 // ไล่สีจากอ่อน (ไม่มี/มีน้อย) ไปเข้ม (มาก) โดยใช้โทนสีเดียวกับธีมเว็บ (var(--line) -> var(--green))
 const LIGHT_FILL = [232, 224, 201]; // ~ var(--line) #E3DCC9
@@ -26,6 +29,9 @@ function colorForShare(t) {
  *   provinceTotals: { province: string, netIncome: number, communityCount: number }[]
  *     ข้อมูลชุดเดียวกับที่ ProvinceGrid ใช้ (มาจาก aggregateByProvince() ใน homepageAggregations.js)
  *   onSelectProvince: (province: string) => void — เรียกเมื่อคลิกจังหวัดที่มีข้อมูล (ต่อกับ FilterBar เหมือน ProvinceGrid)
+ *   valueKey: 'netIncome' | 'householdReduction' ตัวชี้วัดที่ใช้ลงสี (ค่าเริ่มต้น netIncome)
+ *   valueLabel: ชื่อตัวชี้วัดสำหรับ tooltip/คำอธิบายสี
+ *   selectedProvince: จังหวัดที่กำลังกรองอยู่ จะถูกเน้นขอบ
  *
  * วาดแผนที่ประเทศไทยระดับจังหวัดแบบ choropleth (ไล่สีเข้ม-อ่อนตามรายได้สุทธิ) จาก GeoJSON ที่
  * ฝังไว้ในโปรเจกต์เอง (src/data/thailand_provinces.json — 77 จังหวัด ย่อขนาดจุดแล้วจาก ~1.1MB
@@ -33,7 +39,13 @@ function colorForShare(t) {
  * เพราะข้อมูลที่ต้องการสื่อคือ "รายได้ต่อจังหวัดเทียบกัน" ไม่ใช่ตำแหน่งทางภูมิศาสตร์ละเอียด —
  * ยังไม่มีพิกัดรายแปลง (ตามที่ Ton ยืนยัน) จึงยังทำได้แค่ระดับจังหวัด รอข้อมูลพิกัดแปลงจริงในอนาคต
  */
-export default function ProvinceMap({ provinceTotals, onSelectProvince }) {
+export default function ProvinceMap({
+  provinceTotals,
+  onSelectProvince,
+  valueKey = 'netIncome',
+  valueLabel = 'รายได้สุทธิ',
+  selectedProvince = null,
+}) {
   const geoJsonRef = useRef(null);
 
   const totalsByProvince = useMemo(() => {
@@ -42,27 +54,54 @@ export default function ProvinceMap({ provinceTotals, onSelectProvince }) {
     return map;
   }, [provinceTotals]);
 
-  const maxNetIncome = useMemo(
-    () => provinceTotals.reduce((max, p) => Math.max(max, p.netIncome), 0),
-    [provinceTotals]
+  const maxValue = useMemo(
+    () => provinceTotals.reduce((max, p) => Math.max(max, p[valueKey] || 0), 0),
+    [provinceTotals, valueKey]
+  );
+
+  // จังหวัดที่ค่าสูงสุด N อันดับแรก ใช้ใส่ชื่อกำกับบนแผนที่
+  const topProvinces = useMemo(
+    () =>
+      new Set(
+        [...provinceTotals]
+          .filter((p) => (p[valueKey] || 0) > 0)
+          .sort((a, b) => b[valueKey] - a[valueKey])
+          .slice(0, LABEL_TOP_N)
+          .map((p) => p.province)
+      ),
+    [provinceTotals, valueKey]
+  );
+
+  // จุดกึ่งกลางของจังหวัดที่ต้องใส่ชื่อกำกับ (ใช้ CircleMarker โปร่งใสถือ Tooltip ถาวร เพื่อให้ tooltip ตอนชี้เมาส์ของจังหวัดนั้นยังทำงานตามปกติ)
+  const labelPoints = useMemo(
+    () =>
+      thailandProvinces.features
+        .filter((f) => topProvinces.has(f.properties.name_th))
+        .map((f) => {
+          const center = L.geoJSON(f).getBounds().getCenter();
+          return { name: f.properties.name_th, position: [center.lat, center.lng] };
+        }),
+    [topProvinces]
   );
 
   // บังคับให้ layer GeoJSON สร้างใหม่ทุกครั้งที่ข้อมูลเปลี่ยน (เปลี่ยนตัวกรอง/ปี) แทนที่จะ
   // พึ่งกลไก diff ภายในของ react-leaflet เพื่อความชัวร์ว่าสี/tooltip อัปเดตตรงกับข้อมูลจริงเสมอ
   const dataVersion = useMemo(
-    () => provinceTotals.map((p) => `${p.province}:${p.netIncome}:${p.communityCount}`).join('|'),
-    [provinceTotals]
+    () => provinceTotals.map((p) => `${p.province}:${p[valueKey]}:${p.communityCount}`).join('|') + `|${valueKey}|${selectedProvince}`,
+    [provinceTotals, valueKey, selectedProvince]
   );
 
   function styleForFeature(feature) {
     const provinceName = feature.properties.name_th;
     const stat = totalsByProvince.get(provinceName);
-    const hasData = !!stat && stat.netIncome > 0;
+    const value = stat ? stat[valueKey] || 0 : 0;
+    const hasData = !!stat && value > 0;
+    const isSelected = provinceName === selectedProvince;
     return {
-      fillColor: hasData ? colorForShare(maxNetIncome > 0 ? stat.netIncome / maxNetIncome : 0) : NO_DATA_FILL,
+      fillColor: hasData ? colorForShare(maxValue > 0 ? value / maxValue : 0) : NO_DATA_FILL,
       fillOpacity: 1,
-      color: '#FFFEFA',
-      weight: 1,
+      color: isSelected ? HOVER_STROKE : '#FFFEFA',
+      weight: isSelected ? 2.5 : 1,
       dashArray: hasData ? null : '3,3',
     };
   }
@@ -71,7 +110,7 @@ export default function ProvinceMap({ provinceTotals, onSelectProvince }) {
     const provinceName = feature.properties.name_th;
     const stat = totalsByProvince.get(provinceName);
     const label = stat
-      ? `<b>${provinceName}</b><br/>${formatMillionBaht(stat.netIncome)} ล้านบาท · ${stat.communityCount} ชุมชน`
+      ? `<b>${provinceName}</b><br/>${valueLabel} ${formatBaht(stat[valueKey] || 0)} บาท · ${stat.communityCount} ชุมชน`
       : `<b>${provinceName}</b><br/>ไม่มีข้อมูลในช่วงนี้`;
     layer.bindTooltip(label, { sticky: true });
     layer.on({
@@ -106,11 +145,18 @@ export default function ProvinceMap({ provinceTotals, onSelectProvince }) {
           style={styleForFeature}
           onEachFeature={onEachFeature}
         />
+        {labelPoints.map((pt) => (
+          <CircleMarker key={`${pt.name}-${dataVersion}`} center={pt.position} radius={1} interactive={false} opacity={0} fillOpacity={0}>
+            <Tooltip permanent direction="center" className="province-map__label" interactive={false}>
+              {pt.name}
+            </Tooltip>
+          </CircleMarker>
+        ))}
       </MapContainer>
       <div className="province-map__legend">
-        <span className="province-map__legend-label">รายได้สุทธิน้อย</span>
+        <span className="province-map__legend-label">0</span>
         <div className="province-map__legend-bar" />
-        <span className="province-map__legend-label">รายได้สุทธิมาก</span>
+        <span className="province-map__legend-label">{formatBaht(maxValue)} บาท ({valueLabel}สูงสุดในช่วงนี้)</span>
         <span className="province-map__legend-nodata">
           <span className="province-map__legend-swatch province-map__legend-swatch--nodata" /> ไม่มีข้อมูลในช่วงนี้
         </span>
