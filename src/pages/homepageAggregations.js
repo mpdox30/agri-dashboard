@@ -272,3 +272,22 @@ export function buildHomepageExportSheets(communities, allSummaryRows, yearType,
 
   return { sheets: [monthlySheet, provinceSheet, communitySheet], periodLabel };
 }
+
+/**
+ * เดือนล่าสุด (YYYY-MM) ที่มีข้อมูลจริงในระบบ: ตัดเดือนที่น่าจะไม่ได้กรอกออกก่อน (cleanAllSummaryRows)
+ * แล้วข้ามเดือนที่ทุกยอดเป็น 0 ทั้งหมด เพื่อไม่ให้ป้าย "ข้อมูลล่าสุด" ชี้ไปที่เดือนที่ยังเป็นค่าว่างปลอม
+ * คืน null ถ้าไม่มีข้อมูลเลย
+ */
+export function findLatestDataMonth(allSummaryRows) {
+  const cleaned = cleanAllSummaryRows(allSummaryRows);
+  let latest = null;
+  cleaned.forEach((r) => {
+    const hasValue =
+      (Number(r.sale) || 0) !== 0 ||
+      (Number(r.purchase) || 0) !== 0 ||
+      (Number(r.sharing) || 0) !== 0 ||
+      (Number(r.household_expense_reduction) || 0) !== 0;
+    if (hasValue && (latest === null || r.month > latest)) latest = r.month;
+  });
+  return latest;
+}

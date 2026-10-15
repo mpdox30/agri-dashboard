@@ -1,10 +1,16 @@
 // src/components/FilterBar.jsx
 import { buildFiscalYearDropdownOptions, buildCalendarYearDropdownOptions } from '../pages/fiscalYears';
+import SegmentedControl from './ui/SegmentedControl';
 import './FilterBar.css';
 
 // สร้างจาก fiscalYears.js จุดเดียว — ไม่ต้องแก้ที่นี่เวลาขึ้นปีงบใหม่
 const FISCAL_YEARS = buildFiscalYearDropdownOptions({ includeAll: true });
 const CALENDAR_YEARS = buildCalendarYearDropdownOptions();
+
+const YEAR_TYPE_OPTIONS = [
+  { value: 'fiscal', label: 'ปีงบประมาณ' },
+  { value: 'calendar', label: 'ปีปฏิทิน' },
+];
 
 const MONTH_OPTIONS = [
   { value: 'all', label: 'ทั้งปี' },
@@ -96,22 +102,12 @@ export default function FilterBar({
       <div className="filter-bar__row">
         <div className="control-group">
           <label>ประเภทปี</label>
-          <div className="seg-toggle">
-            <button
-              type="button"
-              className={yearType === 'fiscal' ? 'active' : ''}
-              onClick={() => handleYearTypeChange('fiscal')}
-            >
-              ปีงบประมาณ
-            </button>
-            <button
-              type="button"
-              className={yearType === 'calendar' ? 'active' : ''}
-              onClick={() => handleYearTypeChange('calendar')}
-            >
-              ปีปฏิทิน
-            </button>
-          </div>
+          <SegmentedControl
+            ariaLabel="ประเภทปี"
+            value={yearType}
+            onChange={handleYearTypeChange}
+            options={YEAR_TYPE_OPTIONS}
+          />
         </div>
 
         <div className="control-group">

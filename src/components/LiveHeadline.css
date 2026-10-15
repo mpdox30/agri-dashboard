@@ -1,0 +1,33 @@
+/* src/components/LiveHeadline.css */
+
+.live-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0 0 18px;
+}
+
+.live-headline__sentence {
+  margin: 0;
+  max-width: 760px;
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 2.2vw, 22px);
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.live-headline__sentence strong {
+  font-weight: 600;
+  color: var(--green);
+}
+
+.live-headline__badge {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  color: var(--green-soft);
+  background: var(--shell);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--line);
+}

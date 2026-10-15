@@ -1,12 +1,19 @@
 // src/components/KpiRow.jsx
+import StatCard from './ui/StatCard';
 import './KpiRow.css';
 
-function formatBaht(n) {
+// หน่วยล้านบาท ทศนิยม 2 ตำแหน่ง (คงรูปแบบเดิมของการ์ด KPI) ตัวเลขจะนับขึ้นจาก 0 ตอนเลื่อนมาเห็น
+function formatMillionBaht(n) {
+  return (n / 1_000_000).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatInteger(n) {
   return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(n);
 }
 
-function formatMillionBaht(n) {
-  return (n / 1_000_000).toLocaleString('th-TH', { maximumFractionDigits: 2 });
+function percentChange(current, previous) {
+  if (!previous) return null;
+  return ((current - previous) / Math.abs(previous)) * 100;
 }
 
 /**
@@ -16,76 +23,60 @@ function formatMillionBaht(n) {
  *   dataQualityFlagCount: number
  */
 export default function KpiRow({ currentTotals, previousTotals, dataQualityFlagCount }) {
-  const netDelta = previousTotals
-    ? ((currentTotals.netIncome - previousTotals.netIncome) / previousTotals.netIncome) * 100
-    : null;
+  const netDelta = previousTotals ? percentChange(currentTotals.netIncome, previousTotals.netIncome) : null;
   const householdDelta = previousTotals
-    ? ((currentTotals.householdReduction - previousTotals.householdReduction) /
-        previousTotals.householdReduction) *
-      100
+    ? percentChange(currentTotals.householdReduction, previousTotals.householdReduction)
     : null;
+  const missing = currentTotals.totalCommunities - currentTotals.communitiesWithData;
+  const cleanPercent =
+    currentTotals.communitiesWithData > 0
+      ? ((currentTotals.communitiesWithData - dataQualityFlagCount) / currentTotals.communitiesWithData) * 100
+      : null;
 
   return (
     <div className="kpi-row">
-      <div className="kpi-card">
-        <div className="kpi-label">รายได้สุทธิรวม</div>
-        <div className="kpi-value">
-          {formatMillionBaht(currentTotals.netIncome)}
-          <span className="unit">ล้านบาท</span>
-        </div>
-        {netDelta !== null && <DeltaLabel value={netDelta} suffix="จากช่วงก่อน" />}
-      </div>
-
-      <div className="kpi-card">
-        <div className="kpi-label">ลดรายจ่ายครัวเรือนรวม</div>
-        <div className="kpi-value">
-          {formatMillionBaht(currentTotals.householdReduction)}
-          <span className="unit">ล้านบาท</span>
-        </div>
-        {householdDelta !== null && <DeltaLabel value={householdDelta} suffix="จากช่วงก่อน" />}
-      </div>
-
-      <div className="kpi-card">
-        <div className="kpi-label">ชุมชนที่มีข้อมูลในช่วงที่เลือก</div>
-        <div className="kpi-value">
-          {currentTotals.communitiesWithData}
-          <span className="unit">/ {currentTotals.totalCommunities} ชุมชน</span>
-        </div>
-        <div className="kpi-delta flat">
-          {currentTotals.totalCommunities - currentTotals.communitiesWithData} ชุมชนยังไม่มีข้อมูลในช่วงนี้
-        </div>
-      </div>
-
-      <div className="kpi-card">
-        <div className="kpi-label">
-          คุณภาพข้อมูล
-          {dataQualityFlagCount > 0 && (
-            <span className="data-flag" title={`มี ${dataQualityFlagCount} ชุมชนที่มีประเด็นตรวจสอบในช่วงนี้`}>
-              ⚑ {dataQualityFlagCount}
-            </span>
-          )}
-        </div>
-        <div className="kpi-value">
-          {currentTotals.communitiesWithData > 0
-            ? formatBaht(
-                ((currentTotals.communitiesWithData - dataQualityFlagCount) /
-                  currentTotals.communitiesWithData) *
-                  100
-              )
-            : '—'}
-          <span className="unit">% ไม่มีประเด็นต้องตรวจสอบ</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DeltaLabel({ value, suffix }) {
-  const direction = value > 0 ? 'up' : value < 0 ? 'down' : 'flat';
-  const arrow = value > 0 ? '↑' : value < 0 ? '↓' : '—';
-  return (
-    <div className={`kpi-delta ${direction}`}>
-      {arrow} {Math.abs(value).toFixed(1)}% {suffix}
+      <StatCard
+        label="รายได้สุทธิรวม"
+        value={currentTotals.netIncome}
+        format={formatMillionBaht}
+        unit="ล้านบาท"
+        delta={netDelta}
+        deltaSuffix="จากช่วงก่อน"
+        delay={0}
+      />
+      <StatCard
+        label="ลดรายจ่ายครัวเรือนรวม"
+        value={currentTotals.householdReduction}
+        format={formatMillionBaht}
+        unit="ล้านบาท"
+        delta={householdDelta}
+        deltaSuffix="จากช่วงก่อน"
+        delay={80}
+      />
+      <StatCard
+        label="ชุมชนที่มีข้อมูลในช่วงที่เลือก"
+        value={currentTotals.communitiesWithData}
+        format={formatInteger}
+        unit={`/ ${currentTotals.totalCommunities} ชุมชน`}
+        note={missing > 0 ? `${missing} ชุมชนยังไม่มีข้อมูลในช่วงนี้` : 'ทุกชุมชนมีข้อมูลในช่วงนี้'}
+        delay={160}
+      />
+      <StatCard
+        label={
+          <>
+            คุณภาพข้อมูล
+            {dataQualityFlagCount > 0 && (
+              <span className="data-flag" title={`มี ${dataQualityFlagCount} ชุมชนที่มีประเด็นตรวจสอบในช่วงนี้`}>
+                ⚑ {dataQualityFlagCount}
+              </span>
+            )}
+          </>
+        }
+        value={cleanPercent}
+        format={formatInteger}
+        unit="% ไม่มีประเด็นต้องตรวจสอบ"
+        delay={240}
+      />
     </div>
   );
 }

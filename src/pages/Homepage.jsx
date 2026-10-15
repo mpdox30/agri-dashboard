@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
+import LiveHeadline from '../components/LiveHeadline';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
 import ProvinceMap from '../components/ProvinceMap';
@@ -13,6 +14,7 @@ import {
   aggregateByProvince,
   buildOverdueReport,
   buildHomepageExportSheets,
+  findLatestDataMonth,
 } from './homepageAggregations';
 import { formatMonthLabel } from './fiscalYears';
 import { downloadWorkbook } from '../utils/excelExport';
@@ -134,6 +136,8 @@ export default function Homepage() {
     return aggregateByProvince(rowsForProvinceView, communities);
   }, [summaryRows, filters, communities, communityToRegion, communityToProvince]);
 
+  const latestDataMonth = useMemo(() => findLatestDataMonth(summaryRows), [summaryRows]);
+
   const overdueReport = useMemo(
     () => buildOverdueReport(communities, summaryRows, currentMonthString()),
     [communities, summaryRows]
@@ -190,6 +194,14 @@ export default function Homepage() {
           รวบรวมจาก {communities.length} ชุมชน/กลุ่ม ครอบคลุมข้อมูลตั้งแต่ปีงบประมาณ 2565
           ถึง 2569 ตามแนวทางเกษตรทฤษฎีใหม่
         </p>
+
+        <LiveHeadline
+          scopeLabel={yearLabel}
+          communitiesWithData={currentTotals.communitiesWithData}
+          totalCommunities={currentTotals.totalCommunities}
+          netIncome={currentTotals.netIncome}
+          latestMonth={latestDataMonth}
+        />
 
         <FilterBar
           yearType={filters.yearType}
