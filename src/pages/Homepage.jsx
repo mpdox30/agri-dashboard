@@ -11,7 +11,7 @@ import DigestCard from '../components/DigestCard';
 import ShareCardButton from '../components/ShareCardButton';
 import PresentationMode from '../components/PresentationMode';
 import useMyCommunity from '../components/useMyCommunity';
-import TrendChart from '../components/TrendChart';
+import BarTrendChart from '../components/BarTrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
 import ProvinceMapExplorer from '../components/ProvinceMapExplorer';
 import {
@@ -176,6 +176,11 @@ export default function Homepage() {
         communityToProvince,
       }),
     [summaryRows, filters, communityToRegion, communityToProvince]
+  );
+
+  const monthlyBarItems = useMemo(
+    () => monthlySeries.map((m) => ({ key: m.key || m.label, label: m.label, value: m.netIncome })),
+    [monthlySeries]
   );
 
   const latestDataMonth = useMemo(() => findLatestDataMonth(summaryRows), [summaryRows]);
@@ -385,11 +390,14 @@ export default function Homepage() {
       <div className="homepage__section" id="sec-trend">
         <div className="homepage__section-head">
           <h2>แนวโน้มรายเดือน — {yearLabel}</h2>
-          <span className="homepage__section-note">
-            หน่วย: ล้านบาท · แท่งสีเทาหมายถึงเดือนที่ยังไม่มีข้อมูลกรอกเข้ามา
-          </span>
+          <span className="homepage__section-note">หน่วย: บาท (รายได้สุทธิ)</span>
         </div>
-        <TrendChart months={monthlySeries} />
+        <BarTrendChart
+          items={monthlyBarItems}
+          ariaLabel={`รายได้สุทธิรายเดือน ${yearLabel}`}
+          tableLabel="เดือน"
+          legend="แท่งลายเส้นหมายถึงเดือนที่ยังไม่มีข้อมูลกรอกเข้ามา · ชี้หรือแตะที่แท่งเพื่อดูค่าเต็ม"
+        />
       </div>
 
       <div className="homepage__section" id="sec-map">
@@ -483,7 +491,7 @@ export default function Homepage() {
                 </>
               ),
             },
-            { key: 'trend', title: `แนวโน้มรายเดือน ${yearLabel}`, node: <TrendChart months={monthlySeries} /> },
+            { key: 'trend', title: `แนวโน้มรายเดือน ${yearLabel}`, node: <BarTrendChart items={monthlyBarItems} ariaLabel={`รายได้สุทธิรายเดือน ${yearLabel}`} tableLabel="เดือน" /> },
             {
               key: 'map',
               title: `รายได้ตามจังหวัด ${yearLabel}`,

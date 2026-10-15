@@ -1,0 +1,149 @@
+/* src/components/BarTrendChart.css */
+
+.bars {
+  padding: 18px 16px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-core);
+  box-shadow: var(--inset-hi), var(--shadow-card);
+}
+
+.bars__plot {
+  position: relative;
+  height: 220px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/* เส้นกริดแนวนอนจางๆ อยู่ใต้แท่ง (ไม่รวมพื้นที่ป้ายเดือน) */
+.bars__grid {
+  position: absolute;
+  inset: 36px 0 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.bars__grid span {
+  display: block;
+  border-top: 1px dashed var(--line);
+}
+.bars__grid span:last-child { border-top-style: solid; }
+
+.bars__cols {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: clamp(4px, 1.2vw, 14px);
+  height: 100%;
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bars__col {
+  flex: 1 0 34px;
+  min-width: 0;
+  transition: opacity 0.25s var(--ease);
+}
+.bars__col.is-dim { opacity: 0.55; }
+
+.bars__hit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.bars__hit:focus-visible { outline: 2px solid var(--green-soft); outline-offset: 1px; }
+
+/* พื้นที่วาดแท่งจริง: เว้นหัวไว้ให้ป้ายตัวเลขของแท่งที่สูงสุด ส่วนความสูงแท่งคิดเป็น % ของพื้นที่นี้ */
+.bars__stage {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.bars__value {
+  position: absolute;
+  left: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--ink);
+  white-space: nowrap;
+  background: var(--bg-card);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--line), 0 4px 10px -4px rgba(45, 74, 62, 0.3);
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.bars__value em {
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-style: normal;
+  color: var(--muted);
+}
+/* แท่งริมสุดชิดขอบกรอบ: ยึดป้ายไว้ข้างในไม่ให้ถูกตัด */
+.bars__value--end { left: auto; right: 0; transform: none; }
+.bars__value--start { left: 0; transform: none; }
+.bars__value--peak { color: var(--terracotta); }
+.bars__value--peak em { color: var(--terracotta); }
+
+.bars__bar {
+  display: block;
+  width: min(100%, 46px);
+  background: linear-gradient(180deg, var(--green-soft), var(--green));
+  border-radius: 7px 7px 3px 3px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform-origin: 50% 100%;
+  transition:
+    transform 0.8s var(--ease-out),
+    filter 0.25s var(--ease);
+}
+.bars__col.is-active .bars__bar,
+.bars__hit:hover .bars__bar { filter: brightness(1.12) saturate(1.1); }
+.bars__bar--peak { background: linear-gradient(180deg, var(--terracotta), #8f5d2a); }
+.bars__bar--neg { background: linear-gradient(180deg, var(--red-soft), #85463a); }
+.bars__bar--empty {
+  background: repeating-linear-gradient(90deg, var(--line) 0 4px, transparent 4px 7px);
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.bars__label {
+  flex: 0 0 28px;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.bars__col.is-active .bars__label { color: var(--green); }
+
+.bars__legend { margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+html.is-exporting .bars__bar { transition: none; transform: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .bars__bar { transition: none; }
+}

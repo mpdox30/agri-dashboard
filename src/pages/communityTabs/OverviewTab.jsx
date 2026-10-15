@@ -1,10 +1,7 @@
 // src/pages/communityTabs/OverviewTab.jsx
 import { FISCAL_YEAR_DISPLAY_LABEL, FISCAL_YEAR_RANGES, enumerateMonths, formatMonthLabel } from '../fiscalYears';
+import BarTrendChart from '../../components/BarTrendChart';
 import './OverviewTab.css';
-
-function formatBaht(n) {
-  return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(n);
-}
 
 /**
  * props:
@@ -17,11 +14,6 @@ function formatBaht(n) {
  *     (เพื่ออธิบายให้เห็นว่าทำไมปีที่ "ดูเหมือนมีแถวครบ" ถึงไม่ถูกนับว่าครบ)
  */
 export default function OverviewTab({ summaryRowsForCommunity, trend, excludedMonths }) {
-  const maxNetIncome = Math.max(
-    1,
-    ...trend.map((t) => (t.totals ? Math.abs(t.totals.netIncome) : 0))
-  );
-
   const excludedMonthsList = excludedMonths ? Array.from(excludedMonths).sort() : [];
 
   return (
@@ -75,28 +67,16 @@ export default function OverviewTab({ summaryRowsForCommunity, trend, excludedMo
           <h2>แนวโน้มรายได้สุทธิ 4 ปีงบประมาณ</h2>
           <span className="note">รายได้สุทธิ = ขาย − ซื้อ + แบ่งปัน</span>
         </div>
-        <div className="trend-card">
-          <div className="trend-chart">
-            {trend.map((t) => {
-              const value = t.totals ? t.totals.netIncome : 0;
-              const heightPct = t.totals ? Math.max((Math.abs(value) / maxNetIncome) * 100, 4) : 3;
-              return (
-                <div className="trend-bar-col" key={t.yearKey}>
-                  <div className="trend-bar-val">
-                    {t.totals && t.totals.monthsWithData > 0 ? formatBaht(value) : '—'}
-                  </div>
-                  <div
-                    className={
-                      t.totals && t.totals.monthsWithData > 0 ? 'trend-bar' : 'trend-bar trend-bar--dim'
-                    }
-                    style={{ height: `${heightPct}%` }}
-                  />
-                  <div className="trend-bar-label">{FISCAL_YEAR_DISPLAY_LABEL[t.yearKey]}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <BarTrendChart
+          items={trend.map((t) => ({
+            key: t.yearKey,
+            label: FISCAL_YEAR_DISPLAY_LABEL[t.yearKey],
+            value: t.totals && t.totals.monthsWithData > 0 ? t.totals.netIncome : null,
+          }))}
+          ariaLabel="รายได้สุทธิรายปีงบประมาณ 4 ปี"
+          tableLabel="ปีงบประมาณ"
+          legend="แท่งลายเส้นหมายถึงปีงบที่ยังไม่มีข้อมูล · ชี้หรือแตะที่แท่งเพื่อดูค่าเต็ม"
+        />
       </div>
     </>
   );

@@ -157,7 +157,8 @@ export function buildMonthlySeries(summaryRows, filters) {
 
   const totalsByMonth = new Map();
   relevantRows.forEach((row) => {
-    const existing = totalsByMonth.get(row.month) || { sale: 0, purchase: 0, sharing: 0, hasAnyRow: false };
+    const existing = totalsByMonth.get(row.month) || { sale: 0, purchase: 0, sharing: 0, household: 0, hasAnyRow: false };
+    existing.household += Number(row.household_expense_reduction) || 0;
     existing.sale += Number(row.sale) || 0;
     existing.purchase += Number(row.purchase) || 0;
     existing.sharing += Number(row.sharing) || 0;
@@ -170,7 +171,9 @@ export function buildMonthlySeries(summaryRows, filters) {
     return {
       label: formatMonthLabel(m),
       // ไม่มีแถวเลยสำหรับเดือนนี้ = ยังไม่มีข้อมูลกรอกเข้ามา (ไม่ใช่ 0 จริง) -> null
+      key: m,
       netIncome: data ? data.sale - data.purchase + data.sharing : null,
+      householdReduction: data ? data.household : null,
     };
   });
 }
