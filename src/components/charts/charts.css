@@ -51,3 +51,6 @@
   transform-box: fill-box;
   transform-origin: 0 50%;
 }
+
+/* พื้นที่ไล่สีใต้เส้น: ตอนส่งออกรูป/PDF แสดงทันทีไม่รอแอนิเมชัน */
+html.is-exporting .area-fill { opacity: 1 !important; transition: none !important; }

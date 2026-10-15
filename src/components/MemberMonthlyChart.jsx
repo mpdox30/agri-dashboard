@@ -6,6 +6,7 @@
 import useCrosshair from './charts/useCrosshair';
 import SvgTooltip from './charts/SvgTooltip';
 import DrawInPath from './charts/DrawInPath';
+import AreaFill from './charts/AreaFill';
 import DataTableToggle from './charts/DataTableToggle';
 import './charts/charts.css';
 import './MemberMonthlyChart.css';
@@ -78,6 +79,7 @@ export default function MemberMonthlyChart({ monthly }) {
           />
         )}
 
+        <AreaFill points={points} baselineY={PADDING_TOP + CHART_HEIGHT} />
         <DrawInPath d={linePath} className="member-chart-line" />
 
         {points.map((p, i) => (

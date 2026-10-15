@@ -100,7 +100,11 @@ export default function BarTrendChart({ items, unit = 'บาท', ariaLabel, ta
                         ]
                           .filter(Boolean)
                           .join(' ')}
-                        style={{ bottom: `calc(${heightPct}% + 5px)` }}
+                        style={{
+                          bottom: `calc(${heightPct}% + 5px)`,
+                          opacity: motionOff || inView || active === it.key ? 1 : 0,
+                          transition: motionOff ? 'none' : `opacity 0.4s var(--ease-out) ${i * 55 + 500}ms`,
+                        }}
                       >
                         {formatBaht(it.value)}
                         {isPeak && active !== it.key && <em>สูงสุด</em>}

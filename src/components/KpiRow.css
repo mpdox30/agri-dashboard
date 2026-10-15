@@ -37,3 +37,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* เส้นแนวโน้มเล็กใต้ตัวเลข: ยืดเต็มความกว้างการ์ด */
+.kpi-row__spark {
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+  margin-top: 12px;
+}
+
+/* แถบสัดส่วนชุมชนที่มีข้อมูล เติมจากซ้ายเมื่อการ์ดโผล่ */
+.kpi-row__meter {
+  height: 8px;
+  margin-top: 14px;
+  overflow: hidden;
+  background: var(--line);
+  border-radius: 999px;
+}
+.kpi-row__meter span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-soft), var(--green));
+  border-radius: 999px;
+  transform-origin: 0 50%;
+  animation: kpi-meter-fill 1s var(--ease-out) 0.3s both;
+}
+@keyframes kpi-meter-fill {
+  from { transform: scaleX(0); }
+}
+@media (prefers-reduced-motion: reduce) { .kpi-row__meter span { animation: none; } }
+html.is-exporting .kpi-row__meter span { animation: none; }

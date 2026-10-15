@@ -5,6 +5,7 @@
 import useCrosshair from './charts/useCrosshair';
 import SvgTooltip from './charts/SvgTooltip';
 import DrawInPath from './charts/DrawInPath';
+import AreaFill from './charts/AreaFill';
 import DataTableToggle from './charts/DataTableToggle';
 import './charts/charts.css';
 import './SeasonalLineChart.css';
@@ -108,6 +109,8 @@ export default function SeasonalLineChart({ monthly }) {
         {minVal < 0 && (
           <line x1={PADDING_LEFT} y1={zeroY} x2={WIDTH - PADDING_RIGHT} y2={zeroY} className="zero-baseline" />
         )}
+
+        <AreaFill points={points} baselineY={PADDING_TOP + CHART_HEIGHT} />
 
         {/* เส้นกราฟหลัก */}
         <DrawInPath d={linePath} className="season-line-path" />

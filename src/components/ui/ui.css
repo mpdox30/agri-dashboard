@@ -177,3 +177,19 @@ html.is-exporting .segbar__part { transition: none; }
 .spark__area { stroke: none; opacity: 0.14; }
 .spark__dot { stroke: var(--bg-card); stroke-width: 1.2; }
 .spark__empty { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 3; }
+
+/* ---------- ยกการ์ดตัวเลขเบาๆ เมื่อชี้ (เฉพาะอุปกรณ์ที่มีเมาส์) ---------- */
+@media (hover: hover) {
+  .stat-card .ui-card__core {
+    transition:
+      transform 0.3s var(--ease-out),
+      box-shadow 0.3s var(--ease-out);
+  }
+  .stat-card:hover .ui-card__core {
+    transform: translateY(-3px);
+    box-shadow: var(--inset-hi), 0 14px 26px -14px rgba(45, 74, 62, 0.38);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stat-card:hover .ui-card__core { transform: none; }
+}

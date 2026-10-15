@@ -12,19 +12,69 @@
   border-radius: 9px;
   padding: 13px 15px;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition:
+    border-color 0.2s,
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out);
   text-align: left;
+  width: 100%;
   font-family: var(--font-sans);
 }
 
 .province-card:hover {
   border-color: var(--terracotta);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px -12px rgba(45, 74, 62, 0.35);
 }
+.province-card:focus-visible { outline: 2px solid var(--green-soft); outline-offset: 2px; }
+.province-card-wrap { min-width: 0; }
+
+.province-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.province-card__rank {
+  flex: 0 0 auto;
+  min-width: 22px;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--green);
+  background: var(--shell);
+  border-radius: 999px;
+}
+.province-card--top .province-card__rank { color: #fff; background: var(--terracotta); }
+
+/* แถบสัดส่วนเทียบจังหวัดอันดับ 1 */
+.province-card__bar {
+  height: 5px;
+  margin-top: 9px;
+  overflow: hidden;
+  background: var(--line);
+  border-radius: 999px;
+}
+.province-card__bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-soft), var(--green));
+  border-radius: 999px;
+  transform-origin: 0 50%;
+  transition: transform 0.7s var(--ease-out);
+}
+.province-card:hover .province-card__bar span { filter: brightness(1.15); }
+@media (prefers-reduced-motion: reduce) {
+  .province-card, .province-card__bar span { transition: none; }
+  .province-card:hover { transform: none; }
+}
+html.is-exporting .province-card { transition: none; }
 
 .province-card__name {
   font-weight: 600;
   font-size: 13.5px;
-  margin-bottom: 4px;
   color: var(--ink);
 }
 

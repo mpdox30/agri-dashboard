@@ -178,6 +178,8 @@ export default function Homepage() {
     [summaryRows, filters, communityToRegion, communityToProvince]
   );
 
+  const kpiNetSeries = useMemo(() => monthlySeries.map((m) => m.netIncome), [monthlySeries]);
+  const kpiHouseholdSeries = useMemo(() => monthlySeries.map((m) => m.householdReduction), [monthlySeries]);
   const monthlyBarItems = useMemo(
     () => monthlySeries.map((m) => ({ key: m.key || m.label, label: m.label, value: m.netIncome })),
     [monthlySeries]
@@ -369,6 +371,8 @@ export default function Homepage() {
           householdDelta={comparison ? comparison.householdPct : null}
           deltaSuffix="จากเดือนเดียวกันของปีก่อน"
           dataQualityFlagCount={0}
+          netSeries={kpiNetSeries}
+          householdSeries={kpiHouseholdSeries}
         />
 
         {comparison && <ChangeSplitCard split={comparison.split} pairedCount={comparison.pairedCount} />}
@@ -486,6 +490,8 @@ export default function Homepage() {
                     householdDelta={comparison ? comparison.householdPct : null}
                     deltaSuffix="จากเดือนเดียวกันของปีก่อน"
                     dataQualityFlagCount={0}
+                    netSeries={kpiNetSeries}
+                    householdSeries={kpiHouseholdSeries}
                   />
                   {comparison && <ChangeSplitCard split={comparison.split} pairedCount={comparison.pairedCount} />}
                 </>
