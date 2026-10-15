@@ -6,6 +6,9 @@ import useCrosshair from './charts/useCrosshair';
 import SvgTooltip from './charts/SvgTooltip';
 import DrawInPath from './charts/DrawInPath';
 import AreaFill from './charts/AreaFill';
+import FlowLine from './charts/FlowLine';
+import PulseRing from './charts/PulseRing';
+import LiveGroup from './charts/LiveGroup';
 import DataTableToggle from './charts/DataTableToggle';
 import './charts/charts.css';
 import './SeasonalLineChart.css';
@@ -130,10 +133,12 @@ export default function SeasonalLineChart({ monthly }) {
               d={seg.pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')}
               className="season-line-path"
             />
+            {seg.pts.length > 1 && <FlowLine d={seg.pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')} />}
           </g>
         ))}
 
         {/* จุดข้อมูลแต่ละเดือน สีตามฤดู + label ค่าเฉพาะจุดสำคัญ + label เดือนด้านล่าง */}
+        <LiveGroup>
         {points.map((p, i) => (
           <g key={i}>
             <circle
@@ -142,6 +147,7 @@ export default function SeasonalLineChart({ monthly }) {
               r={active === i ? 5.5 : 4}
               className={p.isRainy ? 'season-dot rainy-dot' : 'season-dot dry-dot'}
               opacity={p.hasData === false ? 0.3 : 1}
+              style={{ '--i': i }}
             />
             {labelIndexes.has(i) && active === null && (
               <text x={p.x} y={Math.max(p.y - 8, 10)} textAnchor="middle" className="season-value-label">
@@ -153,6 +159,12 @@ export default function SeasonalLineChart({ monthly }) {
             </text>
           </g>
         ))}
+        </LiveGroup>
+
+        {peakIndex >= 0 && <PulseRing cx={points[peakIndex].x} cy={points[peakIndex].y} color="var(--terracotta)" />}
+        {lastIndex >= 0 && lastIndex !== peakIndex && (
+          <PulseRing cx={points[lastIndex].x} cy={points[lastIndex].y} color="var(--green-soft)" delay={1900} />
+        )}
 
         {active !== null && (
           <>

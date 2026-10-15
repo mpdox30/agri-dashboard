@@ -7,6 +7,9 @@ import useCrosshair from './charts/useCrosshair';
 import SvgTooltip from './charts/SvgTooltip';
 import DrawInPath from './charts/DrawInPath';
 import AreaFill from './charts/AreaFill';
+import FlowLine from './charts/FlowLine';
+import PulseRing from './charts/PulseRing';
+import LiveGroup from './charts/LiveGroup';
 import DataTableToggle from './charts/DataTableToggle';
 import './charts/charts.css';
 import './MemberMonthlyChart.css';
@@ -81,7 +84,9 @@ export default function MemberMonthlyChart({ monthly }) {
 
         <AreaFill points={points} baselineY={PADDING_TOP + CHART_HEIGHT} />
         <DrawInPath d={linePath} className="member-chart-line" />
+        <FlowLine d={linePath} />
 
+        <LiveGroup>
         {points.map((p, i) => (
           <g key={i}>
             <circle
@@ -90,6 +95,7 @@ export default function MemberMonthlyChart({ monthly }) {
               r={active === i ? 5.5 : 4}
               className="member-chart-dot"
               opacity={p.hasData ? 1 : 0.35}
+              style={{ '--i': i }}
             />
             {labelIndexes.has(i) && active === null && (
               <text x={p.x} y={Math.max(p.y - 8, 10)} textAnchor="middle" className="member-chart-value-label">
@@ -101,6 +107,12 @@ export default function MemberMonthlyChart({ monthly }) {
             </text>
           </g>
         ))}
+        </LiveGroup>
+
+        {peakIndex >= 0 && <PulseRing cx={points[peakIndex].x} cy={points[peakIndex].y} color="var(--terracotta)" />}
+        {lastIndex >= 0 && lastIndex !== peakIndex && (
+          <PulseRing cx={points[lastIndex].x} cy={points[lastIndex].y} color="var(--green-soft)" delay={1900} />
+        )}
 
         {active !== null && (
           <>

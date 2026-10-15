@@ -7,6 +7,8 @@
 //
 // เพิ่มใน v2: เส้นอ้างอิงแนวตั้งตามเมาส์/นิ้ว/ลูกศรคีย์บอร์ด พร้อมกล่องค่าของทุกปีในเดือนนั้น,
 // เส้นกราฟถูกเปิดเผยจากซ้ายไปขวาเมื่อเลื่อนมาเห็น, และปุ่ม "ดูค่าเป็นตาราง"
+import FlowLine from './charts/FlowLine';
+import PulseRing from './charts/PulseRing';
 import { YOY_SERIES_COLORS } from './yoyColors';
 import useCrosshair from './charts/useCrosshair';
 import SvgTooltip from './charts/SvgTooltip';
@@ -123,6 +125,12 @@ export default function YearOverYearChart({ monthLabels, series }) {
             />
           ))}
 
+          {seriesWithGeometry
+            .filter((s) => s.isCurrent)
+            .map((s) => (
+              <FlowLine key={`flow-${s.key}`} d={s.path} />
+            ))}
+
           {seriesWithGeometry.map((s) => (
             <g key={`dots-${s.key}`}>
               {s.points.map((p, i) => (
@@ -140,6 +148,13 @@ export default function YearOverYearChart({ monthLabels, series }) {
             </g>
           ))}
         </WipeReveal>
+
+        {seriesWithGeometry
+          .filter((s) => s.isCurrent)
+          .map((s) => {
+            const lastWithData = [...s.points].reverse().find((p) => p.hasData);
+            return lastWithData ? <PulseRing key={`pulse-${s.key}`} cx={lastWithData.x} cy={lastWithData.y} color={s.color} /> : null;
+          })}
 
         {monthLabels.map((label, i) => (
           <text
