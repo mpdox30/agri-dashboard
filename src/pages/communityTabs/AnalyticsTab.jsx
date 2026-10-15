@@ -4,6 +4,8 @@ import SeasonalLineChart from '../../components/SeasonalLineChart';
 import YearOverYearChart from '../../components/YearOverYearChart';
 import { YOY_SERIES_COLORS } from '../../components/yoyColors';
 import DependencyTrendChart from '../../components/DependencyTrendChart';
+import DrawInPath from '../../components/charts/DrawInPath';
+import useCrosshair from '../../components/charts/useCrosshair';
 import './AnalyticsTab.css';
 
 function formatBaht(n) {
@@ -189,7 +191,7 @@ export default function AnalyticsTab({
           <div className="retention-card">
             {retention ? (
               <>
-                <div className="retention-ring">
+                <div className="retention-ring" style={{ '--pt': Math.max(0, Math.min(100, retention.retentionPct)) }}>
                   <div className="retention-ring-inner">{retention.retentionPct.toFixed(0)}%</div>
                 </div>
                 <div className="retention-detail">
@@ -318,21 +320,62 @@ function CompLegendRow({ color, label, value }) {
   );
 }
 
-/** การ์ด Lorenz curve + ค่าสัมประสิทธิ์ Gini — SVG เล็ก ๆ วาดเส้นโค้งเทียบเส้นเสมอภาค */
+/** การ์ด Lorenz curve + ค่าสัมประสิทธิ์ Gini: ชี้เส้นโค้งเพื่ออ่านค่า "สมาชิก x% ล่างถือรายได้ y%" ได้ */
+const LZ = { W: 240, H: 216, L: 32, R: 10, T: 10, B: 26 };
+const LZ_PW = LZ.W - LZ.L - LZ.R;
+const LZ_PH = LZ.H - LZ.T - LZ.B;
+const lzX = (pct) => LZ.L + (pct / 100) * LZ_PW;
+const lzY = (pct) => LZ.T + LZ_PH - (pct / 100) * LZ_PH;
+
 function LorenzCurveCard({ lorenzCurve }) {
-  const SIZE = 160;
-  const path = lorenzCurve.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(p.x / 100) * SIZE} ${SIZE - (p.y / 100) * SIZE}`).join(' ');
-  const areaPath = `${path} L ${SIZE} ${SIZE} L 0 ${SIZE} Z`;
+  const points = lorenzCurve.points;
+  const xs = points.map((p) => lzX(p.x));
+  const { active, bind } = useCrosshair(xs, LZ.W);
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${lzX(p.x).toFixed(2)} ${lzY(p.y).toFixed(2)}`).join(' ');
+  // พื้นที่ระหว่างเส้นเสมอภาคกับเส้นโค้ง = ขนาดของความเหลื่อมล้ำ (Gini = 2 x พื้นที่นี้)
+  const gap = `${line} L ${lzX(100)} ${lzY(100)} Z`;
+  const cur = active !== null ? points[active] : null;
+  const ticks = [0, 25, 50, 75, 100];
 
   return (
     <div className="stat-row-card lorenz-card">
       <div className="card-title">
         ความเหลื่อมล้ำรายได้ (Lorenz curve) — Gini = <b>{lorenzCurve.gini.toFixed(3)}</b>
       </div>
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="lorenz-svg" role="img" aria-label="Lorenz curve ของรายได้สมาชิก">
-        <line x1={0} y1={SIZE} x2={SIZE} y2={0} className="lorenz-equality-line" />
-        <path d={areaPath} className="lorenz-area" />
-        <path d={path} className="lorenz-curve-path" fill="none" />
+      <div className="lorenz-readout" aria-live="polite">
+        {cur ? (
+          <>
+            สมาชิกรายได้น้อย <b>{cur.x.toFixed(0)}%</b> ล่าง ถือรายได้รวมเพียง <b>{cur.y.toFixed(1)}%</b>
+          </>
+        ) : (
+          <span className="lorenz-readout__hint">ชี้หรือแตะบนกราฟเพื่ออ่านค่า</span>
+        )}
+      </div>
+      <svg
+        viewBox={`0 0 ${LZ.W} ${LZ.H}`}
+        className="lorenz-svg"
+        role="img"
+        aria-label="Lorenz curve ของรายได้สมาชิก"
+        {...bind}
+      >
+        {ticks.map((t) => (
+          <g key={t} className="lorenz-grid">
+            <line x1={LZ.L} x2={LZ.W - LZ.R} y1={lzY(t)} y2={lzY(t)} />
+            <text x={LZ.L - 6} y={lzY(t) + 3} textAnchor="end">{t}</text>
+            <text x={lzX(t)} y={LZ.H - 10} textAnchor="middle">{t}</text>
+          </g>
+        ))}
+        <line x1={lzX(0)} y1={lzY(0)} x2={lzX(100)} y2={lzY(100)} className="lorenz-equality-line" />
+        <path d={gap} className="lorenz-area" />
+        <DrawInPath d={line} stroke="var(--terracotta)" strokeWidth={2.4} duration={1400} delay={200} />
+        {cur && (
+          <g className="lorenz-cursor" pointerEvents="none">
+            <line x1={lzX(cur.x)} x2={lzX(cur.x)} y1={lzY(cur.y)} y2={lzY(cur.x)} className="lorenz-gapline" />
+            <line x1={lzX(cur.x)} x2={lzX(cur.x)} y1={lzY(0)} y2={lzY(cur.y)} className="lorenz-dropline" />
+            <circle cx={lzX(cur.x)} cy={lzY(cur.x)} r="3.4" className="lorenz-dot lorenz-dot--eq" />
+            <circle cx={lzX(cur.x)} cy={lzY(cur.y)} r="4.6" className="lorenz-dot" />
+          </g>
+        )}
       </svg>
       <div className="lorenz-caption">
         แกนนอน = สัดส่วนสะสมของสมาชิก (น้อย→มาก) · แกนตั้ง = สัดส่วนสะสมของรายได้ · ยิ่งเส้นโค้งห่างจากเส้นทแยงมุม
@@ -353,6 +396,8 @@ function VolatilityCard({ memberVolatility }) {
     );
   }
 
+  const cvMax = Math.max(1, ...memberVolatility.mostVolatile.map((m) => m.cv), ...memberVolatility.mostStable.map((m) => m.cv));
+
   return (
     <div className="stat-row-card">
       <div className="card-title">ความผันผวนของรายได้ต่อสมาชิก (CV)</div>
@@ -362,16 +407,18 @@ function VolatilityCard({ memberVolatility }) {
       </div>
       <div className="volatility-subhead">แกว่งมากที่สุด</div>
       {memberVolatility.mostVolatile.map((m) => (
-        <div className="stat-line" key={`v-${m.fullName}`}>
+        <div className="stat-line cv-line" key={`v-${m.fullName}`}>
           <span className="slabel">{m.fullName}</span>
           <span className="sval">{m.cv.toFixed(1)}%</span>
+          <i className="cv-bar" style={{ '--w': (m.cv / cvMax) * 100 }} />
         </div>
       ))}
       <div className="volatility-subhead">คงที่ที่สุด</div>
       {memberVolatility.mostStable.map((m) => (
-        <div className="stat-line" key={`s-${m.fullName}`}>
+        <div className="stat-line cv-line" key={`s-${m.fullName}`}>
           <span className="slabel">{m.fullName}</span>
           <span className="sval">{m.cv.toFixed(1)}%</span>
+          <i className="cv-bar cv-bar--stable" style={{ '--w': (m.cv / cvMax) * 100 }} />
         </div>
       ))}
       <div className="inequality-caption">CV = ส่วนเบี่ยงเบนมาตรฐาน ÷ ค่าเฉลี่ย — ยิ่งสูงยิ่งรายได้แกว่งมากในแต่ละเดือน</div>

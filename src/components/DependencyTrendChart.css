@@ -10,6 +10,12 @@
   display: block;
 }
 
+.dep-chart { cursor: crosshair; touch-action: pan-y; }
+.dep-chart:focus-visible { outline: 2px solid var(--green-soft); outline-offset: 2px; border-radius: 8px; }
+.dep-col { transition: opacity 0.2s var(--ease); }
+.dep-chart.is-probing .dep-col:not(.is-active) { opacity: 0.38; }
+.dep-col.is-active .dep-month-label { fill: var(--ink, #2d3a2a); font-weight: 700; }
+
 .dep-bar-empty {
   fill: #efe9d8;
   opacity: 0.5;

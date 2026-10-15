@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
+import HomeHero from '../components/HomeHero';
 import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import LiveHeadline from '../components/LiveHeadline';
 import ChangeSplitCard from '../components/ChangeSplitCard';
@@ -319,17 +320,12 @@ export default function Homepage() {
   return (
     <div className="homepage">
       <div className="homepage__hero" id="sec-overview">
-        <h1>ภาพรวมโครงการ</h1>
-        <p className="homepage__sub">
-          รวบรวมจาก {communities.length} ชุมชน/กลุ่ม ครอบคลุมข้อมูลตั้งแต่ปีงบประมาณ 2565
-          ถึง 2569 ตามแนวทางเกษตรทฤษฎีใหม่
-        </p>
-
-        <LiveHeadline
-          scopeLabel={yearLabel}
-          communitiesWithData={currentTotals.communitiesWithData}
-          totalCommunities={currentTotals.totalCommunities}
-          netIncome={currentTotals.netIncome}
+        <HomeHero
+          yearLabel={yearLabel}
+          communityCount={communities.length}
+          totals={currentTotals}
+          netDelta={comparison ? comparison.netIncomePct : null}
+          series={monthlySeries}
           latestMonth={latestDataMonth}
         />
 

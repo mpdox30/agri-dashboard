@@ -1,0 +1,166 @@
+/* src/components/HomeHero.css */
+
+.hhero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 28px 40px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: clamp(24px, 4vw, 44px);
+  overflow: hidden;
+  background:
+    radial-gradient(520px 300px at 0% 0%, rgba(139, 157, 131, 0.30), transparent 70%),
+    radial-gradient(420px 260px at 100% 100%, rgba(193, 127, 62, 0.16), transparent 72%),
+    linear-gradient(135deg, #fffdf6, #f3eedd);
+  border-radius: 28px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px var(--line), 0 24px 50px -30px rgba(45, 74, 62, 0.45);
+}
+
+/* ---------- ฉากหลัง: เนินนาขั้นบันไดไหลช้าๆ ---------- */
+.hhero__bg {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 58%;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 55%);
+  mask-image: linear-gradient(to bottom, transparent, #000 55%);
+}
+.hhero__bg svg { display: block; width: 100%; height: 100%; }
+.hhero__terrace { animation: hhero-flow var(--speed) linear infinite; }
+@keyframes hhero-flow {
+  to { transform: translateX(calc(var(--shift) * -1)); }
+}
+
+/* ---------- ข้อความ ---------- */
+.hhero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 13px 5px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--green);
+  background: rgba(255, 254, 250, 0.8);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.hhero__live {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  background: var(--terracotta);
+  border-radius: 50%;
+}
+.hhero__live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(193, 127, 62, 0.55);
+  animation: hhero-live 1.8s ease-out infinite;
+}
+@keyframes hhero-live { to { box-shadow: 0 0 0 9px rgba(193, 127, 62, 0); } }
+
+.homepage .hhero h1 {
+  margin: 14px 0 10px;
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 5.2vw, 56px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  background: linear-gradient(100deg, var(--green) 20%, var(--green-soft) 70%, var(--terracotta) 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hhero__sub {
+  max-width: 520px;
+  margin: 0 0 26px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.hhero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 34px;
+}
+.hhero__stat-label { font-size: 13.5px; color: var(--muted); }
+.hhero__big {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 2px;
+  font-family: var(--font-sans);
+  font-size: clamp(46px, 7vw, 76px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--green);
+}
+.hhero__unit {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.hhero__delta { margin-top: 4px; }
+
+.hhero__ring-wrap { display: flex; align-items: center; gap: 14px; }
+.hhero__ring { width: 80px; height: 80px; flex: 0 0 auto; transform: rotate(-90deg); }
+.hhero__ring-text { transform: rotate(90deg); transform-origin: 40px 40px; font-family: var(--font-sans); font-size: 17px; font-weight: 700; fill: var(--green); }
+.hhero__ring-track { fill: none; stroke: var(--line); stroke-width: 8; }
+.hhero__ring-fill {
+  fill: none;
+  stroke: var(--green-soft);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 201;
+  stroke-dashoffset: calc(201 * (1 - var(--p, 0)));
+  animation: hhero-ring 1.3s var(--ease-out) 0.2s backwards;
+}
+@keyframes hhero-ring { from { stroke-dashoffset: 201; } }
+.hhero__ring-num { font-size: 22px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+.hhero__empty { margin: 0; font-size: 15px; line-height: 1.7; color: var(--muted); }
+
+/* ---------- กราฟชีพจร ---------- */
+.hhero__panel {
+  padding: 16px 18px 10px;
+  background: rgba(255, 254, 250, 0.78);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px var(--line), 0 12px 28px -18px rgba(45, 74, 62, 0.4);
+}
+.hhero__panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--green);
+}
+.hhero__panel-note { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+.hhero__chart { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+.hhero__grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
+.hhero__line { stroke: var(--green); stroke-width: 2.6; }
+.hhero__dot { fill: var(--bg-card); stroke: var(--green); stroke-width: 2; }
+.hhero__dot--peak { fill: var(--terracotta); stroke: var(--bg-card); }
+.hhero__peak-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; fill: var(--terracotta); }
+.hhero__month { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+
+@media (max-width: 900px) {
+  .hhero { grid-template-columns: minmax(0, 1fr); border-radius: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hhero__terrace, .hhero__live::after, .hhero__ring-fill { animation: none; }
+}
+html.is-exporting .hhero__terrace,
+html.is-exporting .hhero__live::after,
+html.is-exporting .hhero__ring-fill { animation: none; }

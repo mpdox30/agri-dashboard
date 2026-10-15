@@ -41,6 +41,7 @@ import {
 } from './communityAggregations';
 import { buildCommunityExportSheets } from './communityExport';
 import { downloadWorkbook } from '../utils/excelExport';
+import ScrollReveal from '../components/ui/ScrollReveal';
 import './CommunityView.css';
 
 const TABS = [
@@ -363,7 +364,7 @@ export default function CommunityView() {
       {recordsLoadState === 'loading' ? (
         <LoadingSkeleton variant="panel" label="กำลังโหลดข้อมูลรายสมาชิก..." />
       ) : (
-        <div key={activeTab} className="tab-panel-enter">
+        <ScrollReveal key={activeTab} className="tab-panel-enter">
           {activeTab === 'overview' && (
             <OverviewTab
               summaryRowsForCommunity={summaryRowsForCommunity}
@@ -410,7 +411,7 @@ export default function CommunityView() {
               fullPeriodLabel={periodLabel}
             />
           )}
-        </div>
+        </ScrollReveal>
       )}
     </div>
   );

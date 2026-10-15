@@ -13,28 +13,6 @@
   border-bottom: 1px solid var(--line);
 }
 
-/* ฉากหลังนุ่มๆ ของส่วนหัว: แสงสีเขียวอ่อนมุมซ้าย กับสีดินเผามุมขวา ค่อยๆ ลอยเบาๆ (ไม่ใช้ blur หนักๆ) */
-.homepage__hero::before {
-  content: '';
-  position: absolute;
-  inset: 0 -32px 0;
-  z-index: -1;
-  pointer-events: none;
-  /* ขอบจางหายเป็นวงรี ไม่ให้เห็นเป็นกล่องสี่เหลี่ยม */
-  -webkit-mask-image: radial-gradient(ellipse 62% 70% at 50% 45%, #000 35%, transparent 100%);
-  mask-image: radial-gradient(ellipse 62% 70% at 50% 45%, #000 35%, transparent 100%);
-  background:
-    radial-gradient(520px 260px at 8% 0%, rgba(139, 157, 131, 0.42), transparent 70%),
-    radial-gradient(460px 240px at 96% 12%, rgba(193, 127, 62, 0.26), transparent 70%);
-  animation: hero-drift 18s ease-in-out infinite alternate;
-}
-@keyframes hero-drift {
-  to { transform: translate3d(14px, 8px, 0) scale(1.03); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .homepage__hero::before { animation: none; }
-}
-html.is-exporting .homepage__hero::before { animation: none; }
 
 .homepage__hero h1 {
   font-family: var(--font-serif);
@@ -255,9 +233,4 @@ html.is-exporting .homepage__hero::before { animation: none; }
 @media (min-width: 901px) {
   .homepage__section,
   .homepage__hero { scroll-margin-top: 84px; }
-}
-
-/* มือถือ: ฉากหลังส่วนหัวไม่ล้นออกนอกจอ (ไม่ให้เกิดแถบเลื่อนแนวนอน) */
-@media (max-width: 900px) {
-  .homepage__hero::before { inset: 0; }
 }

@@ -1,0 +1,107 @@
+/* src/components/ui/scrollReveal.css
+   ลูกเล่นของการ์ดในแท็บชุมชนที่ผูกกับ data-rv (ตั้งโดย ScrollReveal.jsx)
+   สถานะ "ซ่อน" ใช้เฉพาะหน้าจอที่ไม่ได้ปิดการเคลื่อนไหวและไม่ได้กำลังส่งออกรูป/พิมพ์
+   ถ้าเงื่อนไขไม่ครบ ทุกอย่างแสดงเต็มทันที */
+
+@property --p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 100;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  html:not(.is-exporting) [data-rv] {
+    transition:
+      opacity 0.6s var(--ease-out) var(--rv-d, 0ms),
+      transform 0.6s var(--ease-out) var(--rv-d, 0ms);
+  }
+  html:not(.is-exporting) [data-rv='0'] {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  /* ---- แถบเติมจากซ้ายเมื่อการ์ดโผล่ ---- */
+  html:not(.is-exporting) [data-rv] :is(.season-bar-fill, .inequality-bar-fill, .driver-bar-fill, .rank-list-bar-fill, .profile-bar-fill, .mini-bar-fill, .cv-bar) {
+    transform-origin: 0 50%;
+    transition: transform 1.1s var(--ease-out) calc(var(--rv-d, 0ms) + 0.25s + var(--rn, 0) * 70ms);
+  }
+  html:not(.is-exporting) [data-rv='0'] :is(.season-bar-fill, .inequality-bar-fill, .driver-bar-fill, .rank-list-bar-fill, .profile-bar-fill, .mini-bar-fill, .cv-bar) {
+    transform: scaleX(0);
+  }
+
+  /* ---- แท่งสัดส่วนซ้อน: เปิดจากซ้ายไปขวา ---- */
+  html:not(.is-exporting) [data-rv] .comp-stack {
+    transition: clip-path 1.1s var(--ease-out) calc(var(--rv-d, 0ms) + 0.2s);
+    clip-path: inset(0 0 0 0 round 7px);
+  }
+  html:not(.is-exporting) [data-rv='0'] .comp-stack { clip-path: inset(0 100% 0 0 round 7px); }
+
+  /* ---- วงแหวนคงอยู่: เติมสีจาก 0 ไปถึงเปอร์เซ็นต์จริง ---- */
+  html:not(.is-exporting) [data-rv] .retention-ring {
+    transition: --p 1.4s var(--ease-out) calc(var(--rv-d, 0ms) + 0.25s);
+  }
+  html:not(.is-exporting) [data-rv='0'] .retention-ring { --p: 0; }
+
+  /* ---- Lorenz: พื้นที่ช่องว่างจางเข้ามาหลังเส้นถูกวาด ---- */
+  html:not(.is-exporting) [data-rv] .lorenz-area {
+    transition: opacity 0.9s var(--ease-out) calc(var(--rv-d, 0ms) + 1s);
+  }
+  html:not(.is-exporting) [data-rv='0'] .lorenz-area { opacity: 0; }
+
+  /* ---- กราฟแท่งซ้อนพึ่งพาแหล่งรายได้: แท่งโตจากฐานทีละแท่ง ---- */
+  html:not(.is-exporting) [data-rv] .dep-chart .dep-col rect {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transition: transform 0.8s var(--ease-out) calc(var(--rv-d, 0ms) + 0.15s + var(--i, 0) * 55ms);
+  }
+  html:not(.is-exporting) [data-rv='0'] .dep-chart .dep-col rect { transform: scaleY(0); }
+
+  /* ---- แถวในลิสต์: ไล่ลำดับการหน่วงของแถบ ---- */
+  .rank-list-row:nth-of-type(2), .stat-line:nth-of-type(2), .driver-bar-row:nth-of-type(2), .profile-row:nth-of-type(2) { --rn: 1; }
+  .rank-list-row:nth-of-type(3), .stat-line:nth-of-type(3), .driver-bar-row:nth-of-type(3), .profile-row:nth-of-type(3) { --rn: 2; }
+  .rank-list-row:nth-of-type(4), .stat-line:nth-of-type(4), .profile-row:nth-of-type(4) { --rn: 3; }
+  .rank-list-row:nth-of-type(5), .stat-line:nth-of-type(5), .profile-row:nth-of-type(5) { --rn: 4; }
+  .rank-list-row:nth-of-type(6), .stat-line:nth-of-type(6) { --rn: 5; }
+  .rank-list-row:nth-of-type(7), .stat-line:nth-of-type(7) { --rn: 6; }
+}
+
+/* ---- ปฏิสัมพันธ์ตอนชี้ (ไม่ขึ้นกับการซ่อน/โชว์) ---- */
+.rank-list-row,
+.stat-line,
+.driver-bar-row {
+  transition: background 0.2s var(--ease), transform 0.25s var(--ease-out);
+}
+@media (hover: hover) {
+  .rank-list-row:hover { transform: translateX(3px); }
+  .rank-list-row:not(.highlight):hover { background: rgba(139, 157, 131, 0.12); border-radius: 6px; }
+  .rank-list-row:hover .rank-list-bar-fill { filter: brightness(1.12); }
+  .stat-line:hover { background: rgba(139, 157, 131, 0.08); }
+}
+
+/* แถวของชุมชนนี้ (highlight) มีแสงวูบเบาๆ ให้เจอง่ายในลิสต์ยาว */
+@media (prefers-reduced-motion: no-preference) {
+  .rank-list-row.highlight { animation: rank-self-glow 2.8s ease-in-out 1.2s 2; }
+}
+@keyframes rank-self-glow {
+  50% { box-shadow: 0 0 0 3px rgba(193, 127, 62, 0.22); }
+}
+
+/* แถบเล็กใต้แถวค่า CV (ความยาวตามสัดส่วนเทียบค่าสูงสุดของรายการ) */
+.cv-line { position: relative; }
+.cv-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: calc(var(--w, 0) * 1%);
+  background: var(--terracotta);
+  border-radius: 2px;
+  opacity: 0.8;
+}
+.cv-bar--stable { background: var(--sage); }
+
+/* ตารางในหน้านี้: แถวเลื่อนเข้าทีละแถวตอนเปิดแท็บ */
+@media screen and (prefers-reduced-motion: no-preference) {
+  html:not(.is-exporting) .member-row { animation: row-in 0.45s var(--ease-out) backwards; animation-delay: calc(var(--ri, 0) * 35ms); }
+}
+@keyframes row-in { from { opacity: 0; transform: translateY(8px); } }

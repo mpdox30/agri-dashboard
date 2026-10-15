@@ -2,6 +2,8 @@
 //
 // กราฟแท่งซ้อน (stacked bar) แสดงสัดส่วนแหล่งที่มาของรายได้รายเดือน — ขาย / แบ่งปัน /
 // ผลิตเอง / รับฟรี-อื่นๆ — SVG วาดเอง ตามธรรมเนียมเดียวกับกราฟอื่นในหน้านี้
+import SvgTooltip from './charts/SvgTooltip';
+import useCrosshair from './charts/useCrosshair';
 import './DependencyTrendChart.css';
 
 const WIDTH = 700;
@@ -21,6 +23,13 @@ const SEGMENTS = [
   { key: 'freeOtherPct', className: 'seg-free', label: 'รับฟรี/อื่นๆ' },
 ];
 
+const SEG_COLORS = {
+  salePct: 'var(--green-soft)',
+  sharingPct: 'var(--gold)',
+  selfProducedPct: 'var(--sage)',
+  freeOtherPct: 'var(--terracotta)',
+};
+
 /**
  * props:
  *   monthly: { label, hasData, salePct, sharingPct, selfProducedPct, freeOtherPct }[]
@@ -34,19 +43,25 @@ export default function DependencyTrendChart({ monthly }) {
     return PADDING_LEFT + i * (CHART_WIDTH / n);
   }
 
+  const centers = monthly.map((_, i) => xAt(i) + barWidth / 2);
+  const { active, bind } = useCrosshair(centers, WIDTH);
+  const cur = active !== null ? monthly[active] : null;
+
   return (
     <div className="dep-chart-wrap">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="dep-chart"
+        className={`dep-chart${cur ? ' is-probing' : ''}`}
         role="img"
         aria-label="กราฟแท่งซ้อนสัดส่วนแหล่งที่มาของรายได้รายเดือน"
+        {...bind}
       >
         {monthly.map((m, i) => {
           const x = xAt(i);
+          const colClass = `dep-col${active === i ? ' is-active' : ''}`;
           if (!m.hasData) {
             return (
-              <g key={i}>
+              <g key={i} className={colClass} style={{ '--i': i }}>
                 <rect
                   x={x}
                   y={PADDING_TOP}
@@ -62,7 +77,7 @@ export default function DependencyTrendChart({ monthly }) {
           }
           let cursorY = PADDING_TOP + CHART_HEIGHT;
           return (
-            <g key={i}>
+            <g key={i} className={colClass} style={{ '--i': i }}>
               {SEGMENTS.map((seg) => {
                 const value = m[seg.key] || 0;
                 const segHeight = (value / 100) * CHART_HEIGHT;
@@ -84,6 +99,24 @@ export default function DependencyTrendChart({ monthly }) {
             </g>
           );
         })}
+        {cur && (
+          <SvgTooltip
+            x={centers[active]}
+            y={PADDING_TOP + 6}
+            top={0}
+            viewBoxWidth={WIDTH}
+            title={cur.label}
+            lines={
+              cur.hasData
+                ? SEGMENTS.map((seg) => ({
+                    label: seg.label,
+                    value: `${(cur[seg.key] || 0).toFixed(1)}%`,
+                    color: SEG_COLORS[seg.key],
+                  }))
+                : [{ label: 'สถานะ', value: 'ยังไม่มีข้อมูล', color: '#c9c2ae' }]
+            }
+          />
+        )}
       </svg>
       <div className="dep-chart-legend">
         {SEGMENTS.map((seg) => (

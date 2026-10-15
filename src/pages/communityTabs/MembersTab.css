@@ -227,3 +227,11 @@ tbody tr:hover {
     display: none;
   }
 }
+
+/* แถวสมาชิก: ชี้แล้วมีแถบเขียวด้านซ้าย และพื้นหลังอุ่นขึ้น */
+.member-row td { transition: background 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+@media (hover: hover) {
+  .member-row:hover td { background: rgba(139, 157, 131, 0.1); }
+  .member-row:hover td:first-child { box-shadow: inset 3px 0 0 var(--green-soft); }
+  .member-row:hover .mini-bar-fill { filter: brightness(1.1); }
+}

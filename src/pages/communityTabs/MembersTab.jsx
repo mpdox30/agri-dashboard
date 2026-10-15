@@ -98,7 +98,7 @@ export default function MembersTab({ members, periodLabel, monthlySeriesByName, 
             </tr>
           </thead>
           <tbody>
-            {filteredSorted.map((m) => {
+            {filteredSorted.map((m, rowIndex) => {
               // อันดับอ้างอิงจากลิสต์เต็ม (ก่อนค้นหา) ให้สอดคล้องกับ "อันดับจริง" เสมอ
               const rankInFull = members.findIndex((x) => x.fullName === m.fullName) + 1;
               const rankClass =
@@ -110,6 +110,7 @@ export default function MembersTab({ members, periodLabel, monthlySeriesByName, 
                 <Fragment key={m.fullName}>
                   <tr
                     className="member-row"
+                    style={{ '--ri': Math.min(rowIndex, 14) }}
                     onClick={() => toggleExpand(m.fullName)}
                     aria-expanded={isExpanded}
                   >
