@@ -88,7 +88,7 @@
 }
 
 .qstat.pending b {
-  color: var(--terracotta);
+  color: var(--terracotta-text);
 }
 
 .qstat.note {
@@ -277,18 +277,18 @@
 }
 
 .diff-cell-up {
-  color: var(--terracotta);
+  color: var(--terracotta-text);
   font-weight: 600;
 }
 
 .diff-cell-down {
-  color: var(--sage);
+  color: var(--sage-text);
 }
 
 .diff-flag-note {
   font-family: var(--font-sans);
   font-size: 10.5px;
-  color: var(--terracotta);
+  color: var(--terracotta-text);
 }
 
 .reviewer-note-box {
@@ -386,4 +386,66 @@
   .approval-view {
     padding: 0 16px 60px;
   }
+}
+
+/* ===== ปรับรูปลักษณ์ v2 (ผูกกับ .approval-view) ===== */
+.approval-view .hero { border-bottom: none; padding-top: 36px; }
+.approval-view .hero h1 {
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  background: linear-gradient(100deg, var(--green) 20%, var(--green-soft) 60%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.approval-view .hero p.sub { font-size: 14.5px; line-height: 1.7; }
+.approval-view .qstat {
+  border-radius: var(--r-core);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease);
+}
+.approval-view .qstat.pending { border-left: 4px solid var(--terracotta); }
+@media (hover: hover) {
+  .approval-view .qstat:hover { transform: translateY(-2px); }
+}
+.approval-view .filters select,
+.approval-view .filters input,
+.approval-view .login-panel input {
+  border-radius: var(--r-sm);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.approval-view .filters select:hover,
+.approval-view .filters input:hover { border-color: var(--sage-text); }
+.approval-view .filters select:focus-visible,
+.approval-view .filters input:focus-visible,
+.approval-view .login-panel input:focus-visible { border-color: var(--green-soft); box-shadow: 0 0 0 3px rgba(21, 122, 106, 0.15); outline: none; }
+.approval-view .login-panel { border-radius: var(--r-shell); box-shadow: var(--shadow-card); }
+
+.approval-view .queue-card {
+  border-radius: var(--r-core);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.25s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease-out);
+}
+@media (hover: hover) {
+  .approval-view .queue-card:not(.expanded):hover { transform: translateY(-2px); box-shadow: 0 14px 28px -16px rgba(11, 79, 74, 0.35); }
+}
+.approval-view .queue-card.expanded { border-color: var(--green-soft); box-shadow: 0 16px 34px -18px rgba(11, 79, 74, 0.4); }
+.approval-view .queue-head { transition: background 0.2s var(--ease); }
+.approval-view .queue-head:hover { background: rgba(127, 178, 191, 0.1); }
+.approval-view .status-tag { border-radius: 999px; }
+.approval-view .summary-box { border-radius: var(--r-sm); }
+.approval-view .diff-table tr { transition: background 0.2s var(--ease); }
+@media (hover: hover) {
+  .approval-view .diff-table tbody tr:hover { background: rgba(127, 178, 191, 0.1); }
+}
+.approval-view .reviewer-note-box textarea { border-radius: var(--r-sm); transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.approval-view .reviewer-note-box textarea:focus-visible { border-color: var(--green-soft); box-shadow: 0 0 0 3px rgba(21, 122, 106, 0.15); outline: none; }
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  html:not(.is-exporting) .approval-view .queue-card { animation: row-in 0.5s var(--ease-out) backwards; }
+  html:not(.is-exporting) .approval-view .queue-card:nth-of-type(2) { animation-delay: 60ms; }
+  html:not(.is-exporting) .approval-view .queue-card:nth-of-type(3) { animation-delay: 120ms; }
+  html:not(.is-exporting) .approval-view .queue-card:nth-of-type(4) { animation-delay: 180ms; }
 }

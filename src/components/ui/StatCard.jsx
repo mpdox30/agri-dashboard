@@ -21,6 +21,15 @@ import './ui.css';
  *   icon: ไอคอนมุมขวาบน (ดู kpiIcons.jsx) ไม่ใส่ก็ได้
  *   color: 'green' | 'terracotta' | 'sage' | 'ink' โทนของตัวเลขและแสงเรืองมุมการ์ด (ค่าเริ่มต้น green)
  */
+// ตัวเลขยาวใน 4 คอลัมน์จะตกบรรทัดกลางตัวเลข จึงลดขนาดตามความยาวของค่าที่จัดรูปแล้ว
+function valueSizeClass(value, format) {
+  if (value === null || value === undefined) return '';
+  const len = String(format ? format(value) : value).length;
+  if (len >= 9) return ' stat-card__value--xl';
+  if (len >= 7) return ' stat-card__value--lg';
+  return '';
+}
+
 export default function StatCard({ label, value, format, unit, delta = null, deltaSuffix, note, delay = 0, tone, icon, color = 'green', children, className = '' }) {
   return (
     <Reveal delay={delay} className={`stat-card stat-card--${color} ${className}`.trim()}>
@@ -29,7 +38,7 @@ export default function StatCard({ label, value, format, unit, delta = null, del
           <div className="stat-card__label">{label}</div>
           {icon && <span className="stat-card__icon">{icon}</span>}
         </div>
-        <div className="stat-card__value">
+        <div className={`stat-card__value${valueSizeClass(value, format)}`}>
           {value === null || value === undefined ? (
             '—'
           ) : (

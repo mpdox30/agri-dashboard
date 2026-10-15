@@ -73,6 +73,20 @@ export function buildExecutiveSummaryData(communities, allSummaryRows, yearType,
     .sort((a, b) => b.growthPct - a.growthPct)
     .slice(0, 5);
 
+  // รวมรายได้สุทธิรายภาค (ไว้เทียบภาคในหน้ารายงาน) ภาคที่ไม่ระบุจะรวมเป็น "ไม่ระบุภาค"
+  const regionMap = new Map();
+  communityStats.forEach((c) => {
+    const name = c.region || 'ไม่ระบุภาค';
+    const entry = regionMap.get(name) || { region: name, netIncome: 0, communityCount: 0, withDataCount: 0 };
+    entry.communityCount += 1;
+    if (c.monthsWithData > 0) {
+      entry.withDataCount += 1;
+      entry.netIncome += c.netIncome;
+    }
+    regionMap.set(name, entry);
+  });
+  const regionStats = [...regionMap.values()].sort((a, b) => b.netIncome - a.netIncome);
+
   const completenessCount = months.length > 0
     ? communities.filter((c) => {
         const rows = cleanedRows.filter((r) => r.community_key === c.community_key);
@@ -92,6 +106,7 @@ export function buildExecutiveSummaryData(communities, allSummaryRows, yearType,
     totalHousehold,
     totalNetIncome,
     monthlyTrend,
+    regionStats,
     top5Income,
     top5Growth,
   };

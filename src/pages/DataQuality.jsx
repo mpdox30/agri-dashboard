@@ -7,7 +7,16 @@ import {
   findUnenteredMonthRunsAcrossSystem,
 } from './dataQualityChecks';
 import { formatMonthLabel } from './fiscalYears';
+import StatCard from '../components/ui/StatCard';
+import Card from '../components/ui/Card';
+import Reveal from '../components/ui/Reveal';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
+import { IconShield, IconCommunity, IconTrend } from '../components/ui/kpiIcons';
 import './DataQuality.css';
+
+function formatInteger(n) {
+  return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(Math.round(n));
+}
 
 function currentMonthString() {
   const now = new Date();
@@ -64,12 +73,7 @@ export default function DataQuality() {
   const futureRunsCount = unenteredRuns.length - pastRunsCount;
 
   if (loadState === 'loading') {
-    return (
-      <div className="dq-status">
-        <p>กำลังโหลดและตรวจสอบข้อมูลทั้งระบบ...</p>
-        <p className="dq-status__hint">ต้องดึงข้อมูลรายเดือนของทุกชุมชน (~59,000 แถว) อาจใช้เวลาสักครู่</p>
-      </div>
-    );
+    return <LoadingSkeleton variant="panel" label="กำลังโหลดและตรวจสอบข้อมูลทั้งระบบ (ดึงข้อมูลรายเดือนของทุกชุมชน ~59,000 แถว อาจใช้เวลาสักครู่)" />;
   }
 
   if (loadState === 'error') {
@@ -82,15 +86,49 @@ export default function DataQuality() {
 
   return (
     <div className="data-quality">
-      <div className="dq-hero">
+      <header className="dq-hero">
+        <span className="dq-eyebrow"><i aria-hidden="true" />สแกนอัตโนมัติทุกครั้งที่เปิด</span>
         <h1>คุณภาพข้อมูล</h1>
         <p className="dq-sub">
-          ตรวจสอบปัญหาที่พบได้บ่อยในข้อมูลที่กรอกมาหลายปีโดยหลายคน — ระบบสแกนทุกครั้งที่เปิด
-          หน้านี้ ไม่ต้องรอให้ส่งไฟล์ CSV มาให้ทีหลังอีก
+          ตรวจสอบปัญหาที่พบได้บ่อยในข้อมูลที่กรอกมาหลายปีโดยหลายคน ระบบสแกนทุกครั้งที่เปิดหน้านี้
+          ไม่ต้องรอให้ส่งไฟล์ CSV มาให้ทีหลังอีก
         </p>
+      </header>
+
+      <div className="dq-kpis">
+        <StatCard
+          label="ชื่อสมาชิกที่อาจซ้ำกัน"
+          value={nearDuplicates.length}
+          format={formatInteger}
+          unit="คู่"
+          note="ควรรวมเป็นชื่อเดียวที่ต้นทาง"
+          icon={<IconCommunity />}
+          color="terracotta"
+        />
+        <StatCard
+          label="ข้อมูลที่อาจคัดลอกข้ามปี"
+          value={carryoverDuplicates.length}
+          format={formatInteger}
+          unit="ช่วง"
+          note="ตัวเลขตรงกับปีก่อนหน้าเป๊ะ"
+          icon={<IconTrend />}
+          color="sage"
+          delay={70}
+        />
+        <StatCard
+          label="ช่วงที่อาจไม่ได้กรอกจริง"
+          value={pastRunsCount}
+          format={formatInteger}
+          unit="ช่วงในอดีต"
+          note={`อีก ${futureRunsCount} ช่วงเป็นเดือนอนาคต ไม่ต้องตรวจ`}
+          icon={<IconShield />}
+          color="green"
+          delay={140}
+        />
       </div>
 
-      <div className="dq-section">
+      <Reveal as="section" className="dq-section">
+        <Card className="dq-card">
         <div className="dq-section-head">
           <h2>ชื่อสมาชิกที่อาจซ้ำกัน</h2>
           <span className="dq-count">{nearDuplicates.length} คู่</span>
@@ -116,7 +154,7 @@ export default function DataQuality() {
               </thead>
               <tbody>
                 {nearDuplicates.map((d, i) => (
-                  <tr key={i}>
+                  <tr key={i} style={{ '--ri': Math.min(i, 12) }}>
                     <td>ชุมชน{d.communityKey}</td>
                     <td>{d.nameA}</td>
                     <td>{d.nameB}</td>
@@ -140,9 +178,11 @@ export default function DataQuality() {
             </table>
           </div>
         )}
-      </div>
+        </Card>
+      </Reveal>
 
-      <div className="dq-section">
+      <Reveal as="section" className="dq-section">
+        <Card className="dq-card">
         <div className="dq-section-head">
           <h2>ข้อมูลที่อาจคัดลอกข้ามปี</h2>
           <span className="dq-count">{carryoverDuplicates.length} ช่วง</span>
@@ -168,7 +208,7 @@ export default function DataQuality() {
               </thead>
               <tbody>
                 {carryoverDuplicates.map((c, i) => (
-                  <tr key={i}>
+                  <tr key={i} style={{ '--ri': Math.min(i, 12) }}>
                     <td>ชุมชน{c.communityKey}</td>
                     <td>{c.month}</td>
                     <td>{c.comparedToMonth}</td>
@@ -183,9 +223,11 @@ export default function DataQuality() {
             </table>
           </div>
         )}
-      </div>
+        </Card>
+      </Reveal>
 
-      <div className="dq-section">
+      <Reveal as="section" className="dq-section">
+        <Card className="dq-card">
         <div className="dq-section-head">
           <h2>ช่วงที่อาจไม่ได้กรอกข้อมูลจริง</h2>
           <span className="dq-count">{pastRunsCount} ช่วงในอดีต</span>
@@ -218,7 +260,7 @@ export default function DataQuality() {
               </thead>
               <tbody>
                 {visibleRuns.map((r, i) => (
-                  <tr key={i}>
+                  <tr key={i} style={{ '--ri': Math.min(i, 12) }}>
                     <td>ชุมชน{r.communityKey}</td>
                     <td>
                       {formatMonthLabel(r.runStart)} – {formatMonthLabel(r.runEnd)}
@@ -239,7 +281,8 @@ export default function DataQuality() {
             </table>
           </div>
         )}
-      </div>
+        </Card>
+      </Reveal>
     </div>
   );
 }

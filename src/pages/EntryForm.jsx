@@ -156,6 +156,8 @@ export default function EntryForm() {
 
   // กู้คืนร่างที่บันทึกไว้ (ถ้ามี) ทุกครั้งที่เปลี่ยนชุมชนหรือเดือน — ทำงานหลัง state
   // ถูกรีเซ็ตเป็นค่าว่างจาก handleCommunityChange/handleMonthChange แล้วเสมอ
+  // (ซิงก์กับ localStorage ซึ่งเป็นระบบภายนอก จึงตั้ง state ใน effect ได้ตามเจตนา)
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!communityKey || !month) return;
     const draft = loadDraft(communityKey, month);
@@ -176,6 +178,7 @@ export default function EntryForm() {
       setDraftRestoredNotice(false);
     }
   }, [communityKey, month]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Autosave: บันทึกร่างลง localStorage ทุกครั้งที่ข้อมูลในตารางเปลี่ยน
   // ข้าม 1 รอบทันทีหลังกู้คืนร่าง (justRestoredDraftRef) กันเซฟทับด้วยค่าว่างก่อนที่

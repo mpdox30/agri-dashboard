@@ -17,7 +17,7 @@
   box-shadow: var(--inset-hi), var(--shadow-card);
 }
 .ui-card--accent { background: rgba(204, 122, 28, 0.10); }
-.ui-card--good { background: rgba(23, 128, 111, 0.10); }
+.ui-card--good { background: rgba(21, 122, 106, 0.10); }
 .ui-card--calm { background: rgba(127, 178, 191, 0.14); }
 
 /* ---------- Reveal: ผุดขึ้นเมื่อเลื่อนมาเห็น ---------- */
@@ -98,6 +98,13 @@ html.is-exporting .reveal * {
   color: var(--kpi-c);
   overflow-wrap: anywhere;
 }
+.stat-card__value--lg { font-size: clamp(30px, 3.4vw, 44px); white-space: nowrap; overflow-wrap: normal; }
+.stat-card__value--xl { font-size: clamp(28px, 2.6vw, 36px); white-space: nowrap; overflow-wrap: normal; }
+.stat-card { min-width: 0; }
+@media (max-width: 420px) {
+  .stat-card__value--lg, .stat-card__value--xl { font-size: clamp(26px, 8vw, 32px); }
+}
+.present .stat-card__value--lg, .present .stat-card__value--xl { font-size: clamp(26px, 3.4vw, 42px); }
 .stat-card__unit {
   margin-top: 6px;
   font-size: 14px;
@@ -297,3 +304,6 @@ html.is-exporting .tab-panel-enter { animation: none; }
     radial-gradient(180px 110px at 100% 0%, color-mix(in srgb, var(--kpi-c) 13%, transparent), transparent 75%),
     var(--bg-card);
 }
+
+/* แถวตารางเลื่อนเข้าทีละแถว (ใช้ร่วมหลายหน้า) */
+@keyframes row-in { from { opacity: 0; transform: translateY(8px); } }
