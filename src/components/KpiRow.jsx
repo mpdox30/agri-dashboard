@@ -11,22 +11,21 @@ function formatInteger(n) {
   return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(n);
 }
 
-function percentChange(current, previous) {
-  if (!previous) return null;
-  return ((current - previous) / Math.abs(previous)) * 100;
-}
-
 /**
  * props:
  *   currentTotals: { netIncome, householdReduction, communitiesWithData, totalCommunities }
- *   previousTotals: same shape, สำหรับช่วงเทียบ (ปีก่อน/เดือนก่อน) หรือ null ถ้าไม่มีข้อมูลเทียบ
+ *   netDelta / householdDelta: % เปลี่ยนแปลงเทียบช่วงก่อน หรือ null ถ้าเทียบไม่ได้ (คำนวณแบบจับคู่เดือน
+ *     เดียวกันมาจากข้างนอก ดู buildYearOverYearComparison ใน homepageAggregations.js)
+ *   deltaSuffix: ข้อความต่อท้ายป้ายเปลี่ยนแปลง
  *   dataQualityFlagCount: number
  */
-export default function KpiRow({ currentTotals, previousTotals, dataQualityFlagCount }) {
-  const netDelta = previousTotals ? percentChange(currentTotals.netIncome, previousTotals.netIncome) : null;
-  const householdDelta = previousTotals
-    ? percentChange(currentTotals.householdReduction, previousTotals.householdReduction)
-    : null;
+export default function KpiRow({
+  currentTotals,
+  netDelta = null,
+  householdDelta = null,
+  deltaSuffix = 'จากช่วงก่อน',
+  dataQualityFlagCount,
+}) {
   const missing = currentTotals.totalCommunities - currentTotals.communitiesWithData;
   const cleanPercent =
     currentTotals.communitiesWithData > 0
@@ -41,7 +40,7 @@ export default function KpiRow({ currentTotals, previousTotals, dataQualityFlagC
         format={formatMillionBaht}
         unit="ล้านบาท"
         delta={netDelta}
-        deltaSuffix="จากช่วงก่อน"
+        deltaSuffix={deltaSuffix}
         delay={0}
       />
       <StatCard
@@ -50,7 +49,7 @@ export default function KpiRow({ currentTotals, previousTotals, dataQualityFlagC
         format={formatMillionBaht}
         unit="ล้านบาท"
         delta={householdDelta}
-        deltaSuffix="จากช่วงก่อน"
+        deltaSuffix={deltaSuffix}
         delay={80}
       />
       <StatCard

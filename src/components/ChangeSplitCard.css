@@ -1,0 +1,53 @@
+/* src/components/ChangeSplitCard.css */
+
+.change-split { margin-top: 14px; }
+
+.change-split__title {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.change-split__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.change-split__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13.5px;
+}
+
+.change-split__dot {
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--flat);
+}
+.change-split__item--up .change-split__dot { background: var(--up); }
+.change-split__item--flat .change-split__dot { background: var(--sage); }
+.change-split__item--down .change-split__dot { background: var(--down); }
+
+.change-split__num {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.change-split__label { color: var(--muted); }
+
+.change-split__note,
+.change-split__empty {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}

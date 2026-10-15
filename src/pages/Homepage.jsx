@@ -4,6 +4,7 @@ import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
 import LiveHeadline from '../components/LiveHeadline';
+import ChangeSplitCard from '../components/ChangeSplitCard';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
 import ProvinceMap from '../components/ProvinceMap';
@@ -15,8 +16,11 @@ import {
   buildOverdueReport,
   buildHomepageExportSheets,
   findLatestDataMonth,
+  buildYearOverYearComparison,
+  splitCommunitiesByChange,
 } from './homepageAggregations';
-import { formatMonthLabel } from './fiscalYears';
+import { formatMonthLabel, getPreviousPeriod } from './fiscalYears';
+import { cleanAllSummaryRows } from './communityAggregations';
 import { downloadWorkbook } from '../utils/excelExport';
 import './Homepage.css';
 
@@ -138,6 +142,21 @@ export default function Homepage() {
 
   const latestDataMonth = useMemo(() => findLatestDataMonth(summaryRows), [summaryRows]);
 
+  // เทียบกับปีก่อนแบบ "เดือนเดียวกัน" ใช้ข้อมูลที่ตัดเดือนที่ยังไม่ได้กรอกจริงออกแล้ว
+  const cleanedSummaryRows = useMemo(() => cleanAllSummaryRows(summaryRows), [summaryRows]);
+
+  const comparison = useMemo(() => {
+    if (filters.year === 'all') return null;
+    const previousYear = getPreviousPeriod(filters.yearType, filters.year);
+    if (!previousYear) return null;
+    const scope = { ...filters, communityToRegion, communityToProvince };
+    const result = buildYearOverYearComparison(
+      filterSummaryRows(cleanedSummaryRows, scope),
+      filterSummaryRows(cleanedSummaryRows, { ...scope, year: previousYear })
+    );
+    return { ...result, split: splitCommunitiesByChange(result.communities) };
+  }, [cleanedSummaryRows, filters, communityToRegion, communityToProvince]);
+
   const overdueReport = useMemo(
     () => buildOverdueReport(communities, summaryRows, currentMonthString()),
     [communities, summaryRows]
@@ -227,9 +246,13 @@ export default function Homepage() {
 
         <KpiRow
           currentTotals={currentTotals}
-          previousTotals={null}
+          netDelta={comparison ? comparison.netIncomePct : null}
+          householdDelta={comparison ? comparison.householdPct : null}
+          deltaSuffix="จากเดือนเดียวกันของปีก่อน"
           dataQualityFlagCount={0}
         />
+
+        {comparison && <ChangeSplitCard split={comparison.split} pairedCount={comparison.pairedCount} />}
       </div>
 
       <div className="homepage__section">

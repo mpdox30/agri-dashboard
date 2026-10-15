@@ -291,3 +291,75 @@ export function findLatestDataMonth(allSummaryRows) {
   });
   return latest;
 }
+
+// ---------------------------------------------------------------------------
+// เทียบกับปีก่อน "เดือนเดียวกัน": จับคู่เฉพาะ (ชุมชน, เดือน) ที่มีข้อมูลทั้งสองปี
+// เพื่อไม่ให้ปีที่ยังไม่ครบ (เช่นปีงบปัจจุบัน) ถูกเทียบกับปีก่อนทั้งปีแล้วดูเหมือนรายได้ตก
+// ---------------------------------------------------------------------------
+
+/** ความเปลี่ยนแปลงไม่เกินค่านี้ (เป็น %) ถือว่า "ทรงตัว" ในการแบ่งกลุ่มชุมชน */
+export const COMMUNITY_FLAT_THRESHOLD_PCT = 2;
+
+/** "2026-03" + (-1 ปี) -> "2025-03" */
+function shiftYear(month, deltaYears) {
+  const [y, m] = month.split('-');
+  return `${Number(y) + deltaYears}-${m}`;
+}
+
+function rowNet(r) {
+  return (Number(r.sale) || 0) - (Number(r.purchase) || 0) + (Number(r.sharing) || 0);
+}
+
+/**
+ * currentRows / previousRows: monthly_summary rows ที่ผ่านตัวกรองแล้วของปีปัจจุบัน / ปีก่อน
+ * (ควรเป็นข้อมูลที่ผ่าน cleanAllSummaryRows แล้ว เพื่อไม่จับคู่กับเดือนที่ยังไม่ได้กรอกจริง)
+ *
+ * คืน { pairedCount, netIncomePct, householdPct, communities: { key, currentNet, previousNet, pct }[] }
+ *   pairedCount = จำนวนคู่ (ชุมชน, เดือน) ที่ใช้เทียบ  ถ้า 0 ถือว่าเทียบไม่ได้ (pct เป็น null)
+ */
+export function buildYearOverYearComparison(currentRows, previousRows) {
+  const previousByKey = new Map(previousRows.map((r) => [`${r.community_key}|${r.month}`, r]));
+  const perCommunity = new Map();
+  let pairedCount = 0;
+  let curNet = 0;
+  let prevNet = 0;
+  let curHousehold = 0;
+  let prevHousehold = 0;
+
+  currentRows.forEach((r) => {
+    const prev = previousByKey.get(`${r.community_key}|${shiftYear(r.month, -1)}`);
+    if (!prev) return;
+    pairedCount += 1;
+    const cNet = rowNet(r);
+    const pNet = rowNet(prev);
+    curNet += cNet;
+    prevNet += pNet;
+    curHousehold += Number(r.household_expense_reduction) || 0;
+    prevHousehold += Number(prev.household_expense_reduction) || 0;
+    const entry = perCommunity.get(r.community_key) || { key: r.community_key, currentNet: 0, previousNet: 0 };
+    entry.currentNet += cNet;
+    entry.previousNet += pNet;
+    perCommunity.set(r.community_key, entry);
+  });
+
+  const pct = (cur, prev) => (prev ? ((cur - prev) / Math.abs(prev)) * 100 : null);
+  return {
+    pairedCount,
+    netIncomePct: pairedCount ? pct(curNet, prevNet) : null,
+    householdPct: pairedCount ? pct(curHousehold, prevHousehold) : null,
+    communities: Array.from(perCommunity.values()).map((e) => ({ ...e, pct: pct(e.currentNet, e.previousNet) })),
+  };
+}
+
+/** แบ่งชุมชนเป็น เพิ่มขึ้น / ทรงตัว / ลดลง จากผลของ buildYearOverYearComparison (ข้ามชุมชนที่ไม่มีฐานเทียบ) */
+export function splitCommunitiesByChange(comparisonCommunities) {
+  const result = { up: 0, flat: 0, down: 0, total: 0 };
+  comparisonCommunities.forEach((c) => {
+    if (c.pct === null) return;
+    result.total += 1;
+    if (Math.abs(c.pct) < COMMUNITY_FLAT_THRESHOLD_PCT) result.flat += 1;
+    else if (c.pct > 0) result.up += 1;
+    else result.down += 1;
+  });
+  return result;
+}
