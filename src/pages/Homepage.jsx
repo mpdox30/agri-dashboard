@@ -5,6 +5,8 @@ import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
 import LiveHeadline from '../components/LiveHeadline';
 import ChangeSplitCard from '../components/ChangeSplitCard';
+import MyCommunityCard from '../components/MyCommunityCard';
+import useMyCommunity from '../components/useMyCommunity';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
 import ProvinceMap from '../components/ProvinceMap';
@@ -21,6 +23,7 @@ import {
 } from './homepageAggregations';
 import { formatMonthLabel, getPreviousPeriod } from './fiscalYears';
 import { cleanAllSummaryRows } from './communityAggregations';
+import { summarizeCommunity, buildVisitSnapshot, describeSinceLastVisit } from './myCommunityData';
 import { downloadWorkbook } from '../utils/excelExport';
 import './Homepage.css';
 
@@ -157,6 +160,32 @@ export default function Homepage() {
     return { ...result, split: splitCommunitiesByChange(result.communities) };
   }, [cleanedSummaryRows, filters, communityToRegion, communityToProvince]);
 
+  // ชุมชนของฉัน + ตั้งแต่ครั้งก่อนที่เข้ามา (เก็บในเครื่องผู้ชมเท่านั้น)
+  const currentVisitSnapshot = useMemo(
+    () => (cleanedSummaryRows.length > 0 ? buildVisitSnapshot(cleanedSummaryRows, latestDataMonth) : null),
+    [cleanedSummaryRows, latestDataMonth]
+  );
+  const { myKey, setMyKey, previousVisit } = useMyCommunity(currentVisitSnapshot);
+
+  const myCommunitySummary = useMemo(
+    () =>
+      myKey
+        ? summarizeCommunity({
+            communityKey: myKey,
+            rows: cleanedSummaryRows,
+            communities,
+            yearType: filters.yearType,
+            year: filters.year,
+          })
+        : null,
+    [myKey, cleanedSummaryRows, communities, filters.yearType, filters.year]
+  );
+
+  const sinceLastVisit = useMemo(
+    () => (currentVisitSnapshot ? describeSinceLastVisit(previousVisit, currentVisitSnapshot, myKey, currentVisitSnapshot.at) : null),
+    [previousVisit, currentVisitSnapshot, myKey]
+  );
+
   const overdueReport = useMemo(
     () => buildOverdueReport(communities, summaryRows, currentMonthString()),
     [communities, summaryRows]
@@ -170,6 +199,12 @@ export default function Homepage() {
       province,
       community: 'all',
     }));
+  }
+
+  function handleFocusCommunity(communityKey) {
+    const match = communities.find((c) => c.community_key === communityKey);
+    if (!match) return;
+    setFilters((prev) => ({ ...prev, region: match.region, province: match.province, community: communityKey }));
   }
 
   function handleDownload() {
@@ -253,6 +288,16 @@ export default function Homepage() {
         />
 
         {comparison && <ChangeSplitCard split={comparison.split} pairedCount={comparison.pairedCount} />}
+
+        <MyCommunityCard
+          communities={communities}
+          myKey={myKey}
+          onChangeMyKey={setMyKey}
+          summary={myCommunitySummary}
+          scopeLabel={yearLabel}
+          since={sinceLastVisit}
+          onFocusCommunity={handleFocusCommunity}
+        />
       </div>
 
       <div className="homepage__section">
