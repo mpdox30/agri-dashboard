@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { buildFiscalYearDropdownOptions, buildCalendarYearDropdownOptions, getPeriodDisplayLabel } from '../pages/fiscalYears';
 import SegmentedControl from './ui/SegmentedControl';
 import StatCard from './ui/StatCard';
+import { IconTrend, IconWallet, IconShare, IconPerson } from './ui/kpiIcons';
 import './CommunityHeader.css';
 
 // สร้างจาก fiscalYears.js จุดเดียว — ไม่ต้องแก้ที่นี่เวลาขึ้นปีงบใหม่
@@ -186,9 +187,11 @@ export default function CommunityHeader({
         <div className="comm-kpis">
           <StatCard
             label={`รายได้สุทธิ — ${periodLabel}`}
+            icon={<IconTrend />}
+            color="green"
             value={kpis.netIncome}
             format={formatBaht}
-            unit="฿"
+            unit="บาท"
             delta={kpis.deltas.netIncome}
             deltaSuffix="จากช่วงก่อน"
             note="ไม่มีข้อมูลช่วงก่อนเทียบ"
@@ -196,9 +199,11 @@ export default function CommunityHeader({
           />
           <StatCard
             label="ลดรายจ่ายครัวเรือน"
+            icon={<IconWallet />}
+            color="terracotta"
             value={kpis.householdReduction}
             format={formatBaht}
-            unit="฿"
+            unit="บาท"
             delta={kpis.deltas.householdReduction}
             deltaSuffix="จากช่วงก่อน"
             note="ไม่มีข้อมูลช่วงก่อนเทียบ"
@@ -206,9 +211,11 @@ export default function CommunityHeader({
           />
           <StatCard
             label="แบ่งปันในชุมชน"
+            icon={<IconShare />}
+            color="sage"
             value={kpis.sharing}
             format={formatBaht}
-            unit="฿"
+            unit="บาท"
             delta={kpis.deltas.sharing}
             deltaSuffix="จากช่วงก่อน"
             note="ไม่มีข้อมูลช่วงก่อนเทียบ"
@@ -216,9 +223,11 @@ export default function CommunityHeader({
           />
           <StatCard
             label={`เฉลี่ยต่อสมาชิก (${memberCount} คน)`}
+            icon={<IconPerson />}
+            color="ink"
             value={kpis.perMember}
             format={formatBaht}
-            unit="฿/ช่วง"
+            unit="บาท/ช่วง"
             note="รายบุคคลต่างกันมาก ดูแท็บรายสมาชิก"
             delay={210}
           />

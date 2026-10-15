@@ -1,6 +1,7 @@
 // src/components/KpiRow.jsx
 import StatCard from './ui/StatCard';
 import Sparkline from './ui/Sparkline';
+import { IconTrend, IconWallet, IconCommunity, IconShield } from './ui/kpiIcons';
 import './KpiRow.css';
 
 // หน่วยล้านบาท ทศนิยม 2 ตำแหน่ง (คงรูปแบบเดิมของการ์ด KPI) ตัวเลขจะนับขึ้นจาก 0 ตอนเลื่อนมาเห็น
@@ -43,6 +44,8 @@ export default function KpiRow({
     <div className="kpi-row">
       <StatCard
         label="รายได้สุทธิรวม"
+        icon={<IconTrend />}
+        color="green"
         value={currentTotals.netIncome}
         format={formatMillionBaht}
         unit="ล้านบาท"
@@ -56,6 +59,8 @@ export default function KpiRow({
       </StatCard>
       <StatCard
         label="ลดรายจ่ายครัวเรือนรวม"
+        icon={<IconWallet />}
+        color="terracotta"
         value={currentTotals.householdReduction}
         format={formatMillionBaht}
         unit="ล้านบาท"
@@ -69,6 +74,8 @@ export default function KpiRow({
       </StatCard>
       <StatCard
         label="ชุมชนที่มีข้อมูลในช่วงที่เลือก"
+        icon={<IconCommunity />}
+        color="sage"
         value={currentTotals.communitiesWithData}
         format={formatInteger}
         unit={`/ ${currentTotals.totalCommunities} ชุมชน`}
@@ -90,6 +97,8 @@ export default function KpiRow({
             )}
           </>
         }
+        icon={<IconShield />}
+        color="sage"
         value={cleanPercent}
         format={formatInteger}
         unit="% ไม่มีประเด็นต้องตรวจสอบ"
