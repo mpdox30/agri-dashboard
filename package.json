@@ -8,8 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "predeploy:production": "npm run build",
+    "deploy": "node -e \"console.error('BLOCKED: นี่คือโฟลเดอร์พัฒนา v2 ห้าม deploy ทับ production ใช้ npm run deploy:production เมื่อพร้อมแทนที่จริง'); process.exit(1)\"",
+    "deploy:production": "gh-pages -d dist"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.1",
