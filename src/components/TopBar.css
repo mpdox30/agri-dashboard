@@ -70,3 +70,23 @@
     align-items: flex-start;
   }
 }
+
+/* มือถือ: เมนูโหมดเป็นแถวเดียวเลื่อนแนวนอนได้ ไม่ตกลงมาเป็นสามแถว */
+@media (max-width: 600px) {
+  .topbar__mode-toggle {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .topbar__mode-toggle::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topbar__mode-toggle button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    white-space: nowrap;
+  }
+}

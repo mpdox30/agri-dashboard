@@ -1,0 +1,25 @@
+/* src/components/ShareCardButton.css */
+
+.share-card-btn {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.share-card-btn button {
+  min-height: 40px;
+  padding: 0 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-soft);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.share-card-btn button:hover:not(:disabled) { border-color: var(--green-soft); }
+.share-card-btn button:disabled { opacity: 0.6; cursor: progress; }
+
+.share-card-btn__status { font-size: 12px; color: var(--muted); }

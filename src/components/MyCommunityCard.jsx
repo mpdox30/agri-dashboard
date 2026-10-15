@@ -8,6 +8,7 @@ import Reveal from './ui/Reveal';
 import CountUp from './ui/CountUp';
 import DeltaBadge from './ui/DeltaBadge';
 import Sparkline from './ui/Sparkline';
+import ShareCardButton from './ShareCardButton';
 import { formatMonthLabel } from '../pages/fiscalYears';
 import './MyCommunityCard.css';
 
@@ -55,8 +56,29 @@ function SinceLastVisit({ since }) {
  *   scopeLabel: ป้ายช่วงที่ดูอยู่ เช่น "ปีงบ 68–69"
  *   since: ผลจาก describeSinceLastVisit() หรือ null
  *   onFocusCommunity: (key) => void  กรองหน้านี้ให้ดูเฉพาะชุมชนนี้
+ *   latestMonth: เดือนล่าสุดของข้อมูล (YYYY-MM) ใช้เป็นท้ายการ์ดรูป หรือ null
  */
-export default function MyCommunityCard({ communities, myKey, onChangeMyKey, summary, scopeLabel, since, onFocusCommunity }) {
+export default function MyCommunityCard({ communities, myKey, onChangeMyKey, summary, scopeLabel, since, onFocusCommunity, latestMonth }) {
+  function buildShareOptions() {
+    const delta = summary.deltaPct;
+    const direction = delta === null ? 'flat' : Math.abs(delta) < 0.05 ? 'flat' : delta > 0 ? 'up' : 'down';
+    const arrow = direction === 'up' ? '↑' : direction === 'down' ? '↓' : '—';
+    return {
+      title: `ชุมชน${myKey} · ${scopeLabel}`,
+      label: 'รายได้สุทธิของชุมชน',
+      value: formatInteger(summary.netIncome),
+      unit: 'บาท',
+      deltaText: delta === null ? '' : `${arrow} ${Math.abs(delta).toFixed(1)}% จากเดือนเดียวกันของปีก่อน`,
+      deltaTone: direction,
+      lines: [
+        summary.provinceRank ? `อันดับที่ ${formatInteger(summary.provinceRank.rank)} จาก ${formatInteger(summary.provinceRank.total)} ชุมชนในจังหวัดเดียวกัน` : '',
+        `มีข้อมูล ${formatInteger(summary.monthsWithData)} เดือนในช่วงนี้`,
+      ].filter(Boolean),
+      series: summary.series,
+      footer: latestMonth ? `ข้อมูลล่าสุด: ${monthWithYear(latestMonth)}` : '',
+    };
+  }
+
   const grouped = useMemo(() => {
     const map = new Map();
     communities.forEach((c) => {
@@ -138,9 +160,19 @@ export default function MyCommunityCard({ communities, myKey, onChangeMyKey, sum
         {myKey && (
           <div className="my-community__foot">
             <SinceLastVisit since={since} />
-            <button type="button" className="my-community__focus" onClick={() => onFocusCommunity(myKey)}>
-              ดูเฉพาะชุมชนนี้
-            </button>
+            <span className="my-community__actions">
+              {summary && summary.monthsWithData > 0 && (
+                <ShareCardButton
+                  buildOptions={buildShareOptions}
+                  filename={`ชุมชน${myKey}.png`}
+                  shareText={`สรุปรายได้สุทธิชุมชน${myKey} ${scopeLabel}`}
+                  label="บันทึกเป็นรูปแชร์ไลน์"
+                />
+              )}
+              <button type="button" className="my-community__focus" onClick={() => onFocusCommunity(myKey)}>
+                ดูเฉพาะชุมชนนี้
+              </button>
+            </span>
           </div>
         )}
       </Card>

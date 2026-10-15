@@ -349,7 +349,8 @@ export function buildYearOverYearComparison(currentRows, previousRows) {
     prevNet += pNet;
     curHousehold += Number(r.household_expense_reduction) || 0;
     prevHousehold += Number(prev.household_expense_reduction) || 0;
-    const entry = perCommunity.get(r.community_key) || { key: r.community_key, currentNet: 0, previousNet: 0 };
+    const entry = perCommunity.get(r.community_key) || { key: r.community_key, currentNet: 0, previousNet: 0, pairedMonths: 0 };
+    entry.pairedMonths += 1;
     entry.currentNet += cNet;
     entry.previousNet += pNet;
     perCommunity.set(r.community_key, entry);

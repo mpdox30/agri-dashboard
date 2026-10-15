@@ -100,3 +100,10 @@
   cursor: pointer;
 }
 .my-community__focus:hover { background: var(--green-soft); color: #fff; }
+
+.my-community__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}

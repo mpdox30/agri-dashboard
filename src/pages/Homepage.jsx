@@ -7,6 +7,8 @@ import LiveHeadline from '../components/LiveHeadline';
 import ChangeSplitCard from '../components/ChangeSplitCard';
 import MyCommunityCard from '../components/MyCommunityCard';
 import FloatingNav from '../components/FloatingNav';
+import DigestCard from '../components/DigestCard';
+import ShareCardButton from '../components/ShareCardButton';
 import useMyCommunity from '../components/useMyCommunity';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
@@ -24,6 +26,7 @@ import {
 } from './homepageAggregations';
 import { formatMonthLabel, getPreviousPeriod } from './fiscalYears';
 import { cleanAllSummaryRows } from './communityAggregations';
+import { buildDigest } from './digestData';
 import { summarizeCommunity, buildVisitSnapshot, describeSinceLastVisit } from './myCommunityData';
 import { downloadWorkbook } from '../utils/excelExport';
 import './Homepage.css';
@@ -189,6 +192,18 @@ export default function Homepage() {
     return { ...result, split: splitCommunitiesByChange(result.communities) };
   }, [cleanedSummaryRows, filters, communityToRegion, communityToProvince]);
 
+  const digestItems = useMemo(
+    () =>
+      buildDigest({
+        comparison,
+        communitiesInScope,
+        cleanedRows: cleanedSummaryRows,
+        latestMonth: latestDataMonth,
+        provinceTotals,
+      }),
+    [comparison, communitiesInScope, cleanedSummaryRows, latestDataMonth, provinceTotals]
+  );
+
   // ชุมชนของฉัน + ตั้งแต่ครั้งก่อนที่เข้ามา (เก็บในเครื่องผู้ชมเท่านั้น)
   const currentVisitSnapshot = useMemo(
     () => (cleanedSummaryRows.length > 0 ? buildVisitSnapshot(cleanedSummaryRows, latestDataMonth) : null),
@@ -234,6 +249,29 @@ export default function Homepage() {
     const match = communities.find((c) => c.community_key === communityKey);
     if (!match) return;
     setFilters((prev) => ({ ...prev, region: match.region, province: match.province, community: communityKey }));
+  }
+
+  function buildOverviewShareOptions() {
+    const delta = comparison ? comparison.netIncomePct : null;
+    const direction = delta === null ? 'flat' : Math.abs(delta) < 0.05 ? 'flat' : delta > 0 ? 'up' : 'down';
+    const arrow = direction === 'up' ? '↑' : direction === 'down' ? '↓' : '—';
+    const split = comparison ? comparison.split : null;
+    return {
+      title: `ภาพรวมโครงการ · ${yearLabel}`,
+      label: 'รายได้สุทธิรวมทุกชุมชนที่เลือก',
+      value: formatBahtCompact(currentTotals.netIncome),
+      unit: 'บาท',
+      deltaText: delta === null ? '' : `${arrow} ${Math.abs(delta).toFixed(1)}% จากเดือนเดียวกันของปีก่อน`,
+      deltaTone: direction,
+      lines: [
+        `${formatBahtCompact(currentTotals.communitiesWithData)} จาก ${formatBahtCompact(currentTotals.totalCommunities)} ชุมชนส่งข้อมูลแล้ว`,
+        split && split.total > 0
+          ? `เทียบปีก่อน: เพิ่มขึ้น ${split.up} · ทรงตัว ${split.flat} · ลดลง ${split.down} ชุมชน`
+          : '',
+      ].filter(Boolean),
+      series: monthlySeries.map((m) => m.netIncome),
+      footer: latestDataMonth ? `ข้อมูลล่าสุด: ${formatMonthLabel(latestDataMonth)} ${Number(latestDataMonth.split('-')[0]) + 543}` : '',
+    };
   }
 
   function handleDownload() {
@@ -303,6 +341,12 @@ export default function Homepage() {
           <button type="button" className="homepage__download-btn" onClick={handleDownload}>
             ⬇ ดาวน์โหลดข้อมูล ({yearLabel})
           </button>
+          <ShareCardButton
+            buildOptions={buildOverviewShareOptions}
+            filename="ภาพรวมโครงการ.png"
+            shareText={`ภาพรวมโครงการ ${yearLabel}`}
+            label="บันทึกภาพรวมเป็นรูป"
+          />
           <span className="homepage__download-note">
             ไฟล์ .xlsx — รวมทั้งระบบ (ไม่จำกัดตามจังหวัด/ชุมชนที่กรองไว้ด้านบน)
           </span>
@@ -318,6 +362,8 @@ export default function Homepage() {
 
         {comparison && <ChangeSplitCard split={comparison.split} pairedCount={comparison.pairedCount} />}
 
+        <DigestCard items={digestItems} onFocusCommunity={handleFocusCommunity} />
+
         <MyCommunityCard
           communities={communities}
           myKey={myKey}
@@ -326,6 +372,7 @@ export default function Homepage() {
           scopeLabel={yearLabel}
           since={sinceLastVisit}
           onFocusCommunity={handleFocusCommunity}
+          latestMonth={latestDataMonth}
         />
       </div>
 
