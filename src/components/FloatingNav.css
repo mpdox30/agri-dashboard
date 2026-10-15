@@ -1,0 +1,57 @@
+/* src/components/FloatingNav.css */
+
+.floating-nav {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 900;
+  max-width: calc(100vw - 24px);
+  transform: translateX(-50%);
+  padding: 4px;
+  background: rgba(255, 254, 250, 0.96);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--line), 0 10px 30px -10px rgba(45, 74, 62, 0.35);
+}
+
+/* เบลอพื้นหลังเฉพาะเครื่องที่รองรับ เครื่องเก่าจะได้พื้นทึบเกือบเต็มแทน (ไม่หนัก ไม่เสียการอ่าน) */
+@supports (backdrop-filter: blur(8px)) {
+  .floating-nav {
+    background: rgba(255, 254, 250, 0.82);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.floating-nav ul {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.floating-nav ul::-webkit-scrollbar { display: none; }
+
+.floating-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 999px;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+.floating-nav__link:hover { color: var(--green); }
+.floating-nav__link.is-active {
+  color: #fff;
+  font-weight: 600;
+  background: var(--green-soft);
+}
+
+@media print {
+  .floating-nav { display: none; }
+}
+html.is-exporting .floating-nav { display: none; }

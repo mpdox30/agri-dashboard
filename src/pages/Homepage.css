@@ -3,7 +3,7 @@
 .homepage {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 28px 80px;
+  padding: 0 28px 96px;
 }
 
 .homepage__hero {
@@ -28,6 +28,7 @@
 }
 
 .homepage__section {
+  scroll-margin-top: 16px;
   padding: 34px 0;
   border-bottom: 1px solid var(--line);
 }

@@ -6,6 +6,7 @@ import KpiRow from '../components/KpiRow';
 import LiveHeadline from '../components/LiveHeadline';
 import ChangeSplitCard from '../components/ChangeSplitCard';
 import MyCommunityCard from '../components/MyCommunityCard';
+import FloatingNav from '../components/FloatingNav';
 import useMyCommunity from '../components/useMyCommunity';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
@@ -35,6 +36,14 @@ function currentMonthString() {
 function formatBahtCompact(n) {
   return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(n);
 }
+
+// ส่วนต่างๆ ของหน้าสำหรับแถบนำทางลอย (id ต้องตรงกับ id ของ element ด้านล่าง)
+const NAV_ITEMS = [
+  { id: 'sec-overview', label: 'ภาพรวม' },
+  { id: 'sec-trend', label: 'แนวโน้ม' },
+  { id: 'sec-map', label: 'แผนที่' },
+  { id: 'sec-overdue', label: 'ยังไม่ส่งข้อมูล' },
+];
 
 const DEFAULT_FILTERS = {
   yearType: 'fiscal',
@@ -262,7 +271,7 @@ export default function Homepage() {
 
   return (
     <div className="homepage">
-      <div className="homepage__hero">
+      <div className="homepage__hero" id="sec-overview">
         <h1>ภาพรวมโครงการ</h1>
         <p className="homepage__sub">
           รวบรวมจาก {communities.length} ชุมชน/กลุ่ม ครอบคลุมข้อมูลตั้งแต่ปีงบประมาณ 2565
@@ -320,7 +329,7 @@ export default function Homepage() {
         />
       </div>
 
-      <div className="homepage__section">
+      <div className="homepage__section" id="sec-trend">
         <div className="homepage__section-head">
           <h2>แนวโน้มรายเดือน — {yearLabel}</h2>
           <span className="homepage__section-note">
@@ -330,7 +339,7 @@ export default function Homepage() {
         <TrendChart months={monthlySeries} />
       </div>
 
-      <div className="homepage__section">
+      <div className="homepage__section" id="sec-map">
         <div className="homepage__section-head">
           <h2>รายได้ตามจังหวัด — {yearLabel}</h2>
           <span className="homepage__section-note">
@@ -346,7 +355,7 @@ export default function Homepage() {
         <ProvinceGrid provinceTotals={provinceTotals} onSelectProvince={handleSelectProvince} />
       </div>
 
-      <div className="homepage__section">
+      <div className="homepage__section" id="sec-overdue">
         <div className="homepage__section-head">
           <h2>ชุมชนที่ยังไม่ส่งข้อมูลเดือน {formatMonthLabel(currentMonthString())}</h2>
           <span className="homepage__section-note">{overdueReport.length} / {communities.length} ชุมชน</span>
@@ -391,6 +400,8 @@ export default function Homepage() {
           </div>
         )}
       </div>
+
+      <FloatingNav items={NAV_ITEMS} />
     </div>
   );
 }
