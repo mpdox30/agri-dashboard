@@ -393,7 +393,9 @@
 .approval-view .hero h1 {
   font-weight: 700;
   font-size: clamp(28px, 4vw, 40px);
-  line-height: 1.15;
+  /* สระบน/ล่างของฟอนต์ไทยล้นกล่องบรรทัด ถ้า clip ตามตัวอักษรจะถูกตัดหาย จึงเผื่อ padding ไว้ใน box */
+  line-height: 1.25;
+  padding: 0.16em 0.06em 0.14em;
   letter-spacing: -0.01em;
   background: linear-gradient(100deg, var(--green) 20%, var(--green-soft) 60%, var(--blue) 100%);
   -webkit-background-clip: text;
