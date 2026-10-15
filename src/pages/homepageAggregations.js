@@ -175,25 +175,36 @@ export function buildMonthlySeries(summaryRows, filters) {
   });
 }
 
-/** รวมยอดตามจังหวัด เรียงจากมากไปน้อย */
+/**
+ * รวมยอดตามจังหวัด เรียงจากมากไปน้อย
+ * แต่ละจังหวัดมี series = รายได้สุทธิรายเดือน เรียงตามเดือนที่พบในข้อมูลที่กรองแล้ว (null = เดือนนั้นไม่มีแถวของจังหวัดนี้)
+ * ไว้วาดเส้นแนวโน้มเล็กในการ์ดจังหวัด
+ */
 export function aggregateByProvince(filteredRows, communities) {
   const communityToProvince = new Map(communities.map((c) => [c.community_key, c.province]));
 
-  const totals = new Map(); // province -> { netIncome, communitySet }
+  const totals = new Map(); // province -> { netIncome, communitySet, byMonth }
+  const monthSet = new Set();
   filteredRows.forEach((row) => {
     const province = communityToProvince.get(row.community_key);
     if (!province) return;
-    const entry = totals.get(province) || { netIncome: 0, communitySet: new Set() };
-    entry.netIncome += (Number(row.sale) || 0) - (Number(row.purchase) || 0) + (Number(row.sharing) || 0);
+    const net = (Number(row.sale) || 0) - (Number(row.purchase) || 0) + (Number(row.sharing) || 0);
+    const entry = totals.get(province) || { netIncome: 0, communitySet: new Set(), byMonth: new Map() };
+    entry.netIncome += net;
     entry.communitySet.add(row.community_key);
+    entry.byMonth.set(row.month, (entry.byMonth.get(row.month) || 0) + net);
+    monthSet.add(row.month);
     totals.set(province, entry);
   });
+
+  const months = Array.from(monthSet).sort();
 
   return Array.from(totals.entries())
     .map(([province, entry]) => ({
       province,
       netIncome: entry.netIncome,
       communityCount: entry.communitySet.size,
+      series: months.map((m) => (entry.byMonth.has(m) ? entry.byMonth.get(m) : null)),
     }))
     .sort((a, b) => b.netIncome - a.netIncome);
 }

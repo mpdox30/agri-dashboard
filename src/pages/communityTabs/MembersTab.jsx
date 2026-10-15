@@ -1,6 +1,7 @@
 // src/pages/communityTabs/MembersTab.jsx
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import MemberMonthlyChart from '../../components/MemberMonthlyChart';
+import Sparkline from '../../components/ui/Sparkline';
 import './MembersTab.css';
 
 function formatBaht(n) {
@@ -93,6 +94,7 @@ export default function MembersTab({ members, periodLabel, monthlySeriesByName, 
               <th className="num">ซื้อ</th>
               <th className="num">แบ่งปัน</th>
               <th className="num">รายได้สุทธิ</th>
+              <th className="member-spark-cell">แนวโน้ม</th>
             </tr>
           </thead>
           <tbody>
@@ -128,10 +130,20 @@ export default function MembersTab({ members, periodLabel, monthlySeriesByName, 
                       </span>
                       {formatBaht(m.netIncome)}
                     </td>
+                    <td className="member-spark-cell">
+                      {monthly && monthly.filter((x) => x.hasData).length >= 3 && (
+                        <Sparkline
+                          values={monthly.map((x) => (x.hasData ? x.netIncome : null))}
+                          width={84}
+                          height={24}
+                          label={`แนวโน้มรายได้สุทธิรายเดือนของ ${m.fullName}`}
+                        />
+                      )}
+                    </td>
                   </tr>
                   {isExpanded && (
                     <tr className="member-detail-row">
-                      <td colSpan={6}>
+                      <td colSpan={7}>
                         <div className="member-chart-card">
                           <div className="member-chart-title">
                             แนวโน้มรายเดือน — {m.fullName} ({fullPeriodLabel})

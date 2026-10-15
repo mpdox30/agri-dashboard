@@ -215,3 +215,15 @@ tbody tr:hover {
     font-size: 12px;
   }
 }
+
+.member-spark-cell {
+  width: 100px;
+  text-align: right;
+  vertical-align: middle;
+}
+
+@media (max-width: 760px) {
+  .member-spark-cell {
+    display: none;
+  }
+}
