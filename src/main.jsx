@@ -8,3 +8,10 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+// ลงทะเบียน service worker เฉพาะตอน build จริง (ไม่ยุ่งกับ npm run dev) ถ้าลงทะเบียนไม่ได้เว็บก็ทำงานปกติ
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {})
+  })
+}
