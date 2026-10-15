@@ -39,7 +39,7 @@
 
 .topbar__mode-toggle {
   display: flex;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 999px;
   padding: 3px;
   gap: 2px;
@@ -102,7 +102,7 @@
   /* เปลี่ยนเฉพาะเงา ห้ามเปลี่ยนความสูง/ระยะห่างของแถบ: ความสูงที่เปลี่ยนทำให้เนื้อหาขยับ
      ตำแหน่งเลื่อนเลยเส้นแบ่งกลับไปมา จนแถบสั่นไม่หยุด */
   .topbar.is-stuck {
-    box-shadow: 0 6px 18px -10px rgba(45, 74, 62, 0.35);
+    box-shadow: 0 6px 18px -10px rgba(11, 79, 74, 0.35);
   }
 }
 @media (min-width: 901px) and (prefers-reduced-motion: reduce) {

@@ -127,6 +127,6 @@
 }
 
 .cep-confirm-btn:disabled {
-  background: #c9cfc4;
+  background: #bccfd0;
   cursor: not-allowed;
 }

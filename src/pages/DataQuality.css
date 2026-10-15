@@ -55,7 +55,7 @@
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
-  background: #efe9d8;
+  background: #e4eded;
   padding: 3px 10px;
   border-radius: 999px;
 }
@@ -110,7 +110,7 @@ thead th {
   letter-spacing: 0.03em;
   padding: 10px 14px;
   border-bottom: 1px solid var(--line);
-  background: #f1ecdb;
+  background: #e6eeee;
   position: sticky;
   top: 0;
 }
@@ -136,7 +136,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #fbf8ef;
+  background: #f6fafa;
 }
 
 .dq-tag {
@@ -153,12 +153,12 @@ tbody tr:hover {
 }
 
 .dq-tag--medium {
-  background: #fbeedd;
+  background: #fff5e5;
   color: var(--terracotta);
 }
 
 .dq-tag--low {
-  background: #efe9d8;
+  background: #e4eded;
   color: var(--muted);
 }
 

@@ -73,9 +73,9 @@
 }
 @media (hover: hover) {
   .rank-list-row:hover { transform: translateX(3px); }
-  .rank-list-row:not(.highlight):hover { background: rgba(139, 157, 131, 0.12); border-radius: 6px; }
+  .rank-list-row:not(.highlight):hover { background: rgba(127, 178, 191, 0.12); border-radius: 6px; }
   .rank-list-row:hover .rank-list-bar-fill { filter: brightness(1.12); }
-  .stat-line:hover { background: rgba(139, 157, 131, 0.08); }
+  .stat-line:hover { background: rgba(127, 178, 191, 0.08); }
 }
 
 /* แถวของชุมชนนี้ (highlight) มีแสงวูบเบาๆ ให้เจอง่ายในลิสต์ยาว */
@@ -83,7 +83,7 @@
   .rank-list-row.highlight { animation: rank-self-glow 2.8s ease-in-out 1.2s 2; }
 }
 @keyframes rank-self-glow {
-  50% { box-shadow: 0 0 0 3px rgba(193, 127, 62, 0.22); }
+  50% { box-shadow: 0 0 0 3px rgba(204, 122, 28, 0.22); }
 }
 
 /* แถบเล็กใต้แถวค่า CV (ความยาวตามสัดส่วนเทียบค่าสูงสุดของรายการ) */

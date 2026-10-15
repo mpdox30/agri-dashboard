@@ -1,20 +1,22 @@
 /* src/styles/tokens.css
-   ระบบสีและตัวอักษรเดียวกับ mockup ที่ใช้คุยกับ Ton มาตลอด (homepage_mockup.html,
-   internal_community_mockup_v3.html, ฯลฯ) — ตั้งใจคงเอกลักษณ์เดิมไว้ ไม่ออกแบบใหม่
-   เพราะทิศทางสีและฟอนต์ผ่านการตกลงกันหลายรอบแล้วในขั้น mockup */
+   ธีมสี v2 "เขียวน้ำ + ฟ้าชลประทาน": เขียวมรกตเข้มเป็นสีหลัก เขียวเทอร์ควอยซ์เป็นสีรอง
+   ฟ้าชลประทานเป็นสีเน้นข้อมูล และอำพัน/ทองข้าวสุกเป็นสีอบอุ่นตัดกัน บนพื้นขาวอมฟ้าเขียวจางๆ
+   (เดิมเป็นเขียวเข้ม + ครีมเหลือง) ชื่อโทเคนยังเหมือนเดิมเพื่อให้ทั้งแอปเปลี่ยนตามอัตโนมัติ */
 
 :root {
-  --bg: #F7F3E8;
-  --bg-card: #FFFEFA;
-  --ink: #1A1A1A;
-  --green: #2D4A3E;
-  --green-soft: #41614F;
-  --terracotta: #C17F3E;
-  --sage: #8B9D83;
-  --gold: #B8884A;
-  --line: #E3DCC9;
-  --red-soft: #A85C4A;
-  --muted: #6b6552;
+  --bg: #f2f7f7;
+  --bg-card: #ffffff;
+  --ink: #10201f;
+  --green: #0b4f4a;
+  --green-soft: #17806f;
+  --terracotta: #cc7a1c;
+  --sage: #7fb2bf;
+  --blue: #2e7fb8;
+  --blue-soft: #e3f0f9;
+  --gold: #e3b23c;
+  --line: #d8e4e4;
+  --red-soft: #b9543f;
+  --muted: #5b6e6d;
 
   --font-serif: 'Noto Serif Thai', serif;
   --font-sans: 'Noto Sans Thai', sans-serif;
@@ -27,7 +29,11 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(1100px 520px at 10% -6%, rgba(23, 128, 111, 0.1), transparent 62%),
+    radial-gradient(900px 480px at 100% 0%, rgba(46, 127, 184, 0.09), transparent 58%),
+    var(--bg);
+  background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -60,8 +66,8 @@ body {
   --down: var(--red-soft);
   --flat: var(--muted);
 
-  --shell: rgba(45, 74, 62, 0.05);
-  --shadow-card: 0 1px 2px rgba(45, 74, 62, 0.05), 0 8px 24px -12px rgba(45, 74, 62, 0.18);
+  --shell: rgba(11, 79, 74, 0.05);
+  --shadow-card: 0 1px 2px rgba(11, 79, 74, 0.05), 0 8px 24px -12px rgba(11, 79, 74, 0.18);
   --inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 

@@ -43,7 +43,7 @@
 }
 
 .incomplete-warning {
-  background: #fbf3e4;
+  background: #fff5e5;
   border: 1px solid #ead8ae;
   border-radius: 8px;
   padding: 12px 16px;
@@ -99,7 +99,7 @@
 }
 
 .rank-list-row.highlight {
-  background: #fbf3e4;
+  background: #fff5e5;
   margin: 0 -10px;
   padding: 7px 10px;
   border-radius: 6px;
@@ -120,7 +120,7 @@
 .rank-list-bar-track {
   flex: 2;
   height: 6px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -191,7 +191,7 @@
 
 .profile-bar-track {
   height: 9px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 5px;
   overflow: hidden;
 }

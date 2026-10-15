@@ -6,15 +6,15 @@
 
 const SIZE = 1080;
 const COLORS = {
-  bg: '#F7F3E8',
-  card: '#FFFEFA',
-  ink: '#1A1A1A',
-  green: '#2D4A3E',
-  greenSoft: '#41614F',
-  muted: '#6B6552',
-  line: '#E3DCC9',
-  down: '#A85C4A',
-  sage: '#8B9D83',
+  bg: '#f2f7f7',
+  card: '#ffffff',
+  ink: '#10201f',
+  green: '#0b4f4a',
+  greenSoft: '#17806f',
+  muted: '#5b6e6d',
+  line: '#d8e4e4',
+  down: '#b9543f',
+  sage: '#7fb2bf',
 };
 const SERIF = "'Noto Serif Thai', serif";
 const SANS = "'Noto Sans Thai', sans-serif";
@@ -134,7 +134,7 @@ export async function renderShareCard(options) {
   ctx.fillRect(0, 0, SIZE, SIZE);
 
   // การ์ดสองชั้นเหมือนบนเว็บ: เปลือกจาง ๆ ห่อเนื้อในสีครีมสว่าง
-  ctx.fillStyle = 'rgba(45, 74, 62, 0.06)';
+  ctx.fillStyle = 'rgba(11, 79, 74, 0.06)';
   roundRect(ctx, 40, 40, SIZE - 80, SIZE - 80, 44);
   ctx.fill();
   ctx.fillStyle = COLORS.card;

@@ -42,7 +42,7 @@
 
 .seg-toggle {
   display: flex;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 8px;
   padding: 3px;
   gap: 2px;
@@ -101,7 +101,7 @@
 .filter-chip {
   font-size: 12px;
   font-weight: 600;
-  background: #e4ece3;
+  background: #e1eeec;
   color: var(--green-soft);
   padding: 4px 10px;
   border-radius: 999px;

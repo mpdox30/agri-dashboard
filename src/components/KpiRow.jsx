@@ -98,7 +98,7 @@ export default function KpiRow({
           </>
         }
         icon={<IconShield />}
-        color="sage"
+        color="green"
         value={cleanPercent}
         format={formatInteger}
         unit="% ไม่มีประเด็นต้องตรวจสอบ"

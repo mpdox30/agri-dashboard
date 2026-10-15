@@ -170,7 +170,7 @@
   letter-spacing: 0.03em;
   padding: 10px 14px;
   border-bottom: 1px solid var(--line);
-  background: #f1ecdb;
+  background: #e6eeee;
   position: sticky;
   top: 0;
 }
@@ -196,7 +196,7 @@
 }
 
 .homepage__overdue-table tbody tr:hover {
-  background: #fbf8ef;
+  background: #f6fafa;
 }
 
 .homepage__overdue-sample {

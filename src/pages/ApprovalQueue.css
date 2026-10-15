@@ -192,7 +192,7 @@
 }
 
 .status-tag.clean {
-  background: #e4ece3;
+  background: #e1eeec;
   color: var(--green-soft);
 }
 
@@ -216,7 +216,7 @@
 .summary-box {
   flex: 1;
   min-width: 160px;
-  background: #fbf8ef;
+  background: #f6fafa;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 11px 14px;
@@ -258,7 +258,7 @@
 .diff-table td {
   padding: 7px 10px;
   text-align: right;
-  border-bottom: 1px solid #efe9d8;
+  border-bottom: 1px solid #e4eded;
   font-family: var(--font-mono);
 }
 
@@ -269,7 +269,7 @@
 }
 
 .diff-table tr.flagged-row {
-  background: #fbf1e7;
+  background: #fff5e5;
 }
 
 .diff-table tr.flagged-row td:first-child::before {
@@ -378,7 +378,7 @@
 }
 
 .btn-primary:disabled {
-  background: #c9cfc4;
+  background: #bccfd0;
   cursor: not-allowed;
 }
 

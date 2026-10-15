@@ -37,7 +37,7 @@
   width: 140px;
   height: 10px;
   border-radius: 5px;
-  background: linear-gradient(90deg, rgb(232, 224, 201), rgb(45, 74, 62));
+  background: linear-gradient(90deg, rgb(214, 234, 238), rgb(11, 79, 74));
 }
 
 .province-map__legend-nodata {
@@ -55,8 +55,8 @@
 }
 
 .province-map__legend-swatch--nodata {
-  background: #ede8d8;
-  border: 1px dashed #b9ad8a;
+  background: #e4eded;
+  border: 1px dashed #9db1b1;
 }
 
 /* ชื่อกำกับจังหวัดอันดับต้นบนแผนที่ ไม่มีกรอบ อ่านง่ายบนสีเข้ม */
@@ -68,7 +68,7 @@
   background: transparent;
   border: 0;
   box-shadow: none;
-  text-shadow: 0 0 3px #fffefa, 0 0 3px #fffefa, 0 0 3px #fffefa;
+  text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;
   pointer-events: none;
 }
 .province-map .leaflet-tooltip.province-map__label::before { display: none; }
@@ -78,7 +78,7 @@
   transition: fill 0.7s var(--ease), stroke 0.2s;
 }
 .province-map path.leaflet-interactive:hover {
-  filter: drop-shadow(0 3px 5px rgba(45, 74, 62, 0.45));
+  filter: drop-shadow(0 3px 5px rgba(11, 79, 74, 0.45));
 }
 @media (prefers-reduced-motion: reduce) {
   .province-map path.leaflet-interactive { transition: none; }

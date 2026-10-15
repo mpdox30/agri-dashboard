@@ -38,7 +38,7 @@
 }
 
 .incomplete-warning {
-  background: #fbf3e4;
+  background: #fff5e5;
   border: 1px solid #ead8ae;
   border-radius: 8px;
   padding: 12px 16px;
@@ -125,12 +125,12 @@
 }
 
 .season-block.rainy {
-  background: #e9f0ea;
-  border: 1px solid #cfe0d2;
+  background: #e6f1ef;
+  border: 1px solid #c3dfda;
 }
 
 .season-block.dry {
-  background: #fbf1e0;
+  background: #fff5e5;
   border: 1px solid #ead8ae;
 }
 
@@ -171,7 +171,7 @@
 
 .season-bar-track {
   height: 8px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 4px;
   overflow: hidden;
   margin-top: 4px;
@@ -290,7 +290,7 @@
 
 .inequality-bar-track {
   height: 10px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 5px;
   overflow: hidden;
   margin-top: 10px;
@@ -322,7 +322,7 @@
   height: 76px;
   border-radius: 50%;
   --p: var(--pt, 100);
-  background: conic-gradient(var(--green-soft) calc(var(--p) * 1%), #efe9d8 0);
+  background: conic-gradient(var(--green-soft) calc(var(--p) * 1%), #e4eded 0);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -467,7 +467,7 @@
 
 .lorenz-svg { cursor: crosshair; max-width: 260px; touch-action: pan-y; }
 .lorenz-svg:focus-visible { outline: 2px solid var(--green-soft); outline-offset: 2px; border-radius: 8px; }
-.lorenz-grid line { stroke: rgba(139, 157, 131, 0.28); stroke-width: 1; }
+.lorenz-grid line { stroke: rgba(127, 178, 191, 0.28); stroke-width: 1; }
 .lorenz-grid text { font-family: var(--font-mono); font-size: 8.5px; fill: var(--muted); }
 .lorenz-gapline { stroke: var(--terracotta); stroke-width: 1.4; opacity: 0.55; }
 .lorenz-dropline { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.7; }
@@ -515,7 +515,7 @@
 }
 
 .rank-list-row.highlight {
-  background: #fbf3e4;
+  background: #fff5e5;
   margin: 0 -10px;
   padding: 7px 10px;
   border-radius: 6px;
@@ -536,7 +536,7 @@
 .rank-list-bar-track {
   flex: 2;
   height: 6px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -578,7 +578,7 @@
 
 .driver-bar-track {
   height: 9px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 5px;
   overflow: hidden;
 }

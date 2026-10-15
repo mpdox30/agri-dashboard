@@ -35,7 +35,7 @@
 }
 
 .trend-bar--dim {
-  background: linear-gradient(180deg, #c9cfc4, #aab3a0);
+  background: linear-gradient(180deg, #bccfd0, #9db4b5);
 }
 
 .trend-bar-val {
@@ -77,7 +77,7 @@
 }
 
 .trend-legend__dot--unknown {
-  background: #aab3a0;
+  background: #9db4b5;
 }
 
 @media (max-width: 600px) {

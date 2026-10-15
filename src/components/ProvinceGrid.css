@@ -24,7 +24,7 @@
 .province-card:hover {
   border-color: var(--terracotta);
   transform: translateY(-3px);
-  box-shadow: 0 10px 22px -12px rgba(45, 74, 62, 0.35);
+  box-shadow: 0 10px 22px -12px rgba(11, 79, 74, 0.35);
 }
 .province-card:focus-visible { outline: 2px solid var(--green-soft); outline-offset: 2px; }
 .province-card-wrap { min-width: 0; }

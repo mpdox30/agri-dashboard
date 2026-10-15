@@ -113,7 +113,7 @@ export default function DependencyTrendChart({ monthly }) {
                     value: `${(cur[seg.key] || 0).toFixed(1)}%`,
                     color: SEG_COLORS[seg.key],
                   }))
-                : [{ label: 'สถานะ', value: 'ยังไม่มีข้อมูล', color: '#c9c2ae' }]
+                : [{ label: 'สถานะ', value: 'ยังไม่มีข้อมูล', color: '#b7c6c6' }]
             }
           />
         )}

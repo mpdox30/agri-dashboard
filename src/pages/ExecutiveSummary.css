@@ -61,7 +61,7 @@
 
 .seg-toggle {
   display: flex;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 8px;
   padding: 3px;
   gap: 2px;
@@ -80,7 +80,7 @@
 }
 
 .seg-toggle button.active {
-  background: var(--terracotta);
+  background: var(--green);
   color: #fff;
 }
 

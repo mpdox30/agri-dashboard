@@ -76,7 +76,7 @@
 .completeness-bar-track {
   flex: 1;
   height: 8px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -113,12 +113,12 @@ html.is-exporting .completeness-bar-fill { animation: none; }
 }
 
 .completeness-tag.complete {
-  background: #e4ece3;
+  background: #e1eeec;
   color: var(--green-soft);
 }
 
 .completeness-tag.partial {
-  background: #fbeedd;
+  background: #fff5e5;
   color: var(--terracotta);
 }
 

@@ -66,10 +66,10 @@ function terracePath(baseY, amp, period, periods) {
   return `${d} V160 H0 Z`;
 }
 const TERRACES = [
-  { y: 52, amp: 16, period: 520, speed: 62, fill: 0.1, key: 'a' },
-  { y: 78, amp: 20, period: 640, speed: 48, fill: 0.14, key: 'b' },
-  { y: 104, amp: 18, period: 480, speed: 36, fill: 0.2, key: 'c' },
-  { y: 130, amp: 22, period: 560, speed: 28, fill: 0.22, key: 'd' },
+  { y: 52, amp: 16, period: 520, speed: 62, fill: 0.12, rgb: '46, 127, 184', key: 'a' },
+  { y: 78, amp: 20, period: 640, speed: 48, fill: 0.14, rgb: '46, 127, 184', key: 'b' },
+  { y: 104, amp: 18, period: 480, speed: 36, fill: 0.2, rgb: '23, 128, 111', key: 'c' },
+  { y: 130, amp: 22, period: 560, speed: 28, fill: 0.24, rgb: '11, 79, 74', key: 'd' },
 ];
 
 /**
@@ -135,7 +135,7 @@ export default function HomeHero({ yearLabel, communityCount, totals, netDelta, 
         <svg viewBox="0 0 520 160" preserveAspectRatio="none">
           {TERRACES.map((t) => (
             <g key={t.key} className="hhero__terrace" style={{ '--speed': `${t.speed}s`, '--shift': `${t.period}px` }}>
-              <path d={terracePath(t.y, t.amp, t.period, 6)} fill={`rgba(65, 97, 79, ${t.fill})`} />
+              <path d={terracePath(t.y, t.amp, t.period, 6)} fill={`rgba(${t.rgb}, ${t.fill})`} />
             </g>
           ))}
         </svg>

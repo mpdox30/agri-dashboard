@@ -77,7 +77,7 @@ thead th {
   letter-spacing: 0.03em;
   padding: 11px 14px;
   border-bottom: 1px solid var(--line);
-  background: #f1ecdb;
+  background: #e6eeee;
 }
 
 thead th.num {
@@ -101,7 +101,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #fbf8ef;
+  background: #f6fafa;
 }
 
 .member-name {
@@ -121,7 +121,7 @@ tbody tr:hover {
   width: 20px;
   height: 20px;
   border-radius: 5px;
-  background: #efe9d8;
+  background: #e4eded;
   color: var(--muted);
   font-size: 11px;
   font-weight: 700;
@@ -146,7 +146,7 @@ tbody tr:hover {
 .mini-bar-track {
   width: 90px;
   height: 6px;
-  background: #efe9d8;
+  background: #e4eded;
   border-radius: 3px;
   overflow: hidden;
   display: inline-block;
@@ -183,7 +183,7 @@ tbody tr:hover {
 
 .member-detail-row td {
   padding: 0 14px 16px;
-  background: #fbf8ef;
+  background: #f6fafa;
 }
 
 .member-detail-row:hover {
@@ -231,7 +231,7 @@ tbody tr:hover {
 /* แถวสมาชิก: ชี้แล้วมีแถบเขียวด้านซ้าย และพื้นหลังอุ่นขึ้น */
 .member-row td { transition: background 0.2s var(--ease), box-shadow 0.2s var(--ease); }
 @media (hover: hover) {
-  .member-row:hover td { background: rgba(139, 157, 131, 0.1); }
+  .member-row:hover td { background: rgba(127, 178, 191, 0.1); }
   .member-row:hover td:first-child { box-shadow: inset 3px 0 0 var(--green-soft); }
   .member-row:hover .mini-bar-fill { filter: brightness(1.1); }
 }

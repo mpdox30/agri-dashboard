@@ -16,9 +16,9 @@
   border-radius: var(--r-core);
   box-shadow: var(--inset-hi), var(--shadow-card);
 }
-.ui-card--accent { background: rgba(193, 127, 62, 0.10); }
-.ui-card--good { background: rgba(65, 97, 79, 0.10); }
-.ui-card--calm { background: rgba(139, 157, 131, 0.14); }
+.ui-card--accent { background: rgba(204, 122, 28, 0.10); }
+.ui-card--good { background: rgba(23, 128, 111, 0.10); }
+.ui-card--calm { background: rgba(127, 178, 191, 0.14); }
 
 /* ---------- Reveal: ผุดขึ้นเมื่อเลื่อนมาเห็น ---------- */
 .reveal {
@@ -85,7 +85,7 @@ html.is-exporting .reveal * {
 /* ตัวเลขใหญ่หนา แบบหน้าแดชบอร์ดที่เห็นแล้วรู้ค่าทันที สีตามโทนของการ์ด */
 .stat-card { --kpi-c: var(--green); }
 .stat-card--terracotta { --kpi-c: var(--terracotta); }
-.stat-card--sage { --kpi-c: var(--green-soft); }
+.stat-card--sage { --kpi-c: var(--blue); }
 .stat-card--ink { --kpi-c: var(--ink); }
 
 .stat-card__value {
@@ -144,7 +144,7 @@ html.is-exporting .reveal * {
   transform: translateX(var(--x, 0px));
   background: var(--bg-card);
   border-radius: 999px;
-  box-shadow: var(--inset-hi), 0 1px 3px rgba(45, 74, 62, 0.18);
+  box-shadow: var(--inset-hi), 0 1px 3px rgba(11, 79, 74, 0.18);
   pointer-events: none;
 }
 .seg[data-ready] .seg__ind {
@@ -214,7 +214,7 @@ html.is-exporting .segbar__part { transition: none; }
   }
   .stat-card:hover .ui-card__core {
     transform: translateY(-3px);
-    box-shadow: var(--inset-hi), 0 14px 26px -14px rgba(45, 74, 62, 0.38);
+    box-shadow: var(--inset-hi), 0 14px 26px -14px rgba(11, 79, 74, 0.38);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -253,7 +253,7 @@ html.is-exporting .segbar__part { transition: none; }
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(100deg, transparent 20%, rgba(255, 254, 250, 0.75) 50%, transparent 80%);
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.75) 50%, transparent 80%);
   transform: translateX(-100%);
   animation: skel-sheen 1.5s ease-in-out infinite;
   animation-delay: calc(var(--i, 0) * 0.15s);

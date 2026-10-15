@@ -15,10 +15,10 @@ function formatBaht(n) {
 const LABEL_TOP_N = 5; // ใส่ชื่อกำกับบนแผนที่เฉพาะจังหวัดที่ค่าสูงสุด กันป้ายซ้อนกันบนจอเล็ก
 
 // ไล่สีจากอ่อน (ไม่มี/มีน้อย) ไปเข้ม (มาก) โดยใช้โทนสีเดียวกับธีมเว็บ (var(--line) -> var(--green))
-const LIGHT_FILL = [232, 224, 201]; // ~ var(--line) #E3DCC9
-const DARK_FILL = [45, 74, 62]; // var(--green) #2D4A3E
-const NO_DATA_FILL = '#EDE8D8';
-const HOVER_STROKE = '#C17F3E'; // var(--terracotta)
+const LIGHT_FILL = [214, 234, 238]; // ฟ้าเขียวจาง (ต้นทางของสเกลสี)
+const DARK_FILL = [11, 79, 74]; // var(--green) #0b4f4a
+const NO_DATA_FILL = '#e4eded';
+const HOVER_STROKE = '#cc7a1c'; // var(--terracotta)
 
 function colorForShare(t) {
   const clamped = Math.max(0, Math.min(1, t));
@@ -106,7 +106,7 @@ export default function ProvinceMap({
     return {
       fillColor: hasData ? colorForShare(maxValue > 0 ? value / maxValue : 0) : NO_DATA_FILL,
       fillOpacity: 1,
-      color: isSelected ? HOVER_STROKE : '#FFFEFA',
+      color: isSelected ? HOVER_STROKE : '#ffffff',
       weight: isSelected ? 2.5 : 1,
       dashArray: hasData ? null : '3,3',
     };

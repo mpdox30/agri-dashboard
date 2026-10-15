@@ -28,7 +28,7 @@ function drawTrendChartImage(monthlyTrend) {
   const ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
 
-  ctx.fillStyle = '#FFFEFA';
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
 
   const values = monthlyTrend.map((m) => m.netIncome);
@@ -44,16 +44,16 @@ function drawTrendChartImage(monthlyTrend) {
     const x = 20 + i * (barWidth + gap) + gap / 2;
     const hasData = m.netIncome !== null;
     const barHeight = hasData ? Math.max((Math.abs(m.netIncome) / maxVal) * chartHeight, 4) : 3;
-    ctx.fillStyle = hasData ? '#41614F' : '#c9cfc4';
+    ctx.fillStyle = hasData ? '#17806f' : '#bccfd0';
     ctx.fillRect(x, chartBottom - barHeight, barWidth, barHeight);
 
-    ctx.fillStyle = '#1A1A1A';
+    ctx.fillStyle = '#10201f';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'center';
     const valueLabel = hasData ? (m.netIncome / 1_000_000).toFixed(2) : '-';
     ctx.fillText(valueLabel, x + barWidth / 2, chartBottom - barHeight - 6);
 
-    ctx.fillStyle = '#6b6552';
+    ctx.fillStyle = '#5b6e6d';
     ctx.font = '11px sans-serif';
     ctx.fillText(m.label, x + barWidth / 2, chartBottom + 16);
   });

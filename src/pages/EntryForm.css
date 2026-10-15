@@ -100,7 +100,7 @@
   font-weight: 700;
   padding: 6px 13px;
   border-radius: 999px;
-  background: #fbeedd;
+  background: #fff5e5;
   color: var(--terracotta);
 }
 
@@ -120,7 +120,7 @@
 }
 
 .warning-banner {
-  background: #fbeedd;
+  background: #fff5e5;
   border: 1.5px solid #ead2a8;
   border-radius: 10px;
   padding: 13px 18px;
@@ -236,7 +236,7 @@ table.entry-table thead th {
   letter-spacing: 0.02em;
   padding: 10px 10px;
   border-bottom: 1px solid var(--line);
-  background: #f1ecdb;
+  background: #e6eeee;
   white-space: nowrap;
 }
 
@@ -255,7 +255,7 @@ table.entry-table tbody tr:last-child td {
 }
 
 table.entry-table tbody tr:hover {
-  background: #fbf8ef;
+  background: #f6fafa;
 }
 
 .member-name-cell {
@@ -291,7 +291,7 @@ table.entry-table tbody tr:hover {
 .name-similarity-warning {
   font-size: 11px;
   color: var(--terracotta);
-  background: #fbf3e4;
+  background: #fff5e5;
   border: 1px solid #ead8ae;
   border-radius: 6px;
   padding: 6px 8px;
@@ -325,7 +325,7 @@ table.entry-table tbody tr:hover {
 
 .cell-prev {
   font-size: 9.5px;
-  color: #aba384;
+  color: #9db1b1;
   font-family: var(--font-mono);
   margin-top: 2px;
 }
@@ -388,7 +388,7 @@ table.entry-table tbody tr:hover {
   border: 1.5px dashed var(--terracotta);
   border-radius: 10px;
   padding: 16px 18px;
-  background: #fbf6ec;
+  background: #f6fafa;
   font-size: 13px;
   color: #6b5236;
   margin-top: 16px;
@@ -434,7 +434,7 @@ table.entry-table tbody tr:hover {
 }
 
 .btn-primary:disabled {
-  background: #c9cfc4;
+  background: #bccfd0;
   cursor: not-allowed;
 }
 
