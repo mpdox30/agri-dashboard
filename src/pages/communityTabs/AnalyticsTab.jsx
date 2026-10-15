@@ -1,7 +1,8 @@
 // src/pages/communityTabs/AnalyticsTab.jsx
 import { useEffect, useState } from 'react';
 import SeasonalLineChart from '../../components/SeasonalLineChart';
-import YearOverYearChart, { YOY_SERIES_COLORS } from '../../components/YearOverYearChart';
+import YearOverYearChart from '../../components/YearOverYearChart';
+import { YOY_SERIES_COLORS } from '../../components/yoyColors';
 import DependencyTrendChart from '../../components/DependencyTrendChart';
 import './AnalyticsTab.css';
 

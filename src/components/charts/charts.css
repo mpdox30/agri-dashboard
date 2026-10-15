@@ -45,3 +45,9 @@
 .data-table-toggle td:first-child { text-align: left; }
 .data-table-toggle th { color: var(--muted); font-weight: 500; background: var(--shell); }
 .data-table-toggle tbody tr:last-child td { border-bottom: 0; }
+
+/* WipeReveal: ขยายจากขอบซ้ายของสี่เหลี่ยมตัดภาพ */
+.wipe-rect {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+}
