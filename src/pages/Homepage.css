@@ -193,3 +193,21 @@
     padding: 0 16px 60px;
   }
 }
+
+.homepage__present-btn {
+  min-height: 40px;
+  padding: 0 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-soft);
+  background: var(--bg-card);
+  border: 1px solid var(--green-soft);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.homepage__present-btn:hover {
+  background: var(--green-soft);
+  color: #fff;
+}

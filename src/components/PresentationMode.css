@@ -1,0 +1,123 @@
+/* src/components/PresentationMode.css */
+
+.present {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(14px, 3vw, 36px);
+  background: var(--bg);
+  overflow: hidden;
+  outline: none;
+}
+
+.present__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: clamp(10px, 2vw, 22px);
+}
+
+.present__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 3vw, 34px);
+  font-weight: 600;
+  color: var(--green);
+}
+
+.present__exit {
+  min-height: 40px;
+  padding: 0 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.present__exit:hover { color: var(--green); border-color: var(--green-soft); }
+
+/* พื้นที่สไลด์: เลื่อนในแนวตั้งได้ถ้าเนื้อหาสูงเกินจอ เปลี่ยนสไลด์ด้วยการจางเข้า */
+.present__stage {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  animation: present-in 0.45s var(--ease-out);
+}
+
+@keyframes present-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ในโหมดนำเสนอ ตัวเลขและข้อความใหญ่ขึ้นเพื่อให้อ่านจากไกลได้ */
+.present .live-headline__sentence { font-size: clamp(22px, 3.4vw, 40px); max-width: none; }
+.present .stat-card__value { font-size: clamp(28px, 4vw, 48px); }
+.present .stat-card__label { font-size: 15px; }
+.present .change-split__num { font-size: 30px; }
+.present .change-split__item { font-size: 17px; }
+.present .digest__item { font-size: 18px; }
+.present .digest__title,
+.present .change-split__title { font-size: 18px; }
+.present .province-map .leaflet-container { height: min(62vh, 560px); }
+.present .trend-chart { height: min(52vh, 460px); gap: 18px; }
+.present .trend-bar { max-width: 72px; }
+.present .trend-bar-val { font-size: 15px; }
+.present .trend-bar-label { font-size: 15px; }
+.present .trend-legend { font-size: 15px; }
+.present .digest__title { display: none; }
+
+.present__foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.present__nav {
+  width: 48px;
+  height: 48px;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--green-soft);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.present__nav:disabled { opacity: 0.35; cursor: default; }
+
+.present__dots { display: flex; gap: 6px; }
+
+.present__dot {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  position: relative;
+}
+.present__dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: var(--line);
+  border-radius: 50%;
+  transition: background 0.2s, transform 0.2s var(--ease);
+}
+.present__dot.is-active::after { background: var(--green-soft); transform: scale(1.4); }
+
+@media print {
+  .present { display: none; }
+}

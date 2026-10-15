@@ -1,5 +1,5 @@
 // src/pages/Homepage.jsx
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
@@ -9,6 +9,7 @@ import MyCommunityCard from '../components/MyCommunityCard';
 import FloatingNav from '../components/FloatingNav';
 import DigestCard from '../components/DigestCard';
 import ShareCardButton from '../components/ShareCardButton';
+import PresentationMode from '../components/PresentationMode';
 import useMyCommunity from '../components/useMyCommunity';
 import TrendChart from '../components/TrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
@@ -63,6 +64,8 @@ export default function Homepage() {
   const [loadState, setLoadState] = useState('loading'); // 'loading' | 'ready' | 'error'
   const [loadError, setLoadError] = useState(null);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [presenting, setPresenting] = useState(false);
+  const exitPresenting = useCallback(() => setPresenting(false), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -347,6 +350,9 @@ export default function Homepage() {
             shareText={`ภาพรวมโครงการ ${yearLabel}`}
             label="บันทึกภาพรวมเป็นรูป"
           />
+          <button type="button" className="homepage__present-btn" onClick={() => setPresenting(true)}>
+            ▶ โหมดนำเสนอ
+          </button>
           <span className="homepage__download-note">
             ไฟล์ .xlsx — รวมทั้งระบบ (ไม่จำกัดตามจังหวัด/ชุมชนที่กรองไว้ด้านบน)
           </span>
@@ -449,6 +455,55 @@ export default function Homepage() {
       </div>
 
       <FloatingNav items={NAV_ITEMS} />
+
+      {presenting && (
+        <PresentationMode
+          onExit={exitPresenting}
+          slides={[
+            {
+              key: 'summary',
+              title: `ภาพรวมโครงการ ${yearLabel}`,
+              node: (
+                <>
+                  <LiveHeadline
+                    scopeLabel={yearLabel}
+                    communitiesWithData={currentTotals.communitiesWithData}
+                    totalCommunities={currentTotals.totalCommunities}
+                    netIncome={currentTotals.netIncome}
+                    latestMonth={latestDataMonth}
+                  />
+                  <KpiRow
+                    currentTotals={currentTotals}
+                    netDelta={comparison ? comparison.netIncomePct : null}
+                    householdDelta={comparison ? comparison.householdPct : null}
+                    deltaSuffix="จากเดือนเดียวกันของปีก่อน"
+                    dataQualityFlagCount={0}
+                  />
+                  {comparison && <ChangeSplitCard split={comparison.split} pairedCount={comparison.pairedCount} />}
+                </>
+              ),
+            },
+            { key: 'trend', title: `แนวโน้มรายเดือน ${yearLabel}`, node: <TrendChart months={monthlySeries} /> },
+            {
+              key: 'map',
+              title: `รายได้ตามจังหวัด ${yearLabel}`,
+              node: (
+                <ProvinceMapExplorer
+                  rows={mapRows}
+                  communities={communities}
+                  selectedProvince={filters.province}
+                  onSelectProvince={handleSelectProvince}
+                />
+              ),
+            },
+            {
+              key: 'digest',
+              title: 'สัญญาณจากข้อมูล',
+              node: <DigestCard items={digestItems} onFocusCommunity={handleFocusCommunity} />,
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }
