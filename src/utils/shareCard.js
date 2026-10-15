@@ -10,7 +10,7 @@ const COLORS = {
   card: '#ffffff',
   ink: '#10201f',
   green: '#0b4f4a',
-  greenSoft: '#17806f',
+  greenSoft: '#157a6a',
   muted: '#5b6e6d',
   line: '#d8e4e4',
   down: '#b9543f',

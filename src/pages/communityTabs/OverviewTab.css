@@ -119,7 +119,7 @@ html.is-exporting .completeness-bar-fill { animation: none; }
 
 .completeness-tag.partial {
   background: #fff5e5;
-  color: var(--terracotta);
+  color: var(--terracotta-text);
 }
 
 .completeness-footnote {

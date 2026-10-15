@@ -1,5 +1,5 @@
 // src/pages/Homepage.jsx
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { getCommunities, getMonthlySummary } from '../api/supabase';
 import FilterBar from '../components/FilterBar';
 import KpiRow from '../components/KpiRow';
@@ -15,7 +15,6 @@ import PresentationMode from '../components/PresentationMode';
 import useMyCommunity from '../components/useMyCommunity';
 import BarTrendChart from '../components/BarTrendChart';
 import ProvinceGrid from '../components/ProvinceGrid';
-import ProvinceMapExplorer from '../components/ProvinceMapExplorer';
 import {
   filterSummaryRows,
   aggregateTotals,
@@ -33,6 +32,13 @@ import { buildDigest } from './digestData';
 import { summarizeCommunity, buildVisitSnapshot, describeSinceLastVisit } from './myCommunityData';
 import { downloadWorkbook } from '../utils/excelExport';
 import './Homepage.css';
+
+const ProvinceMapExplorer = lazy(() => import('../components/ProvinceMapExplorer'));
+
+// ระหว่างรอโหลดแผนที่ (Leaflet เป็นก้อนใหญ่ แยกโหลดทีหลัง) แสดงกรอบเปล่าเรืองแสงขนาดใกล้เคียงกัน กันหน้ากระโดด
+function MapFallback() {
+  return <div className="skel" style={{ height: 460, borderRadius: 14 }} role="status" aria-label="กำลังโหลดแผนที่" />;
+}
 
 function currentMonthString() {
   const now = new Date();
@@ -286,14 +292,14 @@ export default function Homepage() {
     };
   }
 
-  function handleDownload() {
+  async function handleDownload() {
     const { sheets, periodLabel } = buildHomepageExportSheets(
       communities,
       summaryRows,
       filters.yearType,
       filters.year
     );
-    downloadWorkbook(sheets, `ภาพรวมโครงการ_${periodLabel.replace(/\s/g, '')}`);
+    await downloadWorkbook(sheets, `ภาพรวมโครงการ_${periodLabel.replace(/\s/g, '')}`);
   }
 
   if (loadState === 'loading') {
@@ -406,12 +412,14 @@ export default function Homepage() {
             คลิกจังหวัดเพื่อกรองข้อมูลด้านบนตามจังหวัดนั้น · แสดง {provinceTotals.length} จังหวัด
           </span>
         </div>
-        <ProvinceMapExplorer
-          rows={mapRows}
-          communities={communities}
-          selectedProvince={filters.province}
-          onSelectProvince={handleSelectProvince}
-        />
+        <Suspense fallback={<MapFallback />}>
+          <ProvinceMapExplorer
+            rows={mapRows}
+            communities={communities}
+            selectedProvince={filters.province}
+            onSelectProvince={handleSelectProvince}
+          />
+        </Suspense>
         <ProvinceGrid provinceTotals={provinceTotals} onSelectProvince={handleSelectProvince} />
       </div>
 
@@ -497,12 +505,14 @@ export default function Homepage() {
               key: 'map',
               title: `รายได้ตามจังหวัด ${yearLabel}`,
               node: (
-                <ProvinceMapExplorer
-                  rows={mapRows}
-                  communities={communities}
-                  selectedProvince={filters.province}
-                  onSelectProvince={handleSelectProvince}
-                />
+                <Suspense fallback={<MapFallback />}>
+                  <ProvinceMapExplorer
+                    rows={mapRows}
+                    communities={communities}
+                    selectedProvince={filters.province}
+                    onSelectProvince={handleSelectProvince}
+                  />
+                </Suspense>
               ),
             },
             {

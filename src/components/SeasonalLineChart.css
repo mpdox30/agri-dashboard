@@ -9,6 +9,13 @@
   height: 130px;
   display: block;
 }
+/* จอกว้างพอ: ให้สูงตามสัดส่วน viewBox จะได้เต็มความกว้างการ์ด ไม่ถูกบีบเป็นแถบแคบกลางการ์ด */
+@media (min-width: 700px) {
+  .seasonal-line-chart {
+    height: auto;
+    aspect-ratio: 700 / 130;
+  }
+}
 
 .seasonal-line-chart-legend {
   display: flex;

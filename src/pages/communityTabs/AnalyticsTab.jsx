@@ -1,5 +1,5 @@
 // src/pages/communityTabs/AnalyticsTab.jsx
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import SeasonalLineChart from '../../components/SeasonalLineChart';
 import YearOverYearChart from '../../components/YearOverYearChart';
 import { YOY_SERIES_COLORS } from '../../components/yoyColors';
@@ -61,14 +61,15 @@ export default function AnalyticsTab({
   // (yoyComparison มีข้อมูลของทุกปีในประวัติมาให้พร้อมอยู่แล้วจาก CommunityView)
   const availableYoyKeysSignature = yoyComparison ? yoyComparison.series.map((s) => s.key).join('|') : '';
   const [selectedYoyKeys, setSelectedYoyKeys] = useState(() => new Set());
+  const [seenYoySignature, setSeenYoySignature] = useState(null);
 
-  useEffect(() => {
-    // เลือกทุกปีที่มีเป็นค่าเริ่มต้นเสมอ รีเซ็ตทุกครั้งที่ชุดปีที่มีให้เทียบเปลี่ยนไป (เช่น
-    // สลับชุมชนหรือช่วงที่ดูอยู่ด้านบน) กันไม่ให้ selection เก่าค้างจนดูเหมือนกราฟหายไปเฉย ๆ
-    if (!yoyComparison) return;
-    setSelectedYoyKeys(new Set(yoyComparison.series.map((s) => s.key)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableYoyKeysSignature]);
+  // เลือกทุกปีที่มีเป็นค่าเริ่มต้นเสมอ รีเซ็ตทุกครั้งที่ชุดปีที่มีให้เทียบเปลี่ยนไป (เช่น
+  // สลับชุมชนหรือช่วงที่ดูอยู่ด้านบน) กันไม่ให้ selection เก่าค้างจนดูเหมือนกราฟหายไปเฉย ๆ
+  // ใช้รูปแบบ "ปรับ state ระหว่างเรนเดอร์เมื่อ prop เปลี่ยน" แทน effect (วิธีที่ React แนะนำ)
+  if (seenYoySignature !== availableYoyKeysSignature) {
+    setSeenYoySignature(availableYoyKeysSignature);
+    if (yoyComparison) setSelectedYoyKeys(new Set(yoyComparison.series.map((s) => s.key)));
+  }
 
   function toggleYoyYear(key) {
     setSelectedYoyKeys((prev) => {

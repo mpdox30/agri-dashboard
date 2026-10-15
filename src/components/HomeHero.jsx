@@ -66,9 +66,9 @@ function terracePath(baseY, amp, period, periods) {
   return `${d} V160 H0 Z`;
 }
 const TERRACES = [
-  { y: 52, amp: 16, period: 520, speed: 62, fill: 0.12, rgb: '46, 127, 184', key: 'a' },
-  { y: 78, amp: 20, period: 640, speed: 48, fill: 0.14, rgb: '46, 127, 184', key: 'b' },
-  { y: 104, amp: 18, period: 480, speed: 36, fill: 0.2, rgb: '23, 128, 111', key: 'c' },
+  { y: 52, amp: 16, period: 520, speed: 62, fill: 0.12, rgb: '42, 118, 173', key: 'a' },
+  { y: 78, amp: 20, period: 640, speed: 48, fill: 0.14, rgb: '42, 118, 173', key: 'b' },
+  { y: 104, amp: 18, period: 480, speed: 36, fill: 0.2, rgb: '21, 122, 106', key: 'c' },
   { y: 130, amp: 22, period: 560, speed: 28, fill: 0.24, rgb: '11, 79, 74', key: 'd' },
 ];
 

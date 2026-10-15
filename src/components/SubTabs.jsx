@@ -21,6 +21,11 @@ export default function SubTabs({ tabs, activeKey, onChange }) {
     root.style.setProperty('--x', `${on.offsetLeft}px`);
     root.style.setProperty('--w', `${on.offsetWidth}px`);
     root.setAttribute('data-ready', '');
+    // จอแคบ: แถบเลื่อนแนวนอนได้ ดึงแท็บที่เลือกให้อยู่ในมุมมอง
+    if (root.scrollWidth > root.clientWidth) {
+      const target = on.offsetLeft - (root.clientWidth - on.offsetWidth) / 2;
+      root.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+    }
   }, []);
 
   useLayoutEffect(() => {

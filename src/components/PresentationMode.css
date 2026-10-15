@@ -7,9 +7,33 @@
   display: flex;
   flex-direction: column;
   padding: clamp(14px, 3vw, 36px);
-  background: var(--bg);
+  background:
+    radial-gradient(1200px 560px at 8% -8%, rgba(21, 122, 106, 0.14), transparent 62%),
+    radial-gradient(1000px 520px at 100% 0%, rgba(42, 118, 173, 0.12), transparent 58%),
+    var(--bg);
   overflow: hidden;
   outline: none;
+}
+
+.present__progress {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: rgba(127, 178, 191, 0.25);
+}
+.present__progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-soft), var(--blue));
+  border-radius: 0 3px 3px 0;
+  transition: width 0.5s var(--ease-out);
+}
+.present__heading { display: grid; gap: 4px; }
+.present__count {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
 }
 
 .present__bar {
@@ -24,9 +48,13 @@
 .present__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(20px, 3vw, 34px);
-  font-weight: 600;
-  color: var(--green);
+  font-size: clamp(22px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1.15;
+  background: linear-gradient(100deg, var(--green) 20%, var(--green-soft) 60%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .present__exit {
@@ -65,11 +93,8 @@
 .present .digest__title,
 .present .change-split__title { font-size: 18px; }
 .present .province-map .leaflet-container { height: min(62vh, 560px); }
-.present .trend-chart { height: min(52vh, 460px); gap: 18px; }
-.present .trend-bar { max-width: 72px; }
-.present .trend-bar-val { font-size: 15px; }
-.present .trend-bar-label { font-size: 15px; }
-.present .trend-legend { font-size: 15px; }
+.present .bars__plot { height: min(48vh, 420px); }
+.present .bars__label, .present .bars__name { font-size: 14px; }
 .present .digest__title { display: none; }
 
 .present__foot {
@@ -90,6 +115,11 @@
   border: 1px solid var(--line);
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), transform 0.25s var(--ease-out);
+}
+@media (hover: hover) {
+  .present__nav:hover:not(:disabled) { background: var(--green-soft); color: #fff; transform: scale(1.06); }
 }
 .present__nav:disabled { opacity: 0.35; cursor: default; }
 

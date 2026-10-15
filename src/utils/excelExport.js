@@ -9,14 +9,14 @@
 // จากข้อมูลที่เรารู้ที่มาแน่นอนเท่านั้น ไม่มีจุดไหนอ่านไฟล์ที่ผู้ใช้อัปโหลดเลย จึงไม่เข้า
 // เงื่อนไขที่ช่องโหว่นี้จะถูกใช้โจมตีได้จริง
 
-import * as XLSX from 'xlsx';
+// โหลดไลบรารีแบบ dynamic เฉพาะตอนกดดาวน์โหลดจริง (ก้อนใหญ่ ไม่ควรถ่วงการเปิดหน้าเว็บ)
 
 /**
  * สร้าง 1 ชีตจาก headers + rows (array of array ธรรมดา ไม่ใช่ object) แล้วเพิ่มเข้า
  * workbook ที่ส่งมา
  * sheet: { name: string, headers: string[], rows: (string|number)[][] }
  */
-function addSheet(workbook, sheet) {
+function addSheet(XLSX, workbook, sheet) {
   const data = [sheet.headers, ...sheet.rows];
   const worksheet = XLSX.utils.aoa_to_sheet(data);
   // ตั้งความกว้างคอลัมน์อัตโนมัติแบบหยาบ ๆ จากความยาวข้อความที่ยาวที่สุดในคอลัมน์นั้น
@@ -39,8 +39,9 @@ function addSheet(workbook, sheet) {
  * sheets: { name, headers, rows }[]
  * filename: ชื่อไฟล์ (ไม่ต้องมี .xlsx ต่อท้าย จะเติมให้เอง)
  */
-export function downloadWorkbook(sheets, filename) {
+export async function downloadWorkbook(sheets, filename) {
+  const XLSX = await import('xlsx');
   const workbook = XLSX.utils.book_new();
-  sheets.forEach((sheet) => addSheet(workbook, sheet));
+  sheets.forEach((sheet) => addSheet(XLSX, workbook, sheet));
   XLSX.writeFile(workbook, `${filename}.xlsx`);
 }

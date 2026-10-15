@@ -26,14 +26,40 @@ export default function ShareCardButton({ buildOptions, filename, shareText, lab
     }
   }
 
+  // คัดลอกสรุปเป็นข้อความ (วางลงไลน์/อีเมลได้ทันที) ใช้ข้อมูลชุดเดียวกับรูปสรุป จึงตรงกันเสมอ
+  async function handleCopy() {
+    try {
+      const o = buildOptions();
+      const text = [
+        o.title,
+        `${o.label}: ${o.value}${o.unit ? ` ${o.unit}` : ''}`,
+        o.deltaText,
+        ...(o.lines || []),
+        o.footer,
+      ]
+        .filter(Boolean)
+        .join('\n');
+      await navigator.clipboard.writeText(text);
+      setStatus('copied');
+    } catch {
+      setStatus('error');
+    }
+  }
+
   return (
     <span className="share-card-btn">
       <button type="button" onClick={handleClick} disabled={status === 'busy'}>
         {status === 'busy' ? 'กำลังสร้างรูป...' : label}
       </button>
+      {typeof navigator !== 'undefined' && navigator.clipboard && (
+        <button type="button" onClick={handleCopy} disabled={status === 'busy'}>
+          คัดลอกเป็นข้อความ
+        </button>
+      )}
       <span className="share-card-btn__status" role="status">
+        {status === 'copied' && 'คัดลอกข้อความแล้ว วางในไลน์ได้เลย'}
         {status === 'done' && 'เรียบร้อยแล้ว'}
-        {status === 'error' && 'สร้างรูปไม่สำเร็จ ลองใหม่อีกครั้ง'}
+        {status === 'error' && 'ทำไม่สำเร็จ ลองใหม่อีกครั้ง'}
       </span>
     </span>
   );

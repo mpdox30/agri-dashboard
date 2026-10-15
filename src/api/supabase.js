@@ -26,7 +26,6 @@ async function fetchAll(table, { communityKey, orderBy } = {}) {
     let query = supabase.from(table).select('*').range(from, from + PAGE_SIZE - 1);
     if (communityKey) query = query.eq('community_key', communityKey);
     if (orderBy) query = query.order(orderBy, { ascending: true });
-    // eslint-disable-next-line no-await-in-loop
     const { data, error } = await query;
     if (error) throw new Error(error.message);
     all.push(...data);

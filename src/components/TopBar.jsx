@@ -1,5 +1,5 @@
 // src/components/TopBar.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import sasanLogo from '../assets/sasan-logo.png';
 import './TopBar.css';
 
@@ -26,6 +26,26 @@ export default function TopBar({ activeMode, onModeChange }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // จอแคบ/แท็บเล็ต: เมนูโหมดพับเป็นปุ่มเดียว กดแล้วเปิดรายการแนวตั้ง (ไม่ต้องเลื่อนแนวนอนหาเมนู)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onDown = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
+  const activeLabel = (MODES.find((m) => m.key === activeMode) || MODES[0]).label;
+
   return (
     <div className={stuck ? 'topbar is-stuck' : 'topbar'}>
       <div className="topbar__brand">
@@ -34,6 +54,39 @@ export default function TopBar({ activeMode, onModeChange }) {
           ระบบติดตามรายได้แปลงเกษตรทฤษฎีใหม่
           <span>Hydro-Informatics Institute · ฝ่ายจัดการน้ำชุมชน</span>
         </div>
+      </div>
+      <div className="topbar__menu" ref={menuRef}>
+        <button
+          type="button"
+          className="topbar__menu-btn"
+          aria-expanded={menuOpen}
+          aria-controls="topbar-menu-list"
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span className="topbar__menu-label">{activeLabel}</span>
+          <svg className="topbar__menu-icon" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+            <path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {menuOpen && (
+          <ul className="topbar__menu-list" id="topbar-menu-list">
+            {MODES.map((m) => (
+              <li key={m.key}>
+                <button
+                  type="button"
+                  className={activeMode === m.key ? 'active' : ''}
+                  aria-current={activeMode === m.key ? 'page' : undefined}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onModeChange(m.key);
+                  }}
+                >
+                  {m.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="topbar__mode-toggle">
         {MODES.map((m) => (

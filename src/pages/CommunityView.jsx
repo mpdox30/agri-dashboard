@@ -42,12 +42,14 @@ import {
 import { buildCommunityExportSheets } from './communityExport';
 import { downloadWorkbook } from '../utils/excelExport';
 import ScrollReveal from '../components/ui/ScrollReveal';
+import CompareTab from './communityTabs/CompareTab';
 import './CommunityView.css';
 
 const TABS = [
   { key: 'overview', label: 'ภาพรวม' },
   { key: 'analytics', label: 'วิเคราะห์เชิงลึก' },
   { key: 'benchmark', label: 'เปรียบเทียบ' },
+  { key: 'compare', label: 'เทียบสองชุมชน' },
   { key: 'members', label: 'รายสมาชิก' },
 ];
 
@@ -314,7 +316,7 @@ export default function CommunityView() {
         exportCommunityKey,
         yearKeys
       );
-      downloadWorkbook(sheets, `${communityLabel}_รายชุมชน`);
+      await downloadWorkbook(sheets, `${communityLabel}_รายชุมชน`);
     } catch (err) {
       alert('สร้างไฟล์ดาวน์โหลดไม่สำเร็จ: ' + (err.message || String(err)));
     } finally {
@@ -401,6 +403,16 @@ export default function CommunityView() {
               incomeRanking={incomeRanking}
               growthRanking={growthRanking}
               economicProfile={economicProfile}
+            />
+          )}
+          {activeTab === 'compare' && (
+            <CompareTab
+              communities={communities}
+              cleanedAllSummaryRows={cleanedAllSummaryRows}
+              communityKey={communityKey}
+              selectedRange={selectedRange}
+              previousRange={previousRange}
+              periodLabel={periodLabel}
             />
           )}
           {activeTab === 'members' && (

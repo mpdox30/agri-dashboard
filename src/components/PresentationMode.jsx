@@ -63,8 +63,14 @@ export default function PresentationMode({ slides, onExit }) {
       tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
+      <div className="present__progress" aria-hidden="true">
+        <i style={{ width: `${((index + 1) / total) * 100}%` }} />
+      </div>
       <header className="present__bar">
-        <h2 className="present__title">{slide.title}</h2>
+        <div className="present__heading">
+          <span className="present__count">{index + 1} / {total}</span>
+          <h2 className="present__title">{slide.title}</h2>
+        </div>
         <button type="button" className="present__exit" onClick={onExit}>
           ออกจากโหมดนำเสนอ (Esc)
         </button>

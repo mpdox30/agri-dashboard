@@ -16,6 +16,7 @@ const SELECTOR = [
   '.rank-card',
   '.profile-compare-card',
   '.peer-rank-card',
+  '.cmp-card',
 ].join(',');
 
 export default function ScrollReveal({ children, className = '' }) {

@@ -105,8 +105,8 @@
 /* แท่งริมสุดชิดขอบกรอบ: ยึดป้ายไว้ข้างในไม่ให้ถูกตัด */
 .bars__value--end { left: auto; right: 0; transform: none; }
 .bars__value--start { left: 0; transform: none; }
-.bars__value--peak { color: var(--terracotta); }
-.bars__value--peak em { color: var(--terracotta); }
+.bars__value--peak { color: var(--terracotta-text); }
+.bars__value--peak em { color: var(--terracotta-text); }
 
 .bars__bar {
   display: block;

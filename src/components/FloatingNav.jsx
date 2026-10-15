@@ -31,16 +31,31 @@ export default function FloatingNav({ items }) {
     return () => observer.disconnect();
   }, [items]);
 
+  // เลื่อนลงอ่านต่อ: แถบหลบลงไปไม่บังเนื้อหา, เลื่อนขึ้นหรืออยู่ใกล้ขอบบน: แถบกลับมา
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y > lastY + 8 && y > 240) setHidden(true);
+      else if (y < lastY - 8 || y <= 240) setHidden(false);
+      lastY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   function handleClick(event, id) {
     event.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
     setActiveId(id);
+    setHidden(false);
   }
 
   return (
-    <nav className="floating-nav" aria-label="ไปยังส่วนต่างๆ ของหน้า">
+    <nav className={hidden ? 'floating-nav is-hidden' : 'floating-nav'} aria-label="ไปยังส่วนต่างๆ ของหน้า">
       <ul>
         {items.map((it) => (
           <li key={it.id}>

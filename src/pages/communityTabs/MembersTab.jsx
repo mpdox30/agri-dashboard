@@ -1,5 +1,5 @@
 // src/pages/communityTabs/MembersTab.jsx
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import MemberMonthlyChart from '../../components/MemberMonthlyChart';
 import Sparkline from '../../components/ui/Sparkline';
 import './MembersTab.css';
@@ -26,15 +26,12 @@ const SORT_OPTIONS = [
 export default function MembersTab({ members, periodLabel, monthlySeriesByName, fullPeriodLabel }) {
   const [searchText, setSearchText] = useState('');
   const [sortBy, setSortBy] = useState('netIncome');
-  const [expandedName, setExpandedName] = useState(null);
+  const [expandedNameRaw, setExpandedName] = useState(null);
 
-  // ถ้าสมาชิกที่กำลังขยายอยู่หายไปจากลิสต์ปัจจุบัน (เช่น เปลี่ยนชุมชน/ช่วงเวลา) ให้ยุบกราฟ
+  // ถ้าสมาชิกที่กำลังขยายอยู่หายไปจากลิสต์ปัจจุบัน (เช่น เปลี่ยนชุมชน/ช่วงเวลา) ให้ถือว่ายุบกราฟ
   // ทิ้งไปด้วย — แต่ไม่ยุบทุกครั้งที่แค่ค้นหา/เรียงลำดับใหม่ ตราบใดที่สมาชิกคนนั้นยังอยู่ในลิสต์
-  useEffect(() => {
-    if (expandedName && !members.some((m) => m.fullName === expandedName)) {
-      setExpandedName(null);
-    }
-  }, [members, expandedName]);
+  // (คำนวณตอนเรนเดอร์ ไม่ต้องใช้ effect ตั้ง state ซ้ำ)
+  const expandedName = expandedNameRaw && members.some((m) => m.fullName === expandedNameRaw) ? expandedNameRaw : null;
 
   function toggleExpand(name) {
     setExpandedName((prev) => (prev === name ? null : name));

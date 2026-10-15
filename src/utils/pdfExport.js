@@ -44,7 +44,7 @@ function drawTrendChartImage(monthlyTrend) {
     const x = 20 + i * (barWidth + gap) + gap / 2;
     const hasData = m.netIncome !== null;
     const barHeight = hasData ? Math.max((Math.abs(m.netIncome) / maxVal) * chartHeight, 4) : 3;
-    ctx.fillStyle = hasData ? '#17806f' : '#bccfd0';
+    ctx.fillStyle = hasData ? '#157a6a' : '#bccfd0';
     ctx.fillRect(x, chartBottom - barHeight, barWidth, barHeight);
 
     ctx.fillStyle = '#10201f';
