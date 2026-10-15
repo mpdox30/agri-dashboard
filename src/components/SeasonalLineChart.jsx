@@ -2,6 +2,11 @@
 //
 // กราฟเส้นรายเดือน พร้อมแถบสีพื้นหลังเน้นช่วงฤดูฝน/ฤดูแล้ง — ใช้ SVG วาดเอง ไม่ต้องพึ่ง
 // library กราฟเพิ่ม เพราะมีจุดข้อมูลแค่ 12 จุด ไม่ซับซ้อนพอจะคุ้มกับการเพิ่ม dependency
+import useCrosshair from './charts/useCrosshair';
+import SvgTooltip from './charts/SvgTooltip';
+import DrawInPath from './charts/DrawInPath';
+import DataTableToggle from './charts/DataTableToggle';
+import './charts/charts.css';
 import './SeasonalLineChart.css';
 
 const WIDTH = 700;
@@ -12,6 +17,12 @@ const PADDING_TOP = 14;
 const PADDING_BOTTOM = 22;
 const CHART_WIDTH = WIDTH - PADDING_LEFT - PADDING_RIGHT;
 const CHART_HEIGHT = HEIGHT - PADDING_TOP - PADDING_BOTTOM;
+
+const TABLE_COLUMNS = [
+  { key: 'month', label: 'เดือน' },
+  { key: 'season', label: 'ฤดู' },
+  { key: 'net', label: 'รายได้สุทธิ (บาท)', align: 'right' },
+];
 
 function formatCompact(n) {
   return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(Math.round(n));
@@ -55,6 +66,15 @@ export default function SeasonalLineChart({ monthly }) {
   }
 
   const points = monthly.map((m, i) => ({ x: xAt(i), y: yAt(m.netIncome), ...m }));
+  const xs = points.map((p) => p.x);
+  const { active, bind } = useCrosshair(xs, WIDTH);
+
+  // แสดงตัวเลขกำกับเฉพาะจุดสูงสุด จุดล่าสุด และจุดที่ผู้ใช้ชี้อยู่ ที่เหลืออ่านจากกล่องค่าหรือตาราง
+  // (12 ป้ายตัวเลขเต็มพร้อมจุลภาคแน่นเกินไปบนจอมือถือ)
+  const peakIndex = values.indexOf(maxVal);
+  const lastIndex = points.length - 1;
+  const labelIndexes = new Set([peakIndex, lastIndex]);
+  if (active !== null) labelIndexes.add(active);
   const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
   const zeroY = yAt(0);
   const bands = buildSeasonBands(monthly);
@@ -63,9 +83,10 @@ export default function SeasonalLineChart({ monthly }) {
     <div className="seasonal-line-chart-wrap">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="seasonal-line-chart"
+        className="seasonal-line-chart chart-focus-ring"
         role="img"
-        aria-label="กราฟเส้นรายได้สุทธิรายเดือน แยกฤดูฝนและฤดูแล้ง"
+        aria-label="กราฟเส้นรายได้สุทธิรายเดือน แยกฤดูฝนและฤดูแล้ง ใช้ปุ่มลูกศรซ้ายขวาเพื่ออ่านค่าแต่ละเดือน หรือเปิดดูเป็นตารางด้านล่าง"
+        {...bind}
       >
         {/* แถบพื้นหลังเน้นช่วงฤดู */}
         {bands.map((band, i) => {
@@ -89,20 +110,40 @@ export default function SeasonalLineChart({ monthly }) {
         )}
 
         {/* เส้นกราฟหลัก */}
-        <path d={linePath} className="season-line-path" fill="none" />
+        <DrawInPath d={linePath} className="season-line-path" />
 
-        {/* จุดข้อมูลแต่ละเดือน สีตามฤดู + label ค่าด้านบน + label เดือนด้านล่าง */}
+        {/* จุดข้อมูลแต่ละเดือน สีตามฤดู + label ค่าเฉพาะจุดสำคัญ + label เดือนด้านล่าง */}
         {points.map((p, i) => (
           <g key={i}>
-            <circle cx={p.x} cy={p.y} r={4} className={p.isRainy ? 'season-dot rainy-dot' : 'season-dot dry-dot'} />
-            <text x={p.x} y={p.y - 8} textAnchor="middle" className="season-value-label">
-              {formatCompact(p.netIncome)}
-            </text>
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r={active === i ? 5.5 : 4}
+              className={p.isRainy ? 'season-dot rainy-dot' : 'season-dot dry-dot'}
+            />
+            {labelIndexes.has(i) && active === null && (
+              <text x={p.x} y={p.y - 8} textAnchor="middle" className="season-value-label">
+                {formatCompact(p.netIncome)}
+              </text>
+            )}
             <text x={p.x} y={HEIGHT - 6} textAnchor="middle" className="season-month-label">
               {p.label}
             </text>
           </g>
         ))}
+
+        {active !== null && (
+          <>
+            <line x1={xs[active]} x2={xs[active]} y1={PADDING_TOP - 4} y2={HEIGHT - PADDING_BOTTOM} className="chart-crosshair-line" />
+            <SvgTooltip
+              x={xs[active]}
+              y={points[active].y}
+              title={`${points[active].label} · ${points[active].isRainy ? 'ฤดูฝน' : 'ฤดูแล้ง'}`}
+              lines={[{ label: 'รายได้สุทธิ', value: `${formatCompact(points[active].netIncome)} บาท`, color: points[active].isRainy ? 'var(--green-soft)' : 'var(--terracotta)' }]}
+              viewBoxWidth={WIDTH}
+            />
+          </>
+        )}
       </svg>
       <div className="seasonal-line-chart-legend">
         <span className="legend-item">
@@ -112,6 +153,11 @@ export default function SeasonalLineChart({ monthly }) {
           <span className="legend-swatch dry-swatch" /> ฤดูแล้ง
         </span>
       </div>
+      <DataTableToggle
+        columns={TABLE_COLUMNS}
+        rows={monthly.map((m) => ({ key: m.label, month: m.label, season: m.isRainy ? 'ฤดูฝน' : 'ฤดูแล้ง', net: formatCompact(m.netIncome) }))}
+        caption="รายได้สุทธิรายเดือน หน่วยบาท"
+      />
     </div>
   );
 }
